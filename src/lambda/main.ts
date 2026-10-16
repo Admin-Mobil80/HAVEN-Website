@@ -4,8 +4,11 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { createApp } from "../app.js";
 import { SimulatedNotifier, type Notifier } from "../notify/index.js";
+import { WhatsAppNotifier } from "../notify/whatsapp.js";
+import { WhatsAppClient } from "../notify/whatsappClient.js";
+import { S3MediaStore } from "../store/s3Media.js";
 import { DynamoRepo } from "../store/dynamoRepo.js";
-import { speak } from "../voice/polly.js";
+import { speak, voiceNote } from "../voice/polly.js";
 
 // Production entry, bundled to build/lambda/index.mjs and started by run.sh. The Lambda Web Adapter
 // waits for GET /api/health on this port, then proxies every request (and POSTs non-HTTP events to
@@ -39,10 +42,32 @@ async function loadHouseholdSecret(): Promise<string> {
   return secret;
 }
 
-// Seam for the WhatsApp channel: construct it here from the SSM parameters wa-token and
-// wa-app-secret. Until then nothing leaves the process and the dashboard shows "simulated".
-async function createNotifier(): Promise<Notifier> {
-  return new SimulatedNotifier();
+const ssm = new SSMClient({ region: REGION });
+const prefix = process.env.SSM_PREFIX ?? "/haven/";
+
+// Optional secrets: a missing parameter turns the feature off instead of failing startup.
+async function optionalSecret(name: string): Promise<string | undefined> {
+  try {
+    const out = await ssm.send(new GetParameterCommand({ Name: `${prefix}${name}`, WithDecryption: true }));
+    return out.Parameter?.Value?.trim() || undefined;
+  } catch (err) {
+    if ((err as { name?: string }).name === "ParameterNotFound") return undefined;
+    throw err;
+  }
+}
+
+// WhatsApp is on when the token, app secret, verify token and phone number id are all present.
+// Real sends only for WA_LIVE_HOUSEHOLDS (default: the owner household); demo households stay simulated.
+async function createWhatsApp() {
+  const [token, appSecret, verifyToken] = await Promise.all([optionalSecret("wa-token"), optionalSecret("wa-app-secret"), optionalSecret("wa-verify-token")]);
+  const phoneNumberId = process.env.WA_PHONE_NUMBER_ID?.trim();
+  if (!token || !appSecret || !verifyToken || !phoneNumberId) {
+    console.warn(JSON.stringify({ msg: "whatsapp_disabled", missing: { token: !token, appSecret: !appSecret, verifyToken: !verifyToken, phoneNumberId: !phoneNumberId } }));
+    return undefined;
+  }
+  const client = new WhatsAppClient({ token, phoneNumberId, graphVersion: process.env.WA_GRAPH_VERSION?.trim() || undefined });
+  const live = new Set(list(process.env.WA_LIVE_HOUSEHOLDS ?? "owner"));
+  return { client, appSecret, verifyToken, notifier: new WhatsAppNotifier(client, (hh) => live.has(hh)) as Notifier };
 }
 
 // Bundled next to index.mjs by scripts/build-lambda.mjs when web/dist exists.
@@ -52,10 +77,15 @@ function webDir(): string | undefined {
 }
 
 async function main() {
+  const [householdSecret, whatsapp, adminKey] = await Promise.all([loadHouseholdSecret(), createWhatsApp(), optionalSecret("admin-key")]);
+  const media = new S3MediaStore(requireEnv("MEDIA_BUCKET"));
   const app = createApp({
     repo: new DynamoRepo({ tableName: requireEnv("TABLE_NAME") }),
-    notifier: await createNotifier(),
-    householdSecret: await loadHouseholdSecret(),
+    notifier: whatsapp?.notifier ?? new SimulatedNotifier(),
+    householdSecret,
+    mediaStore: media,
+    whatsapp: whatsapp && { client: whatsapp.client, appSecret: whatsapp.appSecret, verifyToken: whatsapp.verifyToken, media, voiceNote: (text) => voiceNote(text) },
+    adminKey,
     publicDemoId: process.env.PUBLIC_DEMO_ID?.trim() || undefined,
     // The adapter's readiness check calls 127.0.0.1 directly; real traffic arrives with the
     // Function URL host, which is unknown at synth time (it would be a circular reference).

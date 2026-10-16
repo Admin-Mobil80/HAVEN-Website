@@ -63,7 +63,10 @@ Newest first. Each entry gives the date, the decision, why, and the evidence.
   - `haven_urgent_alert` (id 1697051121783562)
   - `haven_family_question` (id 867923293013396)
 - Quick-reply labels the webhook must match exactly: "Play voice note", "I will call tonight", "Calling now".
-- They were submitted with the temporary token from the "Try it out" page. The permanent system-user token still needs the WhatsApp account assigned (Full control) before it can manage templates.
+- They were submitted with the temporary token from the "Try it out" page.
+- **16 Oct update:** all three are now **APPROVED**.
+  - `/haven/wa-token` now holds the permanent system-user token for `haven-bot` (Employee access, with Full access to the Haven app and the Test WhatsApp Business Account).
+  - The earlier stored token was a user token, and Meta invalidated it after a password change (error 190/460).
 
 ## 16 Oct 2026: model bake-off (`npm run bakeoff`, profile `haven`, ap-south-1)
 | Model | Correct /15 | p50 | p95 | Errors |

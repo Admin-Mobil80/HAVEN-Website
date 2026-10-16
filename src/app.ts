@@ -8,6 +8,8 @@ import type { Notifier } from "./notify/index.js";
 import { apiRouter } from "./routes/api.js";
 import { demoRouter } from "./routes/demo.js";
 import { turnRouter } from "./routes/turn.js";
+import { adminRouter } from "./routes/admin.js";
+import { webhooksRouter, type WebhookDeps } from "./routes/webhooks.js";
 import type { TurnDeps } from "./agent/turn.js";
 import type { Repo } from "./store/repo.js";
 
@@ -31,6 +33,9 @@ export type AppDeps = {
   think?: TurnDeps["think"];
   speak?: TurnDeps["speak"];
   dailyBrainCap?: number;
+  // WhatsApp webhook (absent: the route is not mounted) and the owner-household admin key.
+  whatsapp?: Pick<WebhookDeps, "client" | "appSecret" | "verifyToken" | "media" | "voiceNote">;
+  adminKey?: string;
 };
 
 const DEFAULT_DEMO_TTL_SECONDS = 7 * 24 * 60 * 60;
@@ -79,6 +84,8 @@ export function createApp(deps: AppDeps): express.Express {
     }),
   );
   app.use(mediaRouter({ secret, now, store: deps.mediaStore }));
+  if (deps.whatsapp) app.use(webhooksRouter({ ...deps.whatsapp, repo: deps.repo, now }));
+  app.use(adminRouter({ repo: deps.repo, secret, adminKey: deps.adminKey, now }));
   app.use(apiRouter({ repo: deps.repo, secret, now, householdLimit }));
   app.use(
     turnRouter({

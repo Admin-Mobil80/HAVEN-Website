@@ -1,7 +1,9 @@
 {
   "app": "npx tsx infra/bin/haven.ts",
   "watch": {
-    "include": ["infra/**"]
+    "include": [
+      "infra/**"
+    ]
   },
   "context": {
     "lwaLayerArn": "arn:aws:lambda:ap-south-1:753240598075:layer:LambdaAdapterLayerArm64:30",
@@ -9,6 +11,9 @@
     "bedrockFallbackModelId": "apac.amazon.nova-lite-v1:0",
     "pollyVoiceSystem": "Brian",
     "alertEmail": "",
-    "createBudget": true
+    "createBudget": true,
+    "waPhoneNumberId": "989594664244778",
+    "waGraphVersion": "v23.0",
+    "waLiveHouseholds": "owner"
   }
 }

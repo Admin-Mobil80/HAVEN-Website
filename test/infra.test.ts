@@ -224,7 +224,7 @@ describe("HavenStack", () => {
   it("keeps cdk.json context in step with the stack defaults", () => {
     const cdkJson = JSON.parse(readFileSync(new URL("../cdk.json", import.meta.url), "utf8"));
     assert.equal(cdkJson.app, "npx tsx infra/bin/haven.ts");
-    for (const key of ["lwaLayerArn", "bedrockModelId", "bedrockFallbackModelId", "pollyVoiceSystem"] as const) {
+    for (const key of ["lwaLayerArn", "bedrockModelId", "bedrockFallbackModelId", "pollyVoiceSystem", "waPhoneNumberId", "waGraphVersion", "waLiveHouseholds"] as const) {
       assert.equal(cdkJson.context[key], DEFAULTS[key], `cdk.json context.${key}`);
     }
   });

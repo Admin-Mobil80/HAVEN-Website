@@ -23,6 +23,11 @@ export const DEFAULTS = {
   bedrockFallbackModelId: "apac.amazon.nova-lite-v1:0",
   // Confirmed available in ap-south-1 by scripts/polly-check.ts (16 Oct).
   pollyVoiceSystem: "Brian",
+  // WhatsApp Cloud API test number (not a secret; the token is in SSM). Empty disables WhatsApp.
+  waPhoneNumberId: "989594664244778",
+  waGraphVersion: "v23.0",
+  // Households that may send real WhatsApp messages; every other household is simulated.
+  waLiveHouseholds: "owner",
   monthlyBudgetUsd: 50,
 } as const;
 
@@ -103,6 +108,9 @@ export class HavenStack extends Stack {
         POLLY_VOICE_PRIYA: "Kajal",
         POLLY_VOICE_SYSTEM: this.contextString("pollyVoiceSystem", DEFAULTS.pollyVoiceSystem),
         SSM_PREFIX: "/haven/",
+        WA_PHONE_NUMBER_ID: this.contextString("waPhoneNumberId", DEFAULTS.waPhoneNumberId),
+        WA_GRAPH_VERSION: this.contextString("waGraphVersion", DEFAULTS.waGraphVersion),
+        WA_LIVE_HOUSEHOLDS: this.contextString("waLiveHouseholds", DEFAULTS.waLiveHouseholds),
       },
     });
 
