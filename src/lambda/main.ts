@@ -9,6 +9,7 @@ import { WhatsAppClient } from "../notify/whatsappClient.js";
 import { S3MediaStore } from "../store/s3Media.js";
 import { DynamoRepo } from "../store/dynamoRepo.js";
 import { speak, voiceNote } from "../voice/polly.js";
+import { writeDigest } from "../agent/digest.js";
 
 // Production entry, bundled to build/lambda/index.mjs and started by run.sh. The Lambda Web Adapter
 // waits for GET /api/health on this port, then proxies every request (and POSTs non-HTTP events to
@@ -82,6 +83,7 @@ async function main() {
   let adminKeyCache: string | undefined;
   const adminKey = async () => (adminKeyCache ??= await optionalSecret("admin-key"));
   const media = new S3MediaStore(requireEnv("MEDIA_BUCKET"));
+  const systemVoice = process.env.POLLY_VOICE_SYSTEM?.trim() || "Brian";
   const app = createApp({
     repo: new DynamoRepo({ tableName: requireEnv("TABLE_NAME") }),
     notifier: whatsapp?.notifier ?? new SimulatedNotifier(),
@@ -89,6 +91,14 @@ async function main() {
     mediaStore: media,
     whatsapp: whatsapp && { client: whatsapp.client, appSecret: whatsapp.appSecret, verifyToken: whatsapp.verifyToken, media, voiceNote: (text) => voiceNote(text) },
     adminKey,
+    // The digest is read by the neutral system voice, never Digital Priya's.
+    digest: {
+      write: (facts) => writeDigest(facts),
+      voiceNote: (text) => voiceNote(text, { voiceId: systemVoice, languageCode: "en-GB" }),
+      mp3: async (text) => (await speak(text, { voiceId: systemVoice, languageCode: "en-GB" })).audio,
+      media,
+    },
+    liveHouseholds: list(process.env.WA_LIVE_HOUSEHOLDS ?? "owner"),
     publicDemoId: process.env.PUBLIC_DEMO_ID?.trim() || undefined,
     // The adapter's readiness check calls 127.0.0.1 directly; real traffic arrives with the
     // Function URL host, which is unknown at synth time (it would be a circular reference).

@@ -10,6 +10,8 @@ import { demoRouter } from "./routes/demo.js";
 import { turnRouter } from "./routes/turn.js";
 import { adminRouter } from "./routes/admin.js";
 import { webhooksRouter, type WebhookDeps } from "./routes/webhooks.js";
+import { eventsRouter } from "./routes/events.js";
+import type { DigestDeps } from "./jobs/digest.js";
 import type { TurnDeps } from "./agent/turn.js";
 import type { Repo } from "./store/repo.js";
 
@@ -36,6 +38,9 @@ export type AppDeps = {
   // WhatsApp webhook (absent: the route is not mounted) and the owner-household admin key.
   whatsapp?: Pick<WebhookDeps, "client" | "appSecret" | "verifyToken" | "media" | "voiceNote">;
   adminKey?: string | (() => Promise<string | undefined>);
+  // Evening digest: writer, speech and media (all optional), and which households the 21:00 job serves.
+  digest?: Pick<DigestDeps, "write" | "voiceNote" | "mp3" | "media">;
+  liveHouseholds?: string[];
 };
 
 const DEFAULT_DEMO_TTL_SECONDS = 7 * 24 * 60 * 60;
@@ -86,6 +91,18 @@ export function createApp(deps: AppDeps): express.Express {
   app.use(mediaRouter({ secret, now, store: deps.mediaStore }));
   if (deps.whatsapp) app.use(webhooksRouter({ ...deps.whatsapp, repo: deps.repo, now }));
   app.use(adminRouter({ repo: deps.repo, secret, adminKey: deps.adminKey, now }));
+  app.use(
+    eventsRouter({
+      ...deps.digest,
+      repo: deps.repo,
+      notifier: deps.notifier,
+      now,
+      secret,
+      householdLimit,
+      publicDemoId,
+      liveHouseholds: deps.liveHouseholds ?? [],
+    }),
+  );
   app.use(apiRouter({ repo: deps.repo, secret, now, householdLimit }));
   app.use(
     turnRouter({

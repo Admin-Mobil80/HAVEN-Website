@@ -61,7 +61,7 @@ export function defaultModelIds() {
 }
 
 const clients = new Map<string, BedrockRuntimeClient>();
-function defaultClient() {
+export function defaultClient() {
   const region = process.env.AWS_REGION ?? "ap-south-1";
   let c = clients.get(region);
   // One SDK attempt: a throttled or failing model should hand over to the fallback model quickly.
@@ -274,7 +274,7 @@ function isToolChoiceUnsupported(err: unknown) {
   return e?.name === "ValidationException" && /tool.?choice/i.test(e.message ?? "");
 }
 
-async function converse(client: BedrockRuntimeClient, input: ConverseCommandInput, timeoutMs: number) {
+export async function converse(client: BedrockRuntimeClient, input: ConverseCommandInput, timeoutMs: number) {
   const ac = new AbortController();
   let timer: NodeJS.Timeout | undefined;
   // The race guarantees the deadline even if a client ignores the abort signal.
