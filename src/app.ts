@@ -11,6 +11,7 @@ import { turnRouter } from "./routes/turn.js";
 import { adminRouter } from "./routes/admin.js";
 import { webhooksRouter, type WebhookDeps } from "./routes/webhooks.js";
 import { eventsRouter } from "./routes/events.js";
+import { familyRouter } from "./routes/family.js";
 import type { DigestDeps } from "./jobs/digest.js";
 import type { TurnDeps } from "./agent/turn.js";
 import type { Repo } from "./store/repo.js";
@@ -104,6 +105,7 @@ export function createApp(deps: AppDeps): express.Express {
     }),
   );
   app.use(apiRouter({ repo: deps.repo, secret, now, householdLimit }));
+  app.use(familyRouter({ repo: deps.repo, secret, now, householdLimit, media: deps.digest?.media }));
   app.use(
     turnRouter({
       repo: deps.repo,

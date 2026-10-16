@@ -133,21 +133,21 @@ export function fallbackDigest(f: DigestFacts): DigestContent {
   if (f.lines.length === 0) parts.push(`${f.calledBy} didn't chat with Haven today.`);
   else parts.push(`${f.calledBy} chatted with Haven today${f.concerns.length ? ` and mentioned ${f.concerns.slice(0, 2).join(" and ")}` : ""}.`);
   if (f.questions.length) parts.push(`She asked something only you can answer: ${f.questions[0]}`);
-  const starters = f.stories.slice(-2).map((s) => `Ask her about this: ${s}`);
+  const starters = f.stories.slice(-2).map((s) => s.replace(/[.;]+$/, ""));
   return { summary: parts.join(" ").slice(0, 300), mood: f.moods.at(-1), topics: f.concerns.slice(0, 5), starters, modelId: "rules" };
 }
 
 // Spoken by Polly as the WhatsApp voice note (30-60 s).
 export function voiceScript(f: DigestFacts, c: DigestContent) {
   const ask = c.starters.length ? ` When you call, you could ask her: ${c.starters.slice(0, 2).join(" Or, ")}` : "";
-  const q = f.questions.length ? ` She also asked: ${f.questions[0]} Haven told her you'd answer.` : "";
+  const q = f.questions.length && !c.summary.includes(f.questions[0]) ? ` She also asked: ${f.questions[0]} Haven told her you'd answer.` : "";
   return `Hi ${f.child}, here is today's update about ${f.calledBy}. ${c.summary}${q}${ask} Haven is an AI companion and can be wrong.`.slice(0, 2400);
 }
 
 // The text body the family dashboard mirrors and WhatsApp sends inside the 24 h window.
 export function digestBody(f: DigestFacts, c: DigestContent) {
   const lines = [`Today's update about ${f.calledBy}: ${c.summary}`];
-  if (f.questions.length) lines.push(`She asked: ${f.questions[0]}`);
+  if (f.questions.length && !c.summary.includes(f.questions[0])) lines.push(`She asked: ${f.questions[0]}`);
   if (c.starters.length) lines.push(`When you call, ask about: ${c.starters.slice(0, 2).join("; ")}`);
   return lines.join("\n");
 }

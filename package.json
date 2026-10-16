@@ -15,9 +15,12 @@
     "test": "tsx --test test/*.test.ts",
     "build:lambda": "node scripts/build-lambda.mjs",
     "synth": "cdk synth",
-    "deploy": "npm run build:lambda && cdk deploy HavenStack -c alertEmail=${HAVEN_ALERT_EMAIL:-}",
+    "deploy": "npm run web:build && npm run build:lambda && cdk deploy HavenStack -c alertEmail=${HAVEN_ALERT_EMAIL:-}",
     "bakeoff": "tsx --env-file-if-exists=.env scripts/bakeoff.ts",
-    "polly-check": "tsx --env-file-if-exists=.env scripts/polly-check.ts"
+    "polly-check": "tsx --env-file-if-exists=.env scripts/polly-check.ts",
+    "web:dev": "vite --config web/vite.config.ts",
+    "web:build": "vite build --config web/vite.config.ts",
+    "web:typecheck": "tsc -p web/tsconfig.json"
   },
   "dependencies": {
     "@aws-sdk/client-bedrock-runtime": "3.1152.0",
@@ -34,11 +37,17 @@
   "devDependencies": {
     "@types/express": "^5.0.0",
     "@types/node": "^22.0.0",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "@vitejs/plugin-react": "6.1.2",
     "aws-cdk": "2.1145.0",
     "aws-cdk-lib": "2.273.0",
     "constructs": "10.8.1",
     "esbuild": "0.28.2",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
     "tsx": "4.23.15",
-    "typescript": "^5.9.0"
+    "typescript": "^5.9.0",
+    "vite": "8.3.4"
   }
 }

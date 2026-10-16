@@ -8,6 +8,7 @@ import { capPush, nextId } from "../domain/util.js";
 import { requireHousehold } from "../http/households.js";
 import { householdWriteLimit, type HouseholdLimiter } from "../http/security.js";
 import { NotFoundError, type Repo } from "../store/repo.js";
+import { withAudioUrls } from "./family.js";
 
 export type ApiRouteDeps = { repo: Repo; secret: string; now: () => Date; householdLimit?: HouseholdLimiter };
 
@@ -82,7 +83,7 @@ export function apiRouter(deps: ApiRouteDeps): Router {
   });
 
   router.get("/api/state/family", auth, async (_req, res) => {
-    res.json(familyProjection(await loadDoc(deps.repo, res), deps.now()));
+    res.json(withAudioUrls(familyProjection(await loadDoc(deps.repo, res), deps.now()), deps.secret, deps.now()));
   });
 
   router.get("/api/log", auth, async (req: Request, res) => {
