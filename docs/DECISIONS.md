@@ -16,6 +16,16 @@ Newest first. Each entry gives the date, the decision, why, and the evidence.
 - **Hosting:** one Lambda (Express on the Lambda Web Adapter) behind a Function URL, CDK in TypeScript, DynamoDB single table, S3 media, and EventBridge Scheduler.
 - **Safety:** deterministic rules open incidents with no LLM involved. Urgent alerts are awaited before the response. Only a human can cancel, acknowledge or close an incident.
 
+## 16 Oct 2026: WhatsApp verified end to end on a real phone (owner household)
+- **Setup:**
+  - The Haven app (1802222657589249) is subscribed to the test WABA via `POST /{waba}/subscribed_apps`.
+  - Its webhook is active with `messages`; there is no override URL.
+  - The Sportzlytics app is also subscribed to that WABA and gets copies, which is harmless.
+- **Inbound:** "hi" from Priya's phone reaches the webhook, is stored as a message, and Haven replies.
+- **Urgent alert:**
+  - "Help, I feel dizzy" on the tablet sends a real WhatsApp alert in 1.6 s; Ravi has no phone, so his copy is simulated.
+  - Tapping **Calling now** on the alert acknowledges the incident (ackBy priya, 2 min after opening), logs a real call prompted by Haven (calls this week: 1, goal 4, baseline 1) and sends a confirmation reply.
+
 ## 16 Oct 2026: conversation engine (`POST /api/turn`)
 - **Pipeline order:**
   1. The host writes the elder's turn.
