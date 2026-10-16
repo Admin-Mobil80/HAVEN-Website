@@ -15,7 +15,7 @@
     "test": "tsx --test test/*.test.ts",
     "build:lambda": "node scripts/build-lambda.mjs",
     "synth": "cdk synth",
-    "deploy": "npm run build:lambda && cdk deploy",
+    "deploy": "npm run build:lambda && cdk deploy HavenStack -c alertEmail=${HAVEN_ALERT_EMAIL:-}",
     "bakeoff": "tsx --env-file-if-exists=.env scripts/bakeoff.ts",
     "polly-check": "tsx --env-file-if-exists=.env scripts/polly-check.ts"
   },

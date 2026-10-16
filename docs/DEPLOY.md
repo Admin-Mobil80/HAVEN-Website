@@ -84,7 +84,7 @@ npx cdk bootstrap aws://$ACCOUNT/$REGION
 
 ### 5. Alert email (optional but recommended)
 
-Set `alertEmail` in `cdk.json`, or pass it on each deploy with `npx cdk deploy -c alertEmail=you@example.com`. When it is set:
+Keep the address out of the repo: set it in your shell (`export HAVEN_ALERT_EMAIL=you@example.com`) before `npm run deploy`, which passes it as `-c alertEmail`. A deploy without it removes the email subscription. When it is set:
 
 - the SNS topic gets an email subscription. Click the confirmation link AWS sends, or no alarm emails arrive.
 - the monthly budget (50 USD) emails at 25 USD and at 50 USD of actual spend. Budgets only warn: they never stop spend.
