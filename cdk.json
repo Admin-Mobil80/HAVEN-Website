@@ -1,0 +1,14 @@
+{
+  "app": "npx tsx infra/bin/haven.ts",
+  "watch": {
+    "include": ["infra/**"]
+  },
+  "context": {
+    "lwaLayerArn": "arn:aws:lambda:ap-south-1:753240598075:layer:LambdaAdapterLayerArm64:25",
+    "bedrockModelId": "openai.gpt-oss-120b-1:0",
+    "bedrockFallbackModelId": "apac.amazon.nova-lite-v1:0",
+    "pollyVoiceSystem": "Brian",
+    "alertEmail": "",
+    "createBudget": true
+  }
+}

@@ -1,0 +1,1014 @@
+
+
+=== PAGE 1 ===
+Family Connect: Product and Technical
+Specification
+ Oct 14, 2026  · @Rana  · Working name; v0.1 for the development team
+1. Overview and goals
+Family Connect is a voice-first AI companion that keeps older adults socially engaged at
+home and strengthens, rather than replaces, their contact with adult children who live
+away or are busy.
+The problem. Loneliness affects roughly 1 in 5 older adults in India and about a third of
+adults aged 50–80 in the US, and is linked to higher risk of dementia, heart disease, stroke
+and depression. Many older people cannot or will not use smartphone apps, and their
+children cannot be present every day.
+The product. The parent talks by voice to an AI avatar on a tablet or TV, and to Alexa+ on
+Echo devices throughout the home. The avatar is either a clearly labelled digital version of
+their son or daughter (created and approved by the child) or a neutral companion with its
+own name. It chats, remembers their life, plays real messages from family, reminds them
+about medicines and tests, detects emergencies and escalates to real people. Alexa+
+extends the experience to every room: help phrases, messages, reminders, everyday
+tasks and smart-home safety. The adult child receives daily reports, conversation starters
+and timely nudges to call or visit.
+Goals for v1
+Parent can start a conversation with zero touch, by saying a wake phrase.
+Daily engaging conversation in Hindi, English or a mix.
+Real calls and visits from family increase after onboarding (primary success metric).
+Emergencies reach a real person within minutes, with layered backup.
+Parent consent and privacy are enforced in code, not just policy.
+Non-goals for v1
+Avatars of deceased people (excluded by design).
+A general-purpose companion for young people.
+Medical advice, diagnosis or dose changes.
+Building custom hardware.
+Family Connect: Product and Technical Speciﬁcation
+Page 1 of 25
+
+=== PAGE 2 ===
+2. Product principles
+These are design constraints. Any feature that conflicts with them needs explicit sign-off.
+1. Support connection, never replace it. The avatar fills gaps between real contact and
+actively pushes toward calls and visits. Success is measured by real human contact,
+not avatar usage time.
+2. Always honest that it is AI. The child-avatar is labelled on screen at all times, refers to
+itself as the "digital" version, and setup includes a family conversation explaining it.
+3. Defer, don't decide. The avatar never makes commitments, decisions or promises on
+behalf of the real child. Plans, money, health and family matters are passed to the real
+person.
+4. The child controls their avatar. Only the child can create their avatar, from their own
+photo and voice, with explicit consent. They set boundaries and can read what "they"
+said.
+5. The parent controls their data. The parent agrees to what is shared in reports and can
+keep things private.
+6. Safety never depends on the AI alone. Emergency detection runs as a deterministic
+engine alongside the LLM, with layered escalation to humans.
+7. Remind, never advise on health. The system relays doctors' instructions and
+reminders; it never interprets symptoms, changes doses or recommends treatment.
+8. Alexa+ as a core channel, with no single point of failure. Alexa+ on Echo devices is a
+standard part of every installation and the parent's voice access in every room. Safety-
+critical paths are always duplicated through the companion app and our own
+telephony, so no outage or platform change on one channel can stop an emergency
+response.
+3. Users and roles
+Role Who Interface Key permissions
+Parent Older adult living at
+home, possibly with
+hearing, vision or early
+cognitive issues
+Voice only: companion
+app on tablet/TV, and
+Alexa+ on Echo devices
+in other rooms
+Talk to avatar; ask for
+help; approve what is
+shared; pause or stop
+the service
+Family Connect: Product and Technical Speciﬁcation
+Page 2 of 25
+
+=== PAGE 3 ===
+4. Feature requirements
+Priority: P0 = pilot must-have, P1 = Phase 2, P2 = later.
+4.1 Avatar and companion
+Role Who Interface Key permissions
+Primary
+child
+Adult son or daughter,
+account owner and
+payer
+Family app
+(Android/iOS)
+Create own avatar; set
+boundaries; view
+reports and logs; set
+reminder intervals;
+approve orders;
+manage emergency
+contacts
+Family circle
+member
+Siblings, grandchildren,
+relatives
+Family app Receive reports if
+parent consents; call;
+send messages;
+optionally create own
+avatar
+Backup
+contact
+Neighbour or local
+relative
+Phone (SIP call),
+optional app
+Receives emergency
+calls when family
+cannot be reached
+Response
+partner
+Private ambulance or
+medical response
+service
+Phone / API Receives emergency
+dispatch with address
+and details
+Admin /
+support
+Family Connect staff Internal console Device support,
+escalation audits; no
+access to
+conversation content
+without consent
+ID Requirement Priority
+F-01 Two modes: child-avatar (created by the child from
+their own photo, optional voice clone with consent)
+and neutral companion (own name, generic look).
+Family chooses per parent; can use both.
+P0
+Family Connect: Product and Technical Speciﬁcation
+Page 3 of 25
+
+=== PAGE 4 ===
+4.2 Conversation and engagement
+ID Requirement Priority
+F-02 Persistent on-screen label on child-avatar, e.g.
+"Digital Priya". Avatar periodically refers to itself as
+the digital version.
+P0
+F-03 Child-set persona brief: how they talk, nicknames,
+topics to avoid, things they would never say.
+P0
+F-04 Defer, don't decide: on plans, money, health, family
+disputes or promises, avatar replies "Let me check
+with the real me" and creates a deferral item for
+the child.
+P0
+F-05 Conversation log and summary visible to the child
+for everything said in their name.
+P0
+F-06 Dementia safeguard: family (ideally with doctor)
+can switch child-avatar off and default to neutral
+companion.
+P0
+F-07 Hand-over: when the real child is available or
+calling, avatar steps aside ("The real Priya is
+calling!").
+P0
+ID Requirement Priority
+F-10 Natural voice conversation in Hindi, English and
+code-mixed speech; regional languages later.
+P0
+F-11 Long-term memory of the parent: people, places,
+life history, interests, routines, recent events.
+P0
+F-12 Engagement activities: reminiscence prompts,
+daily news and cricket chat, festivals, recipes, old
+songs and films, quizzes, word games, antakshari,
+prayers on request.
+P0
+F-13 Life-story capture: stories recorded (with consent)
+into a family memory book.
+P1
+F-14 Outward nudges: suggest telling family a story,
+local groups, temple or community events.
+P1
+Family Connect: Product and Technical Speciﬁcation
+Page 4 of 25
+
+=== PAGE 5 ===
+4.3 Family connection
+ID Requirement Priority
+F-15 Honest behaviour: can disagree gently, admit not
+knowing, never invents facts about the real child.
+P0
+ID Requirement Priority
+F-20 Child records voice/video messages; avatar plays
+them and captures spoken replies.
+P0
+F-21 App-to-app video calls (WebRTC) between family
+app and tablet; parent answers by voice.
+P0
+F-22 Daily report to child: mood, activity, topics
+discussed, deferral items, conversation starters,
+one-tap "Call Mum".
+P0
+F-23 Smart call reminders: child-set interval plus earlier
+nudges when parent seemed low, unwell or lonely.
+P0
+F-24 Good-time detection: suggest calls when parent is
+awake and free and child is in their availability
+window (time-zone aware).
+P1
+F-25 Family circle and rota: spread contact across
+siblings and grandchildren.
+P1
+F-26 Visit tracking: days since last visit, occasions
+(birthdays, festivals, appointments), visit
+countdown for parent.
+P1
+F-27 Shared activities over video: meal together, watch
+match, cook a recipe, prayer, games.
+P2
+F-28 Family phone number: relatives without the app
+call a number that rings the tablet (SIP inbound).
+P1
+Family Connect: Product and Technical Speciﬁcation
+Page 5 of 25
+
+=== PAGE 6 ===
+4.4 Safety and emergency
+Family Connect: Product and Technical Speciﬁcation
+Page 6 of 25
+
+=== PAGE 7 ===
+ID Requirement Priority
+F-30 Voice help phrases in every room: "Hello Priya,
+help" on the tablet; "Alexa, tell Priya I need help" on
+any Echo. Both route to the same safety engine.
+P0
+F-31 Deterministic detection: distress keywords, no
+response to check-ins, unusual silence, missed
+routines; camera-based fall detection on device.
+P0 (fall: P1)
+F-32 Escalation for concerns that are not emergencies:
+primary child → other family → backup contact, by
+call and WhatsApp.
+P0
+F-33 Emergency camera view: with prior consent, live
+view shared only with the responder during an
+active escalation; visible and spoken indicator; no
+recording by default.
+P1
+F-34 Whole-home coverage via Echo devices with
+Alexa+ in bedroom and bathroom areas (standard
+install).
+P0
+F-35 Fall prevention with Alexa smart-home routines:
+night lights switch on when the parent gets up at
+night (motion sensor or voice).
+P1
+F-36 Automatic emergency dialling: on high-confidence
+triggers only (parent asks for an ambulance or
+emergency help; help request or fall followed by no
+response), spoken 10-second countdown with "say
+cancel", then calls 112 or 108 automatically.
+P0
+F-37 Parallel calling in emergencies: emergency number,
+primary child and backup contact are called at the
+same time, not in sequence.
+P0
+F-38 Live person on the line: emergency call is bridged
+into the tablet speaker and microphone so the
+operator can talk to the parent; child conferenced
+in when they answer; short recorded opener with
+address only.
+P0
+F-39 Emergency details pushed to child, backup and
+response partner by call and WhatsApp: address,
+key medical information, medicines, trigger.
+P0
+Family Connect: Product and Technical Speciﬁcation
+Page 7 of 25
+
+=== PAGE 8 ===
+4.5 Health reminders and medicines
+4.6 Consent and privacy controls
+4.7 Alexa+ experience
+ID Requirement Priority
+F-40 Child scans prescription or report in family app; AI
+extracts medicines, doses, timings, test dates;
+child must confirm before use.
+P0
+F-41 Medicine and test reminders via avatar, Echo
+notifications, and child reports.
+P0
+F-42 Voice reorder: parent asks; system reorders
+exactly what the prescription states via partner
+pharmacy; child approves before payment; avatar
+confirms delivery.
+P1
+F-43 No medical advice: questions about symptoms,
+skipping or changing medicines go to child or
+doctor.
+P0
+ID Requirement Priority
+F-50 Parent consent capture at setup, by voice and
+witnessed by family, for each data category.
+P0
+F-51 Parent can mark topics private ("Don't tell Priya
+about this"), except safety concerns.
+P0
+F-52 Child consent for avatar likeness and voice,
+revocable at any time.
+P0
+F-53 Pause / sleep mode by voice; listening indicator
+always visible.
+P0
+ID Requirement Priority
+F-60 Alexa skill with account linking set up from the
+family app; Echo devices registered to the
+household.
+P0
+Family Connect: Product and Technical Speciﬁcation
+Page 8 of 25
+
+=== PAGE 9 ===
+4.8 Wellbeing updates and WhatsApp delivery
+ID Requirement Priority
+F-61 "Alexa, talk to Priya" starts an avatar session on the
+tablet; on audio-only Echo it starts a voice
+conversation with the same persona, memory and
+boundaries.
+P0
+F-62 "Alexa, any messages from Priya?" plays family
+voice messages and records a spoken reply.
+P0
+F-63 Proactive notifications on Echo: new messages,
+upcoming calls, medicine and test reminders,
+delivery updates.
+P0
+F-64 Medical appointments and tests confirmed by the
+child sync to a calendar linked to the parent's
+Alexa, so Alexa+ can remind and answer "When is
+my blood test?" natively.
+P1
+F-65 Everyday life through Alexa+: music and bhajans,
+news, cricket, smart home, groceries (Amazon
+Now), food and travel services. No custom build;
+covered in onboarding.
+P0
+F-66 Alexa-to-Alexa calling and Drop In as a backup
+family-calling channel, with Drop In permissions
+approved by the parent.
+P1
+F-67 Native Alexa+ agent via the Multi-Agent SDK, so
+the companion persona runs inside Alexa+
+conversations without a skill launch phrase.
+P2
+ID Requirement Priority
+F-70 Scheduled wellbeing digest at a time set by the
+child (daily or weekly): mood, energy, sleep and
+appetite mentions, activity, topics, medicine
+adherence, open deferrals, 2–3 conversation
+starters, "Call Mum" button.
+P0
+Family Connect: Product and Technical Speciﬁcation
+Page 9 of 25
+
+=== PAGE 10 ===
+5. System architecture
+The product runs on two connected front ends in the home: the companion app (avatar,
+camera, calls) and Alexa+ on Echo devices (whole-home voice, notifications, everyday
+tasks, smart-home routines). Both talk to the same cloud backend and MCP tools, so
+memory, boundaries and safety rules are identical on both. Safety-critical paths never
+depend on a single channel.
+ID Requirement Priority
+F-71 AI-triggered alerts in three tiers: Urgent
+(immediately, overrides quiet hours: distress,
+confusion, emergency, parent asking for the child);
+Important (within the hour, respects quiet hours:
+missed medicines two days running, illness signs,
+unusually low mood, not eating); Worth knowing
+(added to the next digest).
+P0
+F-72 Each update available as a short text summary and
+a 30–60 second voice note; child chooses text,
+voice or both.
+P0
+F-73 Delivery by WhatsApp through the official
+WhatsApp Business Platform, plus in-app and
+push. Child opts in during setup.
+P0
+F-74 WhatsApp messages use pre-approved templates,
+carry the voice note and quick-reply buttons ("Call
+Mum", "Reply with voice message", "I'll call
+tonight"), and link to the full report in the family
+app.
+P0
+F-75 Sensitive health detail stays in the app; WhatsApp
+carries only a short summary. Parent privacy flags
+apply; safety items are always included.
+P0
+F-76 Alert fatigue controls: per-child quiet hours, tier
+thresholds and frequency caps; urgent alerts
+always go through.
+P1
+Family Connect: Product and Technical Speciﬁcation
+Page 10 of 25
+
+=== PAGE 11 ===
+5.1 Components
+system architecture · 3 layers, 12 components
+Component Responsibilities Suggested technology
+Companion app Kiosk-mode app on tablet or
+TV; on-device wake phrase;
+streaming speech in/out; avatar
+rendering; WebRTC calls; on-
+device fall detection; listening
+and camera indicators;
+receives push to start sessions
+Android (Kotlin); on-device
+wake-word engine; on-device
+pose model for falls; FCM push
+Echo devices with
+Alexa+ (standard)
+Help phrase and "talk to Priya"
+from other rooms; reminders
+and message notifications;
+everyday Alexa tasks
+Alexa custom skill now; Alexa+
+Multi-Agent SDK when
+available in India
+Family Connect: Product and Technical Speciﬁcation
+Page 11 of 25
+
+=== PAGE 12 ===
+Component Responsibilities Suggested technology
+Session gateway Authenticates devices;
+receives Alexa skill requests
+and app wake events; starts
+and routes sessions; pushes
+wake signals to the app
+API gateway + WebSocket
+service
+Conversation
+orchestrator
+Builds context (persona,
+boundaries, memory, today's
+events); runs the LLM; pre- and
+post-response guardrail
+checks; calls MCP tools
+LLM provider behind an
+internal interface (swappable);
+guardrail classifier
+MCP tool servers All actions the AI can take, with
+permission and consent checks
+enforced inside each server
+(section 7)
+MCP servers per domain
+Safety engine Consumes event stream
+(speech flags, silence, routines,
+fall events, help phrases); runs
+rules independent of the LLM;
+drives escalation state machine
+Event bus + rules engine +
+state machine
+Reports and nudges Daily summaries, conversation
+starters, call reminders, good-
+time detection, connection
+metrics
+Scheduled jobs + LLM
+summarisation
+Consent and data Stores consents and privacy
+flags; enforces them on every
+read; audit log; encryption
+Relational DB, vector store for
+memory, object storage for
+media; India-region hosting
+AI services Speech-to-text and text-to-
+speech (Hindi, English, code-
+mixed); voice clone
+(consented); avatar generation
+and lip-sync
+Third-party vendors behind
+adapters
+SIP telephony Outbound emergency calls
+with IVR; bridge to tablet;
+inbound family number
+Licensed Indian SIP trunk
+provider
+Partner pharmacy Prescription reorders and
+delivery status
+Partner API or WhatsApp
+Business ordering
+Family Connect: Product and Technical Speciﬁcation
+Page 12 of 25
+
+=== PAGE 13 ===
+5.2 Hardware for the pilot
+Primary: Android tablet (LTE model preferred for backup connectivity) on a stand, plus
+a USB or Bluetooth conference speakerphone for far-field hearing.
+Standard: Echo Dot with Alexa+ in the bedroom and near the bathroom; optional Echo
+Show in the kitchen or second living area. Linked to the parent's Amazon account
+during setup.
+Later: big-screen option on Android TV or Fire TV Cube with USB webcam. Avoid Vega
+OS Fire TV Sticks (4K Select and later), which cannot run Android apps.
+Audio rule: each conversation uses one device for both speaking and listening. At the
+tablet, the avatar's video and voice both come from the tablet with a conference
+speakerphone (loud speaker plus echo-cancelling microphones). In other rooms, the
+parent talks to Priya by voice on the Echo, and Alexa can offer to move the conversation
+to the tablet. Do not split video on the tablet and voice on an Echo: Bluetooth delay breaks
+lip-sync, a microphone on one device cannot cancel a speaker on another, and Alexa skills
+cannot stream real-time conversation in sync with another device.
+6. Key flows
+6.1 Starting a conversation
+1. Parent says "Hello Priya" to the tablet (on-device wake phrase), or "Alexa, talk to Priya"
+to an Echo.
+2. For Echo: Alexa skill request → session gateway → push to tablet app.
+3. App wakes screen, shows the labelled avatar (or neutral companion), opens a
+streaming voice session.
+4. Orchestrator loads persona, boundaries, memory and today's context (messages
+waiting, reminders due, recent mood).
+5. Conversation runs; safety signals stream to the safety engine in parallel.
+6. Session ends on silence or "bye"; orchestrator writes memory updates and report
+notes.
+Component Responsibilities Suggested technology
+Family app Avatar creation and consent;
+boundaries; reports and logs;
+messages; calls; approvals;
+prescription scanning
+Cross-platform mobile (Flutter
+or React Native)
+Family Connect: Product and Technical Speciﬁcation
+Page 13 of 25
+
+=== PAGE 14 ===
+6.2 Deferral ("Will you come for Diwali?")
+1. Guardrail classifier tags the turn as a commitment request.
+2. Avatar replies with a deferral ("Let me check with the real me and get back to you").
+3. create_deferral  tool posts the item to the child's app with context.
+4. Child answers in the app (text, voice note or call).
+5. Avatar relays the real answer next session, attributed to the real child.
+6.3 Emergency escalation
+1. Trigger: help phrase (tablet or Echo), distress detected, fall detected, or no response to
+a check-in after a set window.
+2. Safety engine opens an incident and checks with the parent by voice ("Are you
+okay?").
+3. Not an emergency (parent responds and declines help, or concern is low): follow-up
+check and Important alert to the child by call and WhatsApp (F-32).
+4. Emergency (parent asks for an ambulance or help; or help request or fall followed by
+no response): spoken countdown, "Calling emergency services in 10 seconds. Say
+'cancel' if you're okay."
+5. At zero, in parallel: dial 112 or 108 (cellular route on LTE tablet preferred, SIP if verified);
+SIP call to primary child with IVR; SIP call to backup contact; dispatch to response
+partner where configured.
+6. Emergency call is bridged into the tablet speaker and microphone so the operator talks
+to the parent; recorded opener states the address; child is conferenced in when they
+answer.
+7. With prior consent, camera view becomes available to the child or responder; indicator
+on screen and spoken notice.
+8. Address, medical summary, medicines and trigger are sent to child, backup and
+response partner by WhatsApp and in-app.
+9. Every step is logged; incident closes only when a human confirms the parent is safe.
+6.4 Medicine reorder
+1. Parent: "Hello Priya, my BP tablets are running out."
+2. Orchestrator calls check_prescription  and get_refill_status .
+3. draft_order  creates an order for exactly the prescribed item and quantity with the
+partner pharmacy.
+4. Child receives an approval request; nothing is paid until approved.
+Family Connect: Product and Technical Speciﬁcation
+Page 14 of 25
+
+=== PAGE 15 ===
+5. On approval, order is placed; avatar confirms to the parent; Echo notification on
+delivery day.
+6.5 Prescription or report scan
+1. Child photographs the document in the family app.
+2. Extraction service returns medicines, doses, timings and test dates with confidence
+scores.
+3. Child reviews and edits every field; low-confidence fields are highlighted.
+4. On confirmation, reminders are scheduled and the prescription is stored for reorders.
+6.6 Daily report and nudge
+1. Throughout the day, the orchestrator tags wellbeing signals from conversations (mood,
+energy, sleep, appetite, pain or illness mentions, worries) and adherence events.
+2. Alert engine scores each signal against the three tiers (F-71); Urgent and Important
+alerts are sent immediately as text and voice note via WhatsApp, push and in-app.
+3. At the child's chosen time, the digest job summarises the period: mood, activity, topics,
+deferrals, adherence, and 2–3 conversation starters from the parent's own stories.
+4. Text-to-speech generates a 30–60 second voice note of the digest.
+5. Delivery through a pre-approved WhatsApp template with voice note, quick-reply
+buttons and a link to the full report in the app.
+6. Call nudge: checks call cadence against the child's interval and today's mood; adds a
+nudge if due or if the parent seemed low.
+7. Parent privacy flags are applied before sending; safety items are always included;
+sensitive health detail stays behind the app link.
+7. MCP tool design and data model
+All AI actions go through MCP tool servers. The same tools serve the companion app, the
+Alexa skill/agent and any future channel, and the LLM provider can be swapped without
+changing them. Permission, consent and boundary checks are enforced inside each
+server, never left to the model.
+7.1 Tool servers
+Server Tools (initial) Enforced inside the server
+family-
+messages
+list_messages , play_message ,
+record_reply , send_message
+Sender/recipient in family circle
+Family Connect: Product and Technical Speciﬁcation
+Page 15 of 25
+
+=== PAGE 16 ===
+7.2 Core data entities
+Server Tools (initial) Enforced inside the server
+memory recall , remember , get_profile Parent privacy flags; no memory of
+private-marked topics in reports
+boundaries check_topic , get_persona Child's avoid-list and persona;
+blocks disallowed topics
+deferrals create_deferral , get_answers Always routes to the real child;
+avatar cannot resolve its own
+deferrals
+scheduling propose_call , get_availability ,
+start_call
+Child availability windows; time
+zones
+health get_reminders , log_adherence ,
+check_prescription ,
+get_refill_status
+Only child-confirmed data; read-
+only for the LLM except
+adherence logging
+orders draft_order , get_order_status Exact prescribed item and
+quantity only; payment only after
+child approval
+reports add_report_note , add_starter Privacy flags; safety notes always
+allowed
+safety raise_concern , start_escalation ,
+get_incident
+LLM can raise or start; only the
+safety engine can close; rules also
+trigger independently
+Entity Key fields
+Household id, address, language preferences, devices,
+timezone
+Parent profile, health summary, consents, privacy flags,
+routines, emergency info
+FamilyMember role, contact numbers, availability windows, report
+preferences, reminder interval
+Avatar owner (child), mode (child / neutral), likeness
+assets, voice consent, persona brief, avoid-list,
+status
+Family Connect: Product and Technical Speciﬁcation
+Page 16 of 25
+
+=== PAGE 17 ===
+8. Integrations
+8.1 Alexa+ and Echo (core channel)
+Alexa+ is installed in every household and gives the parent voice access in every room. It
+carries four roles; the avatar and the safety decisions stay in our backend, reached
+through the same MCP tools.
+Entity Key fields
+Consent subject, category, granted_at, witnessed_by,
+revoked_at
+Session channel (app / Echo), start/end, transcript ref,
+summary, mood estimate, safety flags
+MemoryItem type (person, place, story, preference, event),
+content, source session, privacy flag, embedding
+Deferral question, context, status, child answer, relayed_at
+Message from, to, media ref, played_at, reply ref
+Prescription document ref, medicines (name, dose, timing),
+tests, confirmed_by, confirmed_at
+Reminder type, schedule, channel, adherence log
+Order items, pharmacy, approval status, approver,
+delivery status
+Incident trigger, timeline of escalation steps, responders,
+camera access log, resolution, closed_by
+ContactEvent type (call, video, visit, message), participants,
+duration — feeds success metrics
+Role What it does How it connects Status / constraint
+Whole-home
+safety
+Help phrase from any
+room; routes to the
+safety engine
+Custom skill → session
+gateway → safety
+engine
+Feasible now with
+classic skill
+Family Connect: Product and Technical Speciﬁcation
+Page 17 of 25
+
+=== PAGE 18 ===
+Integration details
+Account linking: OAuth from the skill to Family Connect, completed by the child in the
+family app during setup.
+Same brain on both channels: Alexa requests call the same orchestrator and MCP
+tools as the app, so memory, persona, boundaries and defer-don't-decide behave
+identically.
+Hand-off to screen: when the parent wants to see the avatar or a video call, Alexa says
+"I've opened Priya on your tablet" and the gateway pushes the session to the app.
+Echo Show: used for Alexa visuals (message cards, reminders) where helpful; the live
+avatar stays on the companion app.
+Known constraints to design around: Echo wake words are a fixed list (no custom names,
+so the Echo phrase is "Alexa, talk to Priya"); third-party skills cannot render a custom live
+avatar on Echo Show or access its camera; Echo cannot call regular phone numbers or
+emergency numbers in India (Alexa-to-Alexa calling only). Amazon discontinued Alexa
+Together in May 2025, so every safety path through Alexa is duplicated through the
+companion app and our SIP telephony.
+8.2 Calling
+Role What it does How it connects Status / constraint
+Second front
+door
+"Talk to Priya", family
+messages, replies
+Custom skill now;
+Alexa+ Action SDK and
+Multi-Agent SDK later,
+all calling our MCP
+tools
+Multi-Agent SDK in
+preview; apply early
+Reminders and
+notifications
+Messages waiting,
+calls, medicines,
+tests, deliveries
+Skill notifications;
+calendar linked to the
+parent's Alexa account
+Verify notification
+availability under
+Alexa+ in India
+Everyday life
+assistant
+Music, news, smart
+home, groceries,
+local services, night-
+light routines
+Native Alexa+; we
+configure routines
+during onboarding
+Alexa+ in India via
+Early Access; free
+with Prime, paid
+otherwise
+Call type Channel
+Family ↔  parent, everyday video WebRTC between family app and tablet
+Concern alert to family or backup SIP trunk → phone, with IVR; plus WhatsApp
+Family Connect: Product and Technical Speciﬁcation
+Page 18 of 25
+
+=== PAGE 19 ===
+Use a licensed Indian telecom operator or established cloud telephony provider for the
+SIP trunk. Households should save the outbound number with a clear name (e.g. "Mum –
+Family Connect").
+Emergency dialling on Android: apps normally cannot place emergency calls without a
+person confirming in the dialer. On the dedicated tablet, the companion app should hold
+the default phone app role so it can place the call automatically; developers must verify
+this on target devices. Run regular emergency drills during the pilot.
+8.3 AI services
+LLM: behind an internal interface so providers can be swapped; must support tool
+calling (MCP) and Hindi/English code-mixing.
+Speech: streaming speech-to-text and text-to-speech tuned for older voices, Indian
+accents and code-mixed speech; evaluate on real pilot recordings.
+Voice clone: only with the child's recorded consent; watermark generated audio where
+supported.
+Avatar: real-time talking-head rendering from the child's approved photo; target lip-
+sync latency compatible with natural turn-taking.
+Document extraction: OCR + LLM for prescriptions and reports, returning confidence
+per field.
+8.4 Pharmacy
+Partner pharmacy via API or WhatsApp Business ordering. Prescription medicines require
+a valid prescription and pharmacist validation under Indian rules; the system only reorders
+what a child-confirmed prescription states. AI voice calls to local chemists are out of
+Call type Channel
+Emergency number (112 / 108) Automatic dial after countdown; cellular call from
+LTE tablet preferred (correct local routing), SIP
+only if the provider confirms emergency support
+and address-based routing
+Child and backup in an emergency SIP calls placed in parallel with the emergency call;
+conferenced into the tablet
+Relative without app calls parent Inbound family number (SIP DID) → tablet
+Medical response partner Phone or API dispatch with address and medical
+summary
+Backup from other rooms Alexa-to-Alexa calling via Echo
+Family Connect: Product and Technical Speciﬁcation
+Page 19 of 25
+
+=== PAGE 20 ===
+scope for v1.
+8.5 WhatsApp
+Official WhatsApp Business Platform only (Cloud API or an approved provider); never
+personal numbers or unofficial tools.
+Opt-in: each family member opts in during setup in the family app.
+Templates: digests, alerts and emergency notices use pre-approved message
+templates, since businesses cannot send free-form messages outside the 24-hour
+customer service window.
+Rich content: voice-note attachment, quick-reply buttons, and a deep link to the full
+report.
+Inbound: child's voice or text replies are captured and delivered to the parent as family
+messages (F-20).
+Fallbacks: if WhatsApp delivery fails, send push notification and SMS; urgent alerts are
+also delivered by phone call.
+9. Safety, privacy and compliance
+9.1 AI safety guardrails
+System design, not just prompts: a guardrail classifier checks each user turn and each
+avatar response for commitments, health advice, disallowed topics and distress.
+Hard blocks: no medical advice or dose changes; no financial actions; no impersonation
+outside the labelled avatar; no claims about the real child's life that are not in
+confirmed data.
+Anti-dependency: avatar regularly bridges outward (family, local groups); reports flag
+rising avatar time alongside falling real contact.
+Evaluation set: scripted conversations covering deferrals, boundary breaches,
+confusion, distress and medical questions, run before every model or prompt change.
+9.2 Privacy
+On-device wake phrase; audio leaves the device only after the wake phrase or an
+active session.
+Camera: fall detection runs on device; no video leaves the home except a live view
+during an active incident, with prior consent and a visible and spoken indicator. No
+recording by default.
+Parent privacy flags respected in all reports; safety-related information is always
+shared.
+Family Connect: Product and Technical Speciﬁcation
+Page 20 of 25
+
+=== PAGE 21 ===
+Child sees logs only of what their avatar said, not the neutral companion's private
+chats, unless the parent consents.
+Data minimisation, encryption at rest and in transit, India-region hosting, retention
+limits, and a full audit log of every access to transcripts or camera.
+9.3 Consent
+Parent: consent per category (conversation storage, reports, camera in emergencies,
+health data), captured by voice with a family witness and revocable by voice.
+Child: explicit consent for likeness and voice cloning, revocable at any time (avatar
+disabled immediately on revocation).
+Capacity: for parents with moderate or advanced dementia, family (ideally with their
+doctor) decides on child-avatar mode; neutral companion is the default fallback.
+9.4 Compliance to review with counsel
+India's Digital Personal Data Protection (DPDP) Act: consent, purpose limitation, data
+principal rights, and handling of health and biometric (face, voice) data.
+Telecom rules for SIP trunking and connecting internet calls to the public phone
+network.
+Emergency calling: rules and practice for automated calls to 112 and 108, location
+routing, and how to avoid false calls.
+WhatsApp Business Platform policies, including what health-related content may be
+sent in templates.
+Online pharmacy and prescription rules for medicine orders.
+Whether any feature (fall detection, health reminders, wellbeing alerts) could be
+classed as a medical device; keep claims to "reminders" and "alerts", not diagnosis.
+Call recording disclosure, if incidents are recorded.
+10. Non-functional requirements and success metrics
+10.1 Non-functional requirements
+Targets below are proposed starting points for the team to validate in the pilot.
+Area Requirement
+Voice latency Response begins within about 1.5 seconds of the
+parent finishing speaking, so turn-taking feels
+natural
+Family Connect: Product and Technical Speciﬁcation
+Page 21 of 25
+
+=== PAGE 22 ===
+10.2 Success metrics
+Area Requirement
+Wake reliability Wake phrase works across the room with TV noise;
+false wakes tracked and kept rare
+Emergency path Escalation path does not depend on the LLM; first
+call placed within seconds of a confirmed trigger;
+continues if the app or LLM is down
+Availability Safety engine and telephony designed for high
+availability; conversation features may degrade
+gracefully
+Offline behaviour App announces when it is offline; help phrase still
+attempts escalation via LTE/SMS fallback where
+available
+Accessibility Large text and captions, slow and clear speech
+option, adjustable volume, high-contrast UI
+Language Hindi, English and code-mixed at launch;
+architecture ready for regional languages
+Observability Per-session metrics, safety-incident tracing, model
+and prompt versioning
+Security Device attestation, encrypted storage, role-based
+access, audited staff access
+Metric Why it matters
+Real calls per week and minutes per call
+(family ↔  parent)
+Primary metric: proof that the product
+increases human contact
+Visits per month Real-world connection
+Parent-reported loneliness, measured with a
+short validated loneliness scale at
+onboarding and periodically
+Outcome measure
+Mood trend after real contact vs avatar-only
+days
+Shows where value comes from
+Avatar time vs real contact ratio Guardrail against dependency
+Family Connect: Product and Technical Speciﬁcation
+Page 22 of 25
+
+=== PAGE 23 ===
+11. Build phases
+Durations are left for the team to estimate.
+Metric Why it matters
+Deferrals answered by children, and time to
+answer
+Health of the defer-don't-decide loop
+Medicine and test adherence Health support value
+Incident response time and false-alarm rate Safety performance
+Family retention after 3 months Business viability
+Phase Scope Exit criteria
+0. Foundations Consent and data service; MCP
+server skeletons; LLM and
+speech vendor evaluation on real
+older-adult Hindi/English
+recordings; avatar vendor proof
+of concept; SIP provider
+onboarding; emergency-dialling
+feasibility on target tablets;
+WhatsApp Business Platform
+setup and template approval;
+Alexa skill and account-linking
+design; apply for Alexa+ Multi-
+Agent SDK early access; legal
+review (section 9.4)
+Vendors chosen; consent model
+approved by counsel; latency
+within target in a lab test;
+emergency call routing verified
+Family Connect: Product and Technical Speciﬁcation
+Page 23 of 25
+
+=== PAGE 24 ===
+Apply for Alexa AI Multi-Agent SDK early access during Phase 0 so access is in place by
+Phase 3.
+12. Open questions and sources
+12.1 To verify before or during Phase 0
+Does the Alexa AI Multi-Agent SDK support the India locale and Hindi, and what visual
+and notification options does it allow on Echo Show?
+Are Alexa skill notifications available to Indian users under Alexa+ Early Access?
+Phase Scope Exit criteria
+1. Pilot (10–20
+families)
+Companion app with wake
+phrase, child-avatar and neutral
+companion, memory, engagement
+activities; Echo with Alexa+ as
+standard install: help phrase,
+"talk to Priya", family messages,
+notifications; family app with
+avatar setup, boundaries,
+messages, call reminders,
+prescription scan and reminders;
+wellbeing digests and tiered
+alerts by WhatsApp (text and
+voice); safety engine with
+automatic emergency dialling and
+parallel family calls; WebRTC calls
+Families use it most days; zero
+missed escalations in drills from
+both tablet and Echo; no
+unintended emergency calls; real
+calls per week measured against
+baseline
+2. Whole home and
+health
+Alexa calendar sync for
+appointments; smart-home
+night-light routines; Drop In and
+Alexa calling as backup; camera
+fall detection and emergency
+view; medicine reorder with
+partner pharmacy; family circle
+and rota; good-time detection;
+visit tracking; inbound family
+number; alert fatigue controls
+Positive change in real-contact
+metrics; adherence
+improvement; incident response
+time within target
+3. Scale Native Alexa+ agent (Multi-Agent
+SDK); big-screen TV app; regional
+languages; memory book; shared
+activities; care-home edition
+Retention and unit economics
+support wider launch
+Family Connect: Product and Technical Speciﬁcation
+Page 24 of 25
+
+=== PAGE 25 ===
+Can the chosen SIP provider route calls to 112 and 108, and are they routed by the
+household's address?
+On target Android tablets, can the companion app (as default phone app) place
+emergency calls automatically over cellular?
+Which private ambulance or medical response partners can accept API or phone
+dispatch in pilot cities?
+WhatsApp Business Platform provider choice and template approval for wellbeing and
+emergency messages.
+Partner pharmacy options and their ordering APIs.
+Avatar vendor: real-time latency, Hindi lip-sync quality, data handling and consent
+terms for likeness.
+Product name and trademark ("Family Connect" is a working name).
+Pricing model: family subscription, hardware bundle, or both.
+12.2 Sources
+TechCrunch – Amazon launches Alexa+ in India with Hindi support
+Amazon Developer Blog – Introducing AI-native SDKs for Alexa+
+About Amazon – Alexa Together (discontinued May 2025)
+Asurion – Alexa wake word options
+Android Central – Alexa-to-Alexa calling and Drop In in India
+Amazon help – Sharing files with Alexa+
+Liliputing – Vega OS on Fire TV Sticks
+About Amazon – Amazon Pharmacy India
+WHO – Social connection report (June 2025)
+IAFOR – Loneliness among older adults in India (LASI)
+Neuroscience News – Loneliness and dementia meta-analysis
+Family Connect: Product and Technical Speciﬁcation
+Page 25 of 25

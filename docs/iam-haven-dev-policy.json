@@ -1,0 +1,57 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "PollyVoices",
+      "Effect": "Allow",
+      "Action": ["polly:SynthesizeSpeech", "polly:DescribeVoices"],
+      "Resource": "*"
+    },
+    {
+      "Sid": "BedrockModels",
+      "Effect": "Allow",
+      "Action": [
+        "bedrock:InvokeModel",
+        "bedrock:InvokeModelWithResponseStream",
+        "bedrock:Converse",
+        "bedrock:ConverseStream",
+        "bedrock:ListFoundationModels",
+        "bedrock:ListInferenceProfiles",
+        "bedrock:GetInferenceProfile"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "HavenSecrets",
+      "Effect": "Allow",
+      "Action": ["ssm:PutParameter", "ssm:GetParameter", "ssm:GetParameters", "ssm:DeleteParameter"],
+      "Resource": "arn:aws:ssm:ap-south-1:ACCOUNT_ID:parameter/haven/*"
+    },
+    {
+      "Sid": "SsmDefaultKey",
+      "Effect": "Allow",
+      "Action": ["kms:Encrypt", "kms:Decrypt"],
+      "Resource": "*",
+      "Condition": { "StringEquals": { "kms:ViaService": "ssm.ap-south-1.amazonaws.com" } }
+    },
+    {
+      "Sid": "CdkDeployViaBootstrapRoles",
+      "Effect": "Allow",
+      "Action": "sts:AssumeRole",
+      "Resource": "arn:aws:iam::ACCOUNT_ID:role/cdk-*"
+    },
+    {
+      "Sid": "OpsChecks",
+      "Effect": "Allow",
+      "Action": [
+        "lambda:GetAccountSettings",
+        "servicequotas:GetServiceQuota",
+        "servicequotas:RequestServiceQuotaIncrease",
+        "budgets:ViewBudget",
+        "budgets:ModifyBudget",
+        "sts:GetCallerIdentity"
+      ],
+      "Resource": "*"
+    }
+  ]
+}

@@ -1,0 +1,44 @@
+{
+  "name": "haven-companion",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Haven: a labelled 'Digital Priya' AI companion that makes families call more, not less. MCP server (2025-11-25, Streamable HTTP) + simulated Alexa+ client + AWS (Bedrock, Polly, DynamoDB, Lambda).",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "tsx watch --env-file-if-exists=.env src/local.ts",
+    "start": "tsx --env-file-if-exists=.env src/local.ts",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "tsx --test test/*.test.ts",
+    "build:lambda": "node scripts/build-lambda.mjs",
+    "synth": "cdk synth",
+    "deploy": "npm run build:lambda && cdk deploy",
+    "bakeoff": "tsx --env-file-if-exists=.env scripts/bakeoff.ts",
+    "polly-check": "tsx --env-file-if-exists=.env scripts/polly-check.ts"
+  },
+  "dependencies": {
+    "@aws-sdk/client-bedrock-runtime": "3.1152.0",
+    "@aws-sdk/client-dynamodb": "3.1152.0",
+    "@aws-sdk/client-polly": "3.1152.0",
+    "@aws-sdk/client-s3": "3.1152.0",
+    "@aws-sdk/client-ssm": "3.1152.0",
+    "@aws-sdk/lib-dynamodb": "3.1152.0",
+    "@aws-sdk/s3-request-presigner": "3.1152.0",
+    "@modelcontextprotocol/sdk": "1.32.1",
+    "express": "5.3.0",
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.0.0",
+    "aws-cdk": "2.1145.0",
+    "aws-cdk-lib": "2.273.0",
+    "constructs": "10.8.1",
+    "esbuild": "0.28.2",
+    "tsx": "4.23.15",
+    "typescript": "^5.9.0"
+  }
+}
