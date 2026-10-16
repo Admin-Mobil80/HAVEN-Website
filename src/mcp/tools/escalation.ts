@@ -68,6 +68,7 @@ export function registerEscalationTools(server: McpServer, ctx: ToolContext) {
             recipients,
             elder: { ...doc.elder },
             primary: primaryMember(doc)?.name,
+            demo: doc.demo,
           };
         });
 
@@ -79,7 +80,9 @@ export function registerEscalationTools(server: McpServer, ctx: ToolContext) {
         const entries = await Promise.all(
           recipients.map((member) => safeSend(ctx, { householdId: ctx.householdId, member, kind: "urgent_alert", body, template, refId: incident.id }, now)),
         );
-        const delivered = entries.filter((e) => e.status !== "failed");
+        // A real household counts only real deliveries; in a demo household (no real phones) a
+        // simulated send stands in for one, so the demo reads the same as the real thing.
+        const delivered = entries.filter((e) => e.status === "sent" || (opened.demo && e.status === "simulated"));
         if (entries.length > 0) {
           await ctx.repo.update(ctx.householdId, (doc) => {
             const stored = doc.incidents.find((i) => i.id === incident.id);

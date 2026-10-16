@@ -35,7 +35,7 @@ export type AppDeps = {
   dailyBrainCap?: number;
   // WhatsApp webhook (absent: the route is not mounted) and the owner-household admin key.
   whatsapp?: Pick<WebhookDeps, "client" | "appSecret" | "verifyToken" | "media" | "voiceNote">;
-  adminKey?: string;
+  adminKey?: string | (() => Promise<string | undefined>);
 };
 
 const DEFAULT_DEMO_TTL_SECONDS = 7 * 24 * 60 * 60;

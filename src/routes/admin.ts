@@ -19,12 +19,16 @@ const Body = z.object({
   replace: z.boolean().optional(),
 });
 
-export function adminRouter(deps: { repo: Repo; secret: string; adminKey?: string; now: () => Date }): Router {
+// adminKey may be a loader so a key created after startup is picked up without a redeploy.
+export function adminRouter(deps: { repo: Repo; secret: string; adminKey?: string | (() => Promise<string | undefined>); now: () => Date }): Router {
   const router = Router();
   if (!deps.adminKey) return router;
-  const key = Buffer.from(deps.adminKey);
+  const loadKey = typeof deps.adminKey === "string" ? async () => deps.adminKey as string : deps.adminKey;
 
   router.post("/api/admin/owner", async (req, res) => {
+    const configured = await loadKey();
+    if (!configured) return void res.status(404).json({ error: "not_found" });
+    const key = Buffer.from(configured);
     const given = Buffer.from(req.header("x-haven-admin") ?? "");
     if (given.length !== key.length || !timingSafeEqual(given, key)) return void res.status(401).json({ error: "unauthorized" });
     const parsed = Body.safeParse(req.body ?? {});

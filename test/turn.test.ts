@@ -223,3 +223,13 @@ test("POST /api/turn needs the household token and validates the body", async ()
     await h.close();
   }
 });
+
+test("in a real household a simulated send is not reported as 'told'", async () => {
+  const repo = new MemoryRepo();
+  await repo.create(seedHousehold("real-hh", new Date(T0), { demo: false }));
+  const deps: TurnDeps = { repo, notifier: new SimulatedNotifier(), now: () => new Date(T0 + 1000), mediaUrl: (k) => k, brain: "rules" };
+  const r = await runTurn("real-hh", { kind: "text", text: "Help, I feel dizzy" }, deps);
+  assert.equal(r.mode, "safety");
+  assert.doesNotMatch(r.text, /been told/);
+  assert.match(r.text, /112/);
+});

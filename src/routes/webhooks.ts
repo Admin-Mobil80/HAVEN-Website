@@ -106,7 +106,19 @@ async function handle(m: WaMessage, deps: WebhookDeps) {
     return mem ? { ...mem } : undefined;
   });
   if (!member) return;
-  const reply = (text: string) => deps.client.sendText(m.from, text).catch((e: Error) => console.warn("whatsapp reply failed:", e.message));
+  // Reply failures go to the household's activity log too (GET /api/log), so they can be seen
+  // without CloudWatch access. No message text or phone number is logged.
+  const logEvent = (summary: string, isError = false) =>
+    deps.repo.appendLog(hh, { at: deps.now().toISOString(), client: "webhook", kind: "webhook", summary: summary.slice(0, 300), isError: isError || undefined }).catch(() => undefined);
+  await logEvent(`inbound ${m.type}${action ? ` -> ${action}` : ""}`);
+  const reply = (text: string) =>
+    deps.client.sendText(m.from, text).then(
+      () => logEvent("reply sent"),
+      (e: Error & { code?: number; status?: number }) => {
+        console.warn("whatsapp reply failed:", e.message);
+        return logEvent(`reply failed: ${e.code !== undefined ? `wa_${e.code} ` : ""}${e.message}`, true);
+      },
+    );
 
   switch (action) {
     case "call_tonight": {

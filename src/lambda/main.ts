@@ -77,7 +77,10 @@ function webDir(): string | undefined {
 }
 
 async function main() {
-  const [householdSecret, whatsapp, adminKey] = await Promise.all([loadHouseholdSecret(), createWhatsApp(), optionalSecret("admin-key")]);
+  const [householdSecret, whatsapp] = await Promise.all([loadHouseholdSecret(), createWhatsApp()]);
+  // Read on use (cached once found) so /haven/admin-key can be created after deploy.
+  let adminKeyCache: string | undefined;
+  const adminKey = async () => (adminKeyCache ??= await optionalSecret("admin-key"));
   const media = new S3MediaStore(requireEnv("MEDIA_BUCKET"));
   const app = createApp({
     repo: new DynamoRepo({ tableName: requireEnv("TABLE_NAME") }),
