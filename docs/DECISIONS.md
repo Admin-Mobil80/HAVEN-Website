@@ -16,6 +16,33 @@ Newest first. Each entry gives the date, the decision, why, and the evidence.
 - **Hosting:** one Lambda (Express on the Lambda Web Adapter) behind a Function URL, CDK in TypeScript, DynamoDB single table, S3 media, and EventBridge Scheduler.
 - **Safety:** deterministic rules open incidents with no LLM involved. Urgent alerts are awaited before the response. Only a human can cancel, acknowledge or close an incident.
 
+## 16 Oct 2026: conversation engine (`POST /api/turn`)
+- **Pipeline order:**
+  1. The host writes the elder's turn.
+  2. Safety rules, which can raise an incident without the LLM.
+  3. A scripted "are you real?" answer.
+  4. Yes/no matching for a pending send.
+  5. The commitment detector, which creates a deferral.
+  6. The Bedrock brain, with the rules brain as fallback (on failure or past 300 turns per household per day).
+  7. The output guard.
+  8. MCP tool calls.
+  9. Polly mp3 with visemes.
+- **Change from the plan:** the engine calls the MCP server through an **in-process MCP client** over an in-memory transport, not HTTP loopback. It is the same JSON-RPC, tools and consent checks, with no port dependency and no rate-limit hit.
+- **Sends need an explicit ask:** a brain-proposed send to Priya only starts when the elder explicitly asked ("tell Priya ..."). Even then it becomes a "Shall I send this?" question, and nothing goes out until her spoken yes.
+- **Live run on the hosted URL** (gpt-oss-120b, Kajal), every turn with audio and visemes:
+
+  | Turn | Time |
+  |---|---|
+  | Greeting | 0.70 s |
+  | Small talk | 1.2 s |
+  | Remember | 1.9 s |
+  | Send preview | 2.3 s |
+  | Consent send | 0.37 s |
+  | Deferral | 0.85 s |
+  | Honesty | 0.63 s |
+  | Urgent alert | 0.48 s |
+- **Local runs:** default to the rules brain and browser speech. Opt in with `HAVEN_BRAIN=bedrock` and `HAVEN_SPEECH=polly`.
+
 ## 16 Oct 2026: first deploy of HavenStack (ap-south-1)
 - Function URL: https://uzm23d4tzykddxqnkq4lld5zva0ixbbl.lambda-url.ap-south-1.on.aws/ (MCP endpoint at `/mcp`).
 - Deploy took 63 s. Lambda Web Adapter pinned to arm64 layer v30.

@@ -3,8 +3,10 @@ import path from "node:path";
 import { createApp } from "./app.js";
 import { SimulatedNotifier } from "./notify/index.js";
 import { MemoryRepo } from "./store/memoryRepo.js";
+import { speak } from "./voice/polly.js";
 
-// No-keys local run: in-memory store, simulated notifications, nothing leaves the machine.
+// No-keys local run: in-memory store, simulated notifications, rules brain, browser speech.
+// Opt in to AWS with HAVEN_BRAIN=bedrock and/or HAVEN_SPEECH=polly (uses your AWS credentials).
 const port = Number(process.env.PORT ?? 3000);
 
 let secret = process.env.HOUSEHOLD_SECRET;
@@ -20,6 +22,8 @@ const app = createApp({
   allowedHosts: [`localhost:${port}`, `127.0.0.1:${port}`],
   allowedOrigins: (process.env.ALLOWED_ORIGINS ?? "").split(",").map((s) => s.trim()).filter(Boolean),
   webDir: path.resolve(process.env.WEB_DIR ?? "web/dist"),
+  brain: process.env.HAVEN_BRAIN === "bedrock" ? "bedrock" : "rules",
+  speak: process.env.HAVEN_SPEECH === "polly" ? (text) => speak(text) : undefined,
 });
 
 // Loopback only: the Host allowlist is not a substitute for keeping the dev server off the LAN.

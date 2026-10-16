@@ -5,6 +5,7 @@ import { fileURLToPath } from "node:url";
 import { createApp } from "../app.js";
 import { SimulatedNotifier, type Notifier } from "../notify/index.js";
 import { DynamoRepo } from "../store/dynamoRepo.js";
+import { speak } from "../voice/polly.js";
 
 // Production entry, bundled to build/lambda/index.mjs and started by run.sh. The Lambda Web Adapter
 // waits for GET /api/health on this port, then proxies every request (and POSTs non-HTTP events to
@@ -62,6 +63,10 @@ async function main() {
     allowedHostSuffixes: [`.lambda-url.${REGION}.on.aws`],
     allowedOrigins: list(process.env.ALLOWED_ORIGINS),
     webDir: webDir(),
+    // Hosted: Bedrock brain (rules brain on failure or past the daily cap) and Polly speech.
+    brain: process.env.HAVEN_BRAIN === "rules" ? "rules" : "bedrock",
+    speak: process.env.HAVEN_SPEECH === "off" ? undefined : (text) => speak(text),
+    dailyBrainCap: Number(process.env.DAILY_BRAIN_CAP) || undefined,
   });
 
   await new Promise<void>((resolve, reject) => {

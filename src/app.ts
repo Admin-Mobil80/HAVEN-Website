@@ -7,6 +7,8 @@ import { bodyErrorHandler, householdLimiter, hostOriginGuard, rateLimit, securit
 import type { Notifier } from "./notify/index.js";
 import { apiRouter } from "./routes/api.js";
 import { demoRouter } from "./routes/demo.js";
+import { turnRouter } from "./routes/turn.js";
+import type { TurnDeps } from "./agent/turn.js";
 import type { Repo } from "./store/repo.js";
 
 export type AppDeps = {
@@ -24,6 +26,11 @@ export type AppDeps = {
   // writes per minute and per day, and the recording store.
   rateLimits?: { mcp?: number; api?: number; demoSession?: number; household?: number; householdDaily?: number };
   mediaStore?: MediaStore;
+  // Conversation engine: "bedrock" calls the LLM (rules brain on failure), "rules" never does.
+  brain?: TurnDeps["brain"];
+  think?: TurnDeps["think"];
+  speak?: TurnDeps["speak"];
+  dailyBrainCap?: number;
 };
 
 const DEFAULT_DEMO_TTL_SECONDS = 7 * 24 * 60 * 60;
@@ -73,6 +80,19 @@ export function createApp(deps: AppDeps): express.Express {
   );
   app.use(mediaRouter({ secret, now, store: deps.mediaStore }));
   app.use(apiRouter({ repo: deps.repo, secret, now, householdLimit }));
+  app.use(
+    turnRouter({
+      repo: deps.repo,
+      notifier: deps.notifier,
+      secret,
+      now,
+      householdLimit,
+      brain: deps.brain ?? "rules",
+      think: deps.think,
+      speak: deps.speak,
+      dailyBrainCap: deps.dailyBrainCap,
+    }),
+  );
   app.use("/api", (_req, res) => void res.status(404).json({ error: "not_found" }));
 
   mountWeb(app, deps.webDir);

@@ -210,6 +210,20 @@ export type Household = {
   outbox: OutboxEntry[];
   turns: Turn[]; // last N turns only (capped)
   seq: number; // id counter
+  session?: ActiveSession; // the tablet conversation in progress, if any
+};
+
+// The conversation currently open on the tablet. Written to a SessionRecord when it ends.
+export type ActiveSession = {
+  id: string;
+  startedAt: ISODate;
+  lastTurnAt: ISODate;
+  disclosedAt: ISODate; // last spoken "I'm an AI" disclosure (session start, then every 3 h)
+  deferralIds: string[];
+  toolsCalled: string[];
+  ruleEvents: string[];
+  // A record_reply preview waiting for her yes. The confirmation binds these exact arguments.
+  pendingReply?: { confirmationId: string; message: string; kind: "reply" | "call_request" };
 };
 
 // Activity log item (external MCP clients, rule events, webhooks). Simulator calls come back inline.
