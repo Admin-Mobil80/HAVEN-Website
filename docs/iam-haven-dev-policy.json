@@ -44,6 +44,13 @@
       "Sid": "OpsChecks",
       "Effect": "Allow",
       "Action": [
+        "ssm:DescribeParameters",
+        "cloudformation:DescribeStacks",
+        "cloudformation:DescribeStackEvents",
+        "lambda:ListFunctions",
+        "lambda:GetFunctionUrlConfig",
+        "logs:FilterLogEvents",
+        "logs:DescribeLogGroups",
         "lambda:GetAccountSettings",
         "servicequotas:GetServiceQuota",
         "servicequotas:RequestServiceQuotaIncrease",

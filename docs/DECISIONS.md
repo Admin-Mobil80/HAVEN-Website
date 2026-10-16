@@ -16,6 +16,28 @@ Newest first. Each entry gives the date, the decision, why, and the evidence.
 - **Hosting:** one Lambda (Express on the Lambda Web Adapter) behind a Function URL, CDK in TypeScript, DynamoDB single table, S3 media, and EventBridge Scheduler.
 - **Safety:** deterministic rules open incidents with no LLM involved. Urgent alerts are awaited before the response. Only a human can cancel, acknowledge or close an incident.
 
+## 16 Oct 2026: first deploy of HavenStack (ap-south-1)
+- Function URL: https://uzm23d4tzykddxqnkq4lld5zva0ixbbl.lambda-url.ap-south-1.on.aws/ (MCP endpoint at `/mcp`).
+- Deploy took 63 s. Lambda Web Adapter pinned to arm64 layer v30.
+- Smoke test passed:
+  - `/api/health` returns 200.
+  - `initialize` echoes 2025-11-25; `tools/list` lists 8 tools.
+  - `recall_memory` and `create_deferral` read and write DynamoDB.
+  - Demo session returns 201.
+  - GET `/mcp` returns 405; a foreign Origin returns 403.
+- Known gaps:
+  - No alert email is set yet (the alarms and budget notify nobody).
+  - `/events` is not built, so the Scheduler's warm, digest and reset calls do nothing yet.
+  - The WhatsApp notifier is still simulated.
+
+## 16 Oct 2026: WhatsApp templates submitted (test number)
+- Templates submitted, each returned PENDING / UTILITY:
+  - `haven_daily_digest` (id 1951027502537585)
+  - `haven_urgent_alert` (id 1697051121783562)
+  - `haven_family_question` (id 867923293013396)
+- Quick-reply labels the webhook must match exactly: "Play voice note", "I will call tonight", "Calling now".
+- They were submitted with the temporary token from the "Try it out" page. The permanent system-user token still needs the WhatsApp account assigned (Full control) before it can manage templates.
+
 ## 16 Oct 2026: model bake-off (`npm run bakeoff`, profile `haven`, ap-south-1)
 | Model | Correct /15 | p50 | p95 | Errors |
 |---|---|---|---|---|

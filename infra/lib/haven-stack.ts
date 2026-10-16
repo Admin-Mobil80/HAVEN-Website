@@ -17,10 +17,8 @@ export const HAVEN_REGION = "ap-south-1";
 
 // Fallbacks for the cdk.json context keys of the same name (cdk.json is the place to change them).
 export const DEFAULTS = {
-  // TODO(verify): LWA layer version. 25 is a published version but not necessarily the latest, and it
-  // was not checked against the awslabs/aws-lambda-web-adapter README (no network at build time).
-  // Look it up before the first deploy with the commands in docs/DEPLOY.md and pin it in cdk.json.
-  lwaLayerArn: "arn:aws:lambda:ap-south-1:753240598075:layer:LambdaAdapterLayerArm64:25",
+  // Lambda Web Adapter arm64 layer; v30 is the latest per the awslabs/aws-lambda-web-adapter README (16 Oct).
+  lwaLayerArn: "arn:aws:lambda:ap-south-1:753240598075:layer:LambdaAdapterLayerArm64:30",
   bedrockModelId: "openai.gpt-oss-120b-1:0",
   bedrockFallbackModelId: "apac.amazon.nova-lite-v1:0",
   // Confirmed available in ap-south-1 by scripts/polly-check.ts (16 Oct).

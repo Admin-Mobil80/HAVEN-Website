@@ -59,7 +59,7 @@ To change a value later, run the same command with `--overwrite`.
 
 ### 3. Pin the Lambda Web Adapter layer version
 
-`cdk.json` sets `lwaLayerArn` to `arn:aws:lambda:ap-south-1:753240598075:layer:LambdaAdapterLayerArm64:25`. That version exists, but nobody has checked whether it is the latest: the build had no network access. Before the first deploy:
+`cdk.json` sets `lwaLayerArn` to `arn:aws:lambda:ap-south-1:753240598075:layer:LambdaAdapterLayerArm64:30`. That version exists, but nobody has checked whether it is the latest: the build had no network access. Before the first deploy:
 
 1. Read the "Lambda functions packaged as Zip package for AWS managed runtimes" section of the README at https://github.com/awslabs/aws-lambda-web-adapter, and the release notes since the version you pick. Watch for renamed `AWS_LWA_*` variables.
 2. Confirm that the layer is reachable from this account. The loop prints every version from 25 up and stops at the first missing one, so the last line printed is the newest:
