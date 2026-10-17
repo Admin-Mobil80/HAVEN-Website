@@ -108,7 +108,7 @@ export function createApp(deps: AppDeps): express.Express {
     }),
   );
   app.use(apiRouter({ repo: deps.repo, secret, now, householdLimit }));
-  app.use(likenessRouter({ ...deps.likeness, repo: deps.repo, secret, now, householdLimit }));
+  app.use(likenessRouter({ ...deps.likeness, media: deps.digest?.media, repo: deps.repo, secret, now, householdLimit }));
   app.use(familyRouter({ repo: deps.repo, secret, now, householdLimit, media: deps.digest?.media, demoTtlSeconds: deps.demoTtlSeconds ?? DEFAULT_DEMO_TTL_SECONDS }));
   app.use(
     turnRouter({

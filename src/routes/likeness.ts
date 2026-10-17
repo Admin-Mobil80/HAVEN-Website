@@ -8,6 +8,7 @@ import type { Repo } from "../store/repo.js";
 import { AnamError, type Anam } from "../voice/anam.js";
 import { ElevenError, type ElevenLabs, type LibraryVoice } from "../voice/eleven.js";
 import { apiErrors } from "./api.js";
+import { mediaKey } from "../store/s3Media.js";
 
 // The companion's voice and face, both from the main user and both with consent:
 // - voice: clone from their own recording (ElevenLabs) or pick a library voice; default Polly
@@ -21,6 +22,7 @@ export type LikenessDeps = {
   eleven?: () => Promise<ElevenLabs | undefined>;
   anam?: () => Promise<Anam | undefined>;
   pollyPcm?: (text: string) => Promise<Buffer>;
+  media?: { put(key: string, data: Buffer, contentType: string): Promise<void> };
   householdLimit?: HouseholdLimiter;
   limits?: { ttsCharsPerDay?: number; clonesPerDay?: number; avatarsPerDay?: number };
 };
@@ -74,6 +76,9 @@ export function likenessRouter(deps: LikenessDeps): Router {
     if (!b.success) return void res.status(400).json({ error: "invalid_body" });
     try {
       const voiceId = await eleven.addLibraryVoice(b.data.publicOwnerId, b.data.voiceId, `Haven ${b.data.name}`);
+      // Some accounts (e.g. ElevenLabs Free) can add a library voice but not speak with it via the API.
+      // Try one short line first so the user hears about it now, not as silence later.
+      await eleven.pcm(voiceId, "Hello.");
       await deps.repo.update(hh(res), (d) => void (d.persona.voice = { provider: "elevenlabs", voiceId, name: b.data.name, source: "library" }));
       res.json({ ok: true, voice: { name: b.data.name, source: "library" } });
     } catch (err) {
@@ -128,7 +133,10 @@ export function likenessRouter(deps: LikenessDeps): Router {
     try {
       const avatarId = await anam.createAvatar(`Haven ${people(doc).user}`, req.body, type);
       const at = deps.now().toISOString();
-      await deps.repo.update(hh(res), (d) => void (d.persona.avatar = { provider: "anam", avatarId, consent: { by: d.persona.childMemberId, at } }));
+      // A still of the same photo, shown on the tablet while it is asleep.
+      const photoKey = deps.media ? mediaKey(doc.id, doc.demo, `avatar/${avatarId}.jpg`) : undefined;
+      if (photoKey) await deps.media!.put(photoKey, req.body, type).catch(() => undefined);
+      await deps.repo.update(hh(res), (d) => void (d.persona.avatar = { provider: "anam", avatarId, photoKey, consent: { by: d.persona.childMemberId, at } }));
       res.status(201).json({ ok: true });
     } catch (err) {
       fail(res, err);
@@ -163,7 +171,15 @@ export function likenessRouter(deps: LikenessDeps): Router {
     const lang = doc.elder.language === "hi-IN" ? "hi" : undefined;
     try {
       const eleven = doc.persona.voice ? await deps.eleven?.() : undefined;
-      const audio = eleven && doc.persona.voice ? await eleven.pcm(doc.persona.voice.voiceId, b.data.text, lang) : await deps.pollyPcm?.(b.data.text);
+      let audio: Buffer | undefined;
+      if (eleven && doc.persona.voice) {
+        // A failing custom voice must not silence the avatar: fall back to the default voice.
+        audio = await eleven.pcm(doc.persona.voice.voiceId, b.data.text, lang).catch((err: Error) => {
+          console.warn(JSON.stringify({ msg: "custom_voice_failed_fallback_polly", error: err.message.slice(0, 200) }));
+          return undefined;
+        });
+      }
+      audio ??= await deps.pollyPcm?.(b.data.text);
       if (!audio) return void res.status(503).json({ error: "speech_unavailable" });
       res.set({ "Content-Type": "application/octet-stream", "Cache-Control": "no-store", "X-Audio-Format": "pcm_s16le;rate=16000;channels=1" }).send(audio);
     } catch (err) {

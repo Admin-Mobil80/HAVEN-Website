@@ -24,6 +24,7 @@ export type ElderProjection = {
   demo: boolean;
   configured: boolean;
   photoAvatar: boolean; // a photo-real avatar is set up (the tablet asks /api/avatar/session)
+  photoKey?: string; // signed into photoUrl by the route
   persona: { displayName: string; mode: "child" | "neutral"; isAI: true; badge: string; childName?: string; childPronouns?: string };
   elder: { name: string; calledBy: string; pronouns: string; language: "en-IN" | "hi-IN" };
   pendingFamilyMessages: number;
@@ -45,6 +46,7 @@ export function elderProjection(doc: Household, now: Date = new Date()): ElderPr
     demo: doc.demo,
     configured: doc.configured,
     photoAvatar: Boolean(doc.persona.avatar) && !neutral,
+    photoKey: neutral ? undefined : doc.persona.avatar?.photoKey,
     persona: { displayName, mode: doc.persona.mode, isAI: true, badge: `${displayName} · AI`, childName: neutral ? undefined : child?.name, childPronouns: neutral ? undefined : child?.pronouns },
     elder: { name: doc.elder.name, calledBy: doc.elder.calledBy, pronouns: doc.elder.pronouns, language: doc.elder.language },
     pendingFamilyMessages: doc.messages.filter((m) => !m.playedAt).length,

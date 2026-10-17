@@ -68,6 +68,7 @@ export type VoiceChoice = {
 export type AvatarChoice = {
   provider: "anam";
   avatarId: string;
+  photoKey?: string; // our copy of the photo, shown while the tablet is asleep
   consent: ConsentRecord;
 };
 

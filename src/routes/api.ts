@@ -9,6 +9,7 @@ import { requireHousehold } from "../http/households.js";
 import { householdWriteLimit, type HouseholdLimiter } from "../http/security.js";
 import { NotFoundError, type Repo } from "../store/repo.js";
 import { withAudioUrls } from "./family.js";
+import { signMediaUrl } from "../http/media.js";
 
 export type ApiRouteDeps = { repo: Repo; secret: string; now: () => Date; householdLimit?: HouseholdLimiter };
 
@@ -79,7 +80,8 @@ export function apiRouter(deps: ApiRouteDeps): Router {
   });
 
   router.get("/api/state/elder", auth, async (_req, res) => {
-    res.json(elderProjection(await loadDoc(deps.repo, res), deps.now()));
+    const { photoKey, ...view } = elderProjection(await loadDoc(deps.repo, res), deps.now());
+    res.json({ ...view, photoUrl: photoKey ? signMediaUrl(photoKey, deps.secret, deps.now()) : undefined });
   });
 
   router.get("/api/state/family", auth, async (_req, res) => {

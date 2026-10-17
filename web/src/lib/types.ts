@@ -20,6 +20,7 @@ export type ElderState = {
   demo: boolean;
   configured: boolean;
   photoAvatar: boolean;
+  photoUrl?: string;
   persona: { displayName: string; mode: "child" | "neutral"; isAI: true; badge: string; childName?: string; childPronouns?: string };
   elder: { name: string; calledBy: string; pronouns: string; language: string };
   pendingFamilyMessages: number;

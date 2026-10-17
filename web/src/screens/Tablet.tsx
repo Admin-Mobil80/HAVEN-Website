@@ -226,6 +226,11 @@ export function Tablet({ chips: chipsProp, compact }: { chips?: string[]; compac
               {photo === "connecting" && <p className="photoav__wait">Connecting to {n.companion}…</p>}
               <div className="avatar__badge" aria-label="This is an AI">{badge}</div>
             </div>
+          ) : elder?.photoUrl && photo === "off" && !open ? (
+            <div className="photoav">
+              <img src={elder.photoUrl} alt={`${n.companion}, asleep`} />
+              <div className="avatar__badge" aria-label="This is an AI">{badge}</div>
+            </div>
           ) : (
             <Avatar mouth={mouth} state={state} badge={badge} dim={Boolean(relay)} />
           )
