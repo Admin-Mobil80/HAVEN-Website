@@ -7,6 +7,7 @@ import { callTool } from "../lib/mcp";
 import { canListen, listen } from "../lib/speech";
 import type { ElderState, PlayedMessage, TurnResponse } from "../lib/types";
 import { forms, useNames } from "../lib/names";
+import { isLive, speakPhoto, startPhotoAvatar } from "../lib/anam";
 
 // Stable function identity that always calls the latest closure.
 function useCallbackRef<A extends unknown[], R>(fn: (...a: A) => R) {
@@ -31,10 +32,17 @@ export function Tablet({ chips: chipsProp, compact }: { chips?: string[]; compac
   const [relay, setRelay] = useState<PlayedMessage | null>(null);
   const [error, setError] = useState("");
   const [callEnded, setCallEnded] = useState<string>();
+  // The photo-real face: "off" (illustrated avatar), "connecting", "live", or "failed" (fallback).
+  const [photo, setPhoto] = useState<"off" | "connecting" | "live" | "failed">("off");
   const busy = useRef(false);
   const openRef = useRef(false);
 
-  const refresh = useCallback(async () => setElder(await api<ElderState>("/api/state/elder")), []);
+  const elderRef = useRef<ElderState | undefined>(undefined);
+  const refresh = useCallback(async () => {
+    const e = await api<ElderState>("/api/state/elder");
+    elderRef.current = e;
+    setElder(e);
+  }, []);
   useEffect(() => {
     const off = poll(refresh, 4000);
     return () => off();
@@ -48,6 +56,16 @@ export function Tablet({ chips: chipsProp, compact }: { chips?: string[]; compac
     if (!r.text) return;
     setCaption(r.text);
     setState("speaking");
+    if (isLive() && !r.audio) {
+      try {
+        await speakPhoto(r.text);
+        setState("idle");
+        return;
+      } catch (e) {
+        console.warn("photo avatar speech failed, falling back", e);
+        setPhoto("failed");
+      }
+    }
     if (r.audio) {
       const timeline = r.visemes;
       let i = 0;
@@ -81,7 +99,8 @@ export function Tablet({ chips: chipsProp, compact }: { chips?: string[]; compac
       setError("");
       setState("thinking");
       try {
-        const r = await api<TurnResponse>("/api/turn", { body });
+        // With the photo avatar live, the avatar speaks (via /api/tts), so skip server audio.
+        const r = await api<TurnResponse>("/api/turn", { body: { ...body, speech: isLive() ? "none" : "server" } });
         for (const t of r.mcpTrace) log({ source: t.client === "rule" ? "rule" : "agent", dir: "•", title: t.summary, isError: t.isError });
         if (r.mode === "safety") log({ source: "rule", dir: "•", title: "safety rule fired: incident opened, family alerted (no LLM)" });
         setConfirm(r.awaitingConfirmation);
@@ -113,8 +132,22 @@ export function Tablet({ chips: chipsProp, compact }: { chips?: string[]; compac
     [turn],
   );
 
+  const startPhoto = useCallback(async () => {
+    if (!elderRef.current?.photoAvatar || isLive()) return;
+    setPhoto("connecting");
+    await new Promise((r) => requestAnimationFrame(() => r(undefined))); // let the <video> mount
+    try {
+      await startPhotoAvatar("haven-video", () => setPhoto("failed"));
+      setPhoto("live");
+    } catch (e) {
+      console.warn("photo avatar unavailable, using the illustrated one", e);
+      setPhoto("failed");
+    }
+  }, []);
+
   const start = useCallback(async () => {
     unlockAudio();
+    await startPhoto();
     if (openRef.current) return;
     openRef.current = true;
     setOpen(true);
@@ -187,7 +220,15 @@ export function Tablet({ chips: chipsProp, compact }: { chips?: string[]; compac
             <button className="btn" onClick={() => setCallEnded(calling.at)}>Call ended</button>
           </div>
         ) : (
-          <Avatar mouth={mouth} state={state} badge={badge} dim={Boolean(relay)} />
+          photo === "connecting" || photo === "live" ? (
+            <div className={`photoav${relay ? " avatar--dim" : ""}`}>
+              <video id="haven-video" autoPlay playsInline />
+              {photo === "connecting" && <p className="photoav__wait">Connecting to {n.companion}…</p>}
+              <div className="avatar__badge" aria-label="This is an AI">{badge}</div>
+            </div>
+          ) : (
+            <Avatar mouth={mouth} state={state} badge={badge} dim={Boolean(relay)} />
+          )
         )}
         {relay && (
           <div className="realcard" role="status">

@@ -8,7 +8,9 @@ import { WhatsAppNotifier } from "../notify/whatsapp.js";
 import { WhatsAppClient } from "../notify/whatsappClient.js";
 import { S3MediaStore } from "../store/s3Media.js";
 import { DynamoRepo } from "../store/dynamoRepo.js";
-import { speak, voiceNote } from "../voice/polly.js";
+import { pcm16, speak, voiceNote } from "../voice/polly.js";
+import { ElevenLabs, charsToMouths } from "../voice/eleven.js";
+import { Anam } from "../voice/anam.js";
 import { writeDigest } from "../agent/digest.js";
 
 // Production entry, bundled to build/lambda/index.mjs and started by run.sh. The Lambda Web Adapter
@@ -84,6 +86,11 @@ async function main() {
   const adminKey = async () => (adminKeyCache ??= await optionalSecret("admin-key"));
   const media = new S3MediaStore(requireEnv("MEDIA_BUCKET"));
   const systemVoice = process.env.POLLY_VOICE_SYSTEM?.trim() || "Brian";
+  // Voice and avatar providers: keys from SSM, read on first use (so they can be added after deploy).
+  let elevenCache: ElevenLabs | undefined;
+  let anamCache: Anam | undefined;
+  const eleven = async () => (elevenCache ??= await optionalSecret("elevenlabs-api-key").then((k) => (k ? new ElevenLabs(k) : undefined)));
+  const anam = async () => (anamCache ??= await optionalSecret("anam-api-key").then((k) => (k ? new Anam(k) : undefined)));
   const app = createApp({
     repo: new DynamoRepo({ tableName: requireEnv("TABLE_NAME") }),
     notifier: whatsapp?.notifier ?? new SimulatedNotifier(),
@@ -108,7 +115,24 @@ async function main() {
     webDir: webDir(),
     // Hosted: Bedrock brain (rules brain on failure or past the daily cap) and Polly speech.
     brain: process.env.HAVEN_BRAIN === "rules" ? "rules" : "bedrock",
-    speak: process.env.HAVEN_SPEECH === "off" ? undefined : (text) => speak(text),
+    // The household's chosen ElevenLabs voice when set (mouth shapes from its character timings),
+    // otherwise Polly Kajal with visemes.
+    speak:
+      process.env.HAVEN_SPEECH === "off"
+        ? undefined
+        : async (text, voice) => {
+            const el = voice ? await eleven() : undefined;
+            if (el && voice) {
+              try {
+                const r = await el.mp3WithTimings(voice.voiceId, text);
+                return { audio: r.audio, contentType: "audio/mpeg", mouths: charsToMouths(r.chars, r.starts) };
+              } catch (err) {
+                console.warn(JSON.stringify({ msg: "elevenlabs_failed_fallback_polly", error: (err as Error).message.slice(0, 200) }));
+              }
+            }
+            return speak(text);
+          },
+    likeness: { eleven, anam, pollyPcm: (text) => pcm16(text) },
     dailyBrainCap: Number(process.env.DAILY_BRAIN_CAP) || undefined,
   });
 

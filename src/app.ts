@@ -12,6 +12,7 @@ import { adminRouter } from "./routes/admin.js";
 import { webhooksRouter, type WebhookDeps } from "./routes/webhooks.js";
 import { eventsRouter } from "./routes/events.js";
 import { familyRouter } from "./routes/family.js";
+import { likenessRouter, type LikenessDeps } from "./routes/likeness.js";
 import type { DigestDeps } from "./jobs/digest.js";
 import type { TurnDeps } from "./agent/turn.js";
 import type { Repo } from "./store/repo.js";
@@ -42,6 +43,8 @@ export type AppDeps = {
   // Evening digest: writer, speech and media (all optional), and which households the 21:00 job serves.
   digest?: Pick<DigestDeps, "write" | "voiceNote" | "mp3" | "media">;
   liveHouseholds?: string[];
+  // Voice (ElevenLabs) and photo avatar (Anam) providers, loaded lazily; absent means off.
+  likeness?: Pick<LikenessDeps, "eleven" | "anam" | "pollyPcm" | "limits">;
 };
 
 const DEFAULT_DEMO_TTL_SECONDS = 7 * 24 * 60 * 60;
@@ -105,6 +108,7 @@ export function createApp(deps: AppDeps): express.Express {
     }),
   );
   app.use(apiRouter({ repo: deps.repo, secret, now, householdLimit }));
+  app.use(likenessRouter({ ...deps.likeness, repo: deps.repo, secret, now, householdLimit }));
   app.use(familyRouter({ repo: deps.repo, secret, now, householdLimit, media: deps.digest?.media, demoTtlSeconds: deps.demoTtlSeconds ?? DEFAULT_DEMO_TTL_SECONDS }));
   app.use(
     turnRouter({

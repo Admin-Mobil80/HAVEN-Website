@@ -1,0 +1,86 @@
+import { test } from "node:test";
+import assert from "node:assert/strict";
+import { signToken } from "../src/http/households.js";
+import { MemoryRepo } from "../src/store/memoryRepo.js";
+import { newHousehold } from "../src/store/seed.js";
+import type { Anam } from "../src/voice/anam.js";
+import { charsToMouths, type ElevenLabs } from "../src/voice/eleven.js";
+import { SECRET, startApp } from "./helpers/httpHarness.js";
+
+const setup = { userName: "Fazil", userPronouns: "he" as const, userRelation: "son", elderName: "Jesy", relationToUser: "mother", calledBy: "Ummi", elderPronouns: "she" as const };
+
+async function app() {
+  const repo = new MemoryRepo();
+  await repo.create(newHousehold("demo-lk", new Date(), setup, { demo: true }));
+  const calls: string[] = [];
+  const eleven = {
+    libraryVoices: async () => [{ voiceId: "lib1", publicOwnerId: "own1", name: "Aarti", accent: "indian" }],
+    addLibraryVoice: async () => (calls.push("add"), "acct-lib1"),
+    cloneVoice: async () => (calls.push("clone"), { voiceId: "clone1", requiresVerification: false }),
+    deleteVoice: async () => void calls.push("delete"),
+    pcm: async () => (calls.push("pcm"), Buffer.alloc(3200)),
+  } as unknown as ElevenLabs;
+  const anam = { createAvatar: async () => (calls.push("avatar"), "av1"), sessionToken: async () => "tok123" } as unknown as Anam;
+  const h = await startApp({ repo, likeness: { eleven: async () => eleven, anam: async () => anam, pollyPcm: async () => Buffer.alloc(1600) } });
+  const auth = { authorization: `Bearer ${signToken("demo-lk", SECRET)}` };
+  return { h, repo, calls, auth };
+}
+
+test("voices: list, pick a library voice, clone own voice only with consent", async () => {
+  const { h, repo, calls, auth } = await app();
+  try {
+    const list = (await h.request("GET", "/api/voices", { headers: auth })).json();
+    assert.equal(list.available, true);
+    assert.equal(list.library[0].name, "Aarti");
+    await h.request("POST", "/api/voice/select", { headers: auth, body: { voiceId: "lib1", publicOwnerId: "own1", name: "Aarti" } });
+    assert.equal((await repo.get("demo-lk"))!.persona.voice?.voiceId, "acct-lib1");
+
+    const rec = Buffer.alloc(30_000, 1);
+    const noConsent = await h.request("POST", "/api/voice/clone", { headers: { ...auth, "content-type": "audio/webm" }, body: rec.toString("latin1") });
+    assert.equal(noConsent.status, 400);
+    const r = await h.request("POST", "/api/voice/clone?consent=yes", { headers: { ...auth, "content-type": "audio/webm" }, body: rec.toString("latin1") });
+    assert.equal(r.status, 201);
+    const v = (await repo.get("demo-lk"))!.persona.voice!;
+    assert.equal(v.source, "cloned");
+    assert.ok(v.consent, "consent recorded");
+    assert.match(v.name, /Fazil's voice \(AI\)/);
+    assert.ok(calls.includes("clone"));
+  } finally {
+    await h.close();
+  }
+});
+
+test("photo avatar: needs consent, then the tablet can get a session token", async () => {
+  const { h, repo, auth } = await app();
+  try {
+    assert.equal((await h.request("POST", "/api/avatar/session", { headers: auth })).status, 409);
+    const img = Buffer.alloc(20_000, 7).toString("latin1");
+    assert.equal((await h.request("POST", "/api/avatar/photo", { headers: { ...auth, "content-type": "image/jpeg" }, body: img })).status, 400);
+    assert.equal((await h.request("POST", "/api/avatar/photo?consent=yes", { headers: { ...auth, "content-type": "image/jpeg" }, body: img })).status, 201);
+    assert.equal((await repo.get("demo-lk"))!.persona.avatar?.avatarId, "av1");
+    assert.equal((await h.request("GET", "/api/state/elder", { headers: auth })).json().photoAvatar, true);
+    assert.equal((await h.request("POST", "/api/avatar/session", { headers: auth })).json().sessionToken, "tok123");
+  } finally {
+    await h.close();
+  }
+});
+
+test("/api/tts returns PCM in the chosen voice, Polly otherwise, with a daily cap", async () => {
+  const { h, repo, calls, auth } = await app();
+  try {
+    const r = await h.request("POST", "/api/tts", { headers: auth, body: { text: "Hello Ummi" } });
+    assert.equal(r.status, 200);
+    assert.match(String(r.headers["x-audio-format"]), /pcm_s16le;rate=16000/);
+    assert.ok(!calls.includes("pcm"), "no voice chosen: Polly");
+    await repo.update("demo-lk", (d) => void (d.persona.voice = { provider: "elevenlabs", voiceId: "v", name: "x", source: "library" }));
+    await h.request("POST", "/api/tts", { headers: auth, body: { text: "Hello again" } });
+    assert.ok(calls.includes("pcm"));
+  } finally {
+    await h.close();
+  }
+});
+
+test("character timings become mouth shapes", () => {
+  const m = charsToMouths(["H", "e", "l", "l", "o", " ", "m", "a"], [0, 60, 120, 180, 240, 300, 360, 420]);
+  assert.deepEqual(m.map((x) => x.mouth), ["rest", "narrow", "open", "narrow", "round", "rest", "closed", "open", "rest"]);
+});

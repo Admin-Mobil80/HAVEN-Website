@@ -4,7 +4,7 @@ import { asksIfReal, declines, isAffirmative } from "../domain/matchers.js";
 import { compilePersona } from "../domain/persona.js";
 import { people } from "../domain/people.js";
 import { classify } from "../domain/safety.js";
-import { CAPS, MOODS, type ActiveSession, type Household, type LogEntry, type SessionRecord } from "../domain/types.js";
+import { CAPS, MOODS, type ActiveSession, type Household, type LogEntry, type SessionRecord, type VoiceChoice } from "../domain/types.js";
 import { capPush, HOUR, istDate, nextId } from "../domain/util.js";
 import type { Notifier } from "../notify/index.js";
 import { NotFoundError, type Repo } from "../store/repo.js";
@@ -24,7 +24,12 @@ import { rulesBrain } from "./rulesBrain.js";
 //   8. speech (Polly mp3 + visemes) for the reply
 // Every outbound effect is awaited before the response: Lambda freezes once it has responded.
 
-export type SpeakFn = (text: string) => Promise<{ audio: Buffer; contentType: string; marks: SpeechMark[] }>;
+// Audio for one reply in the household's chosen voice. marks (Polly visemes) or mouths (from
+// ElevenLabs character timings) drive the illustrated avatar's lips.
+export type SpeakFn = (
+  text: string,
+  voice?: VoiceChoice,
+) => Promise<{ audio: Buffer; contentType: string; marks?: SpeechMark[]; mouths?: { t: number; mouth: Mouth }[] }>;
 
 export type TurnDeps = {
   repo: Repo;
@@ -37,11 +42,13 @@ export type TurnDeps = {
   dailyBrainCap?: number; // Bedrock turns per household per day before the rules brain takes over
 };
 
-export type TurnInput =
+// speech "none": the photo avatar speaks the reply itself (it fetches /api/tts), so no server audio.
+export type TurnInput = (
   | { kind: "text"; text: string }
   | { kind: "session_start" }
   | { kind: "relay_done"; messageId: string }
-  | { kind: "session_end" };
+  | { kind: "session_end" }
+) & { speech?: "server" | "none" };
 
 export type TurnMode = "greeting" | "safety" | "honesty" | "consent" | "deferral" | "brain" | "rules" | "relay" | "goodbye";
 
@@ -99,17 +106,17 @@ export async function runTurn(householdId: string, input: TurnInput, deps: TurnD
       if (reply.pendingReply !== undefined) session.pendingReply = reply.pendingReply ?? undefined;
     }
     if (text) capPush(doc.turns, { id: nextId(doc, "t"), at: now.toISOString(), speaker: "avatar", text }, CAPS.turns);
-    return { familyPending: doc.messages.filter((m) => !m.playedAt).length, speaker: displayName(doc) };
+    return { familyPending: doc.messages.filter((m) => !m.playedAt).length, speaker: displayName(doc), voice: doc.persona.voice };
   });
 
-  const speech = text ? await speakSafely(deps.speak, text) : undefined;
+  const speech = text && input.speech !== "none" ? await speakSafely(deps.speak, text, after.voice) : undefined;
   return {
     text,
     mode,
     speaker: after.speaker,
     audio: speech ? { base64: speech.audio.toString("base64"), contentType: speech.contentType } : undefined,
-    visemes: speech ? toMouthTimeline(speech.marks) : [],
-    words: speech ? speech.marks.filter((m) => m.type === "word").map((m) => ({ time: m.time, value: m.value })) : [],
+    visemes: speech ? (speech.mouths ?? toMouthTimeline(speech.marks ?? [])) : [],
+    words: speech?.marks ? speech.marks.filter((m) => m.type === "word").map((m) => ({ time: m.time, value: m.value })) : [],
     mcpTrace: mcp.trace,
     familyPending: after.familyPending,
     incident: reply.incident,
@@ -348,10 +355,10 @@ async function load(repo: Repo, hh: string) {
 const childName = (doc: Household) => doc.members.find((m) => m.id === doc.persona.childMemberId)?.name ?? "your family";
 const displayName = (doc: Household) => (doc.persona.mode === "neutral" ? "Haven" : doc.persona.displayName);
 
-async function speakSafely(speak: SpeakFn | undefined, text: string) {
+async function speakSafely(speak: SpeakFn | undefined, text: string, voice?: VoiceChoice) {
   if (!speak) return undefined;
   try {
-    return await speak(text);
+    return await speak(text, voice);
   } catch (err) {
     console.warn("speech failed, tablet will use browser speech:", (err as Error).message);
     return undefined;

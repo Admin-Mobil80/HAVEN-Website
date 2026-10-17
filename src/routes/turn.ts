@@ -8,10 +8,11 @@ import { apiErrors } from "./api.js";
 
 export type TurnRouteDeps = Omit<TurnDeps, "mediaUrl"> & { secret: string; householdLimit?: HouseholdLimiter };
 
+const speech = { speech: z.enum(["server", "none"]).optional() };
 const Body = z.union([
-  z.object({ text: z.string().trim().min(1).max(500) }),
-  z.object({ event: z.enum(["session_start", "session_end"]) }),
-  z.object({ event: z.literal("relay_done"), messageId: z.string().trim().min(1).max(40) }),
+  z.object({ text: z.string().trim().min(1).max(500), ...speech }),
+  z.object({ event: z.enum(["session_start", "session_end"]), ...speech }),
+  z.object({ event: z.literal("relay_done"), messageId: z.string().trim().min(1).max(40), ...speech }),
 ]);
 
 // POST /api/turn: the tablet's one conversational endpoint. Text comes from tap-to-talk speech
@@ -24,8 +25,9 @@ export function turnRouter(deps: TurnRouteDeps): Router {
     const parsed = Body.safeParse(req.body ?? {});
     if (!parsed.success) return void res.status(400).json({ error: "invalid_body" });
     const b = parsed.data;
-    const input: TurnInput =
+    const base: TurnInput =
       "text" in b ? { kind: "text", text: b.text } : b.event === "relay_done" ? { kind: "relay_done", messageId: b.messageId } : { kind: b.event };
+    const input: TurnInput = { ...base, speech: b.speech };
     res.set("Cache-Control", "no-store").json(await runTurn(res.locals.householdId as string, input, turnDeps));
   });
 

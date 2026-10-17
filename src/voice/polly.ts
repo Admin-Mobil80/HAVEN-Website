@@ -226,3 +226,19 @@ export async function voiceNote(text: string, opts: Omit<SpeakOptions, "cache"> 
     SampleRate: "48000",
   });
 }
+
+// Raw 16 kHz 16-bit mono PCM for the photo avatar's audio passthrough (default voice).
+export async function pcm16(text: string, opts: Omit<SpeakOptions, "cache"> = {}): Promise<Buffer> {
+  const clean = checkText(text);
+  const o = resolve(opts);
+  const { ssml } = toSsml(clean, o.ratePercent);
+  return synth(o.client, {
+    Engine: o.engine,
+    VoiceId: o.voiceId as VoiceId,
+    LanguageCode: o.languageCode as LanguageCode,
+    Text: ssml,
+    TextType: "ssml",
+    OutputFormat: "pcm",
+    SampleRate: "16000",
+  });
+}

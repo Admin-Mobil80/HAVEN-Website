@@ -8,6 +8,7 @@ import { AlexaSim } from "./AlexaSim";
 import { Family } from "./Family";
 import { Setup } from "./Setup";
 import { SetupWizard } from "./SetupWizard";
+import { Likeness } from "./Likeness";
 import { useNames, type Names } from "../lib/names";
 import { Tablet } from "./Tablet";
 
@@ -67,7 +68,10 @@ export function Judge() {
       {names.ready && !names.configured ? (
         <SetupWizard onDone={() => setTab("demo")} />
       ) : tab === "setup" ? (
-        <Setup />
+        <>
+          <Likeness />
+          <Setup />
+        </>
       ) : (
         <>
           <div className="steps" role="toolbar" aria-label="Demo steps">

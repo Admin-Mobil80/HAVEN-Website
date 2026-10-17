@@ -9,6 +9,8 @@ import { on } from "./bus";
 export type Pronouns = "she" | "he" | "they";
 export type SetupView = {
   configured: boolean;
+  voice: { name: string; source: string } | null;
+  photoAvatar: boolean;
   elder: { name: string; calledBy: string; city: string; relationToUser: string; pronouns: Pronouns };
   user: { name: string; relation: string; pronouns: Pronouns };
   childName: string;

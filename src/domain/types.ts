@@ -50,6 +50,25 @@ export type Persona = {
   deferTopics: DeferTopic[];
   avoidTopics: string[]; // things the avatar must never store or raise
   likenessConsent?: ConsentRecord; // the child approved this avatar
+  voice?: VoiceChoice; // absent: the default Polly voice
+  avatar?: AvatarChoice; // absent: the illustrated avatar
+};
+
+// The companion's voice: cloned from the main user's own recording (with consent) or picked from
+// the ElevenLabs library.
+export type VoiceChoice = {
+  provider: "elevenlabs";
+  voiceId: string;
+  name: string;
+  source: "cloned" | "library";
+  consent?: ConsentRecord; // required for a cloned voice
+};
+
+// The photo-real face: an Anam avatar made from the main user's own photo (with consent).
+export type AvatarChoice = {
+  provider: "anam";
+  avatarId: string;
+  consent: ConsentRecord;
 };
 
 export type Consents = {
