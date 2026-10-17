@@ -146,7 +146,7 @@ const REAL: Case[] = [
 
 for (const [text, expected, todo] of REAL) {
   test(`asksIfReal(${JSON.stringify(text)}) is ${expected}`, todo ? { todo } : {}, () => {
-    assert.equal(asksIfReal(text), expected);
+    assert.equal(asksIfReal(text, "Priya"), expected);
   });
 }
 

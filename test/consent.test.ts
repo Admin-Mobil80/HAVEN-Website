@@ -271,7 +271,7 @@ test("call_request goes through the same consent", async () => {
   h.t.ms += SECOND;
   const r = await h.call({ ...args, confirmation_id: id });
   assert.equal(r.data.status, "simulated");
-  assert.match(h.notifier.sent[0].body, /would like you to call her/);
+  assert.match(h.notifier.sent[0].body, /would like you to call/);
 });
 
 test("no primary member means nothing can be sent", async () => {

@@ -105,7 +105,7 @@ export function createApp(deps: AppDeps): express.Express {
     }),
   );
   app.use(apiRouter({ repo: deps.repo, secret, now, householdLimit }));
-  app.use(familyRouter({ repo: deps.repo, secret, now, householdLimit, media: deps.digest?.media }));
+  app.use(familyRouter({ repo: deps.repo, secret, now, householdLimit, media: deps.digest?.media, demoTtlSeconds: deps.demoTtlSeconds ?? DEFAULT_DEMO_TTL_SECONDS }));
   app.use(
     turnRouter({
       repo: deps.repo,
@@ -185,7 +185,7 @@ const PLACEHOLDER_HTML = `<!doctype html>
 <body>
 <h1>Haven server is running</h1>
 <p>The web app is not built yet. Build it into <code>web/dist</code> to get the judge demo, the tablet and the family view.</p>
-<p>Haven's "Digital Priya" is an AI companion and is always labelled as one. All demo data is synthetic.</p>
+<p>Haven's "Digital &lt;name&gt;" companion is an AI and is always labelled as one. All demo data is synthetic.</p>
 <h2>Endpoints</h2>
 <ul>
   <li><code>POST /mcp</code>: MCP (Streamable HTTP, stateless, JSON responses) for the public demo household</li>

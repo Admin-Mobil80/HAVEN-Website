@@ -7,9 +7,9 @@ export function registerPrompts(server: McpServer, ctx: ToolContext) {
   server.registerPrompt(
     "digital_priya_persona",
     {
-      title: "Digital Priya persona",
+      title: "Companion persona",
       description:
-        "System instructions for talking with the elder as this household's labelled AI companion (Digital Priya, or plain Haven when the family has switched it off).",
+        "System instructions for talking with the elder as this household's labelled AI companion ('Digital <name>', or plain Haven when the family has switched it off).",
     },
     async () => {
       const doc = await loadDoc(ctx);

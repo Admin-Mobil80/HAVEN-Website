@@ -1,23 +1,13 @@
 import { useEffect, useState } from "react";
 import { api } from "../lib/api";
 import { emit } from "../lib/bus";
-
-type SetupView = {
-  elder: { name: string; calledBy: string; city: string; age: number };
-  childName: string;
-  displayName: string;
-  style: { callsElder: string; phrases: string[]; tone: string; topicsSheLoves: string[]; neverSays: string[] };
-  deferTopics: string[];
-  avoidTopics: string[];
-  goals: { baselineCallsPerWeek: number; goalCallsPerWeek: number };
-  consents: { shareSummaries: boolean; likeness: boolean; likenessAt?: string };
-};
+import { forms, type Pronouns, type SetupView } from "../lib/names";
 
 const TOPICS = ["plans", "visit", "money", "health", "family", "promise"] as const;
 const lines = (s: string) => s.split("\n").map((x) => x.trim()).filter(Boolean);
 
-// "Teach Haven about Amma": Priya sets who her mother is, how she herself talks, what Digital
-// Priya must always pass back to her, and the consents. Pre-filled from the household.
+// "Teach Haven about <them>": who they are, how the main user talks to them, what the companion
+// must always pass back, and the consents. Pre-filled from the household's setup.
 export function Setup() {
   const [v, setV] = useState<SetupView>();
   const [saved, setSaved] = useState("");
@@ -26,44 +16,62 @@ export function Setup() {
   }, []);
   if (!v) return <section className="panel setup"><p className="muted">Loading…</p></section>;
 
+  const E = forms(v.elder.pronouns);
+  const them = v.elder.calledBy || v.elder.name;
   const save = async () => {
     setSaved("Saving…");
     try {
-      setV(await api<SetupView>("/api/setup", { body: { elder: v.elder, style: v.style, deferTopics: v.deferTopics, avoidTopics: v.avoidTopics, goals: v.goals, consents: v.consents } }));
-      setSaved("Saved. Digital Priya uses this from her next sentence.");
+      setV(await api<SetupView>("/api/setup", { body: { elder: v.elder, user: v.user, style: v.style, deferTopics: v.deferTopics, avoidTopics: v.avoidTopics, goals: v.goals, consents: v.consents } }));
+      setSaved(`Saved. ${v.displayName} uses this from the next sentence.`);
       emit("refresh");
     } catch (e) {
       setSaved(`Couldn't save: ${(e as Error).message}`);
     }
   };
   const set = (patch: Partial<SetupView>) => setV({ ...v, ...patch });
+  const elder = (patch: Partial<SetupView["elder"]>) => set({ elder: { ...v.elder, ...patch } });
+  const user = (patch: Partial<SetupView["user"]>) => set({ user: { ...v.user, ...patch } });
   const style = (patch: Partial<SetupView["style"]>) => set({ style: { ...v.style, ...patch } });
+  const pron = (value: Pronouns, onChange: (p: Pronouns) => void) => (
+    <div className="pron" role="radiogroup">
+      {(["she", "he", "they"] as Pronouns[]).map((p) => (
+        <button type="button" key={p} className={`chip${value === p ? " is-on" : ""}`} aria-pressed={value === p} onClick={() => onChange(p)}>
+          {p}/{forms(p).obj}
+        </button>
+      ))}
+    </div>
+  );
 
   return (
-    <section className="panel setup" aria-label="Teach Haven about Amma">
+    <section className="panel setup" aria-label={`Teach Haven about ${them}`}>
       <header className="panel__head">
-        <h2>Teach Haven about {v.elder.calledBy}</h2>
-        <span className="muted">only {v.childName} can change this</span>
+        <h2>Teach Haven about {them}</h2>
+        <span className="muted">only {v.user.name} can change this</span>
       </header>
       <div className="setup__grid">
         <fieldset>
-          <legend>{v.elder.calledBy}'s world</legend>
-          <label>Her name<input value={v.elder.name} onChange={(e) => set({ elder: { ...v.elder, name: e.target.value } })} /></label>
-          <label>You call her<input value={v.elder.calledBy} onChange={(e) => set({ elder: { ...v.elder, calledBy: e.target.value } })} /></label>
-          <label>City<input value={v.elder.city} onChange={(e) => set({ elder: { ...v.elder, city: e.target.value } })} /></label>
-          <label>Things she loves (one per line)<textarea rows={4} value={v.style.topicsSheLoves.join("\n")} onChange={(e) => style({ topicsSheLoves: lines(e.target.value) })} /></label>
+          <legend>{them}</legend>
+          <label>Name<input value={v.elder.name} onChange={(e) => elder({ name: e.target.value })} /></label>
+          <label>You call {E.obj}<input value={v.elder.calledBy} onChange={(e) => elder({ calledBy: e.target.value })} /></label>
+          <label>{E.Subj === "They" ? "They are" : `${E.Subj} is`} your<input value={v.elder.relationToUser} onChange={(e) => elder({ relationToUser: e.target.value })} /></label>
+          {pron(v.elder.pronouns, (p) => elder({ pronouns: p }))}
+          <label>City<input value={v.elder.city} onChange={(e) => elder({ city: e.target.value })} /></label>
+          <label>Things {them} loves (one per line)<textarea rows={4} value={v.style.topicsTheyLove.join("\n")} onChange={(e) => style({ topicsTheyLove: lines(e.target.value) })} /></label>
         </fieldset>
 
         <fieldset>
-          <legend>How you talk to her</legend>
-          <label>Your words and phrases (one per line)<textarea rows={3} value={v.style.phrases.join("\n")} onChange={(e) => style({ phrases: lines(e.target.value) })} /></label>
+          <legend>You</legend>
+          <label>Your name<input value={v.user.name} onChange={(e) => user({ name: e.target.value })} /></label>
+          <label>You are {E.poss}<input value={v.user.relation} onChange={(e) => user({ relation: e.target.value })} /></label>
+          {pron(v.user.pronouns, (p) => user({ pronouns: p }))}
+          <label>Words you use with {E.obj} (one per line)<textarea rows={3} value={v.style.phrases.join("\n")} onChange={(e) => style({ phrases: lines(e.target.value) })} /></label>
           <label>Tone<input value={v.style.tone} onChange={(e) => style({ tone: e.target.value })} /></label>
           <label>{v.displayName} must never (one per line)<textarea rows={3} value={v.style.neverSays.join("\n")} onChange={(e) => style({ neverSays: lines(e.target.value) })} /></label>
         </fieldset>
 
         <fieldset>
           <legend>Always pass these to the real you</legend>
-          <p className="muted">{v.displayName} says "let me check with the real {v.childName}" instead of answering.</p>
+          <p className="muted">{v.displayName} says "let me check with the real {v.user.name}" instead of answering.</p>
           {TOPICS.map((t) => (
             <label key={t} className="check">
               <input type="checkbox" checked={v.deferTopics.includes(t)} onChange={(e) => set({ deferTopics: e.target.checked ? [...v.deferTopics, t] : v.deferTopics.filter((x) => x !== t) })} />
@@ -79,11 +87,11 @@ export function Setup() {
           <label>Your goal<input type="number" min={1} max={21} value={v.goals.goalCallsPerWeek} onChange={(e) => set({ goals: { ...v.goals, goalCallsPerWeek: Number(e.target.value) } })} /></label>
           <label className="check">
             <input type="checkbox" checked={v.consents.likeness} onChange={(e) => set({ consents: { ...v.consents, likeness: e.target.checked } })} />
-            I approve "{v.displayName} · AI", an illustrated AI version of me{v.consents.likenessAt ? ` (approved ${new Date(v.consents.likenessAt).toLocaleDateString()})` : ""}. Unticking switches to a neutral "Haven" companion.
+            I approve "{v.displayName} · AI", an AI version of me{v.consents.likenessAt ? ` (approved ${new Date(v.consents.likenessAt).toLocaleDateString()})` : ""}. Unticking switches to a neutral "Haven" companion.
           </label>
           <label className="check">
             <input type="checkbox" checked={v.consents.shareSummaries} onChange={(e) => set({ consents: { ...v.consents, shareSummaries: e.target.checked } })} />
-            {v.elder.calledBy} agreed that a short daily summary is shared with family. Things she asks to keep private are never shared.
+            {them} agreed that a short daily summary is shared with family. Things {E.subj} asks to keep private are never shared.
           </label>
         </fieldset>
       </div>

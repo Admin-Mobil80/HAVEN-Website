@@ -7,16 +7,19 @@ import { resetConnection } from "../lib/mcp";
 import { AlexaSim } from "./AlexaSim";
 import { Family } from "./Family";
 import { Setup } from "./Setup";
+import { SetupWizard } from "./SetupWizard";
+import { useNames, type Names } from "../lib/names";
 import { Tablet } from "./Tablet";
 
-// One page for judges: the simulator, Amma's tablet and Priya's phone side by side, a step bar
-// that walks the story, and a private demo household per browser tab (no sign-up, no tokens).
-const STEPS: { label: string; run: () => void | Promise<unknown> }[] = [
-  { label: "1 · Alexa, talk to Priya", run: () => emit("alexa:say", "Alexa, talk to Priya") },
-  { label: "2 · A memory", run: () => emit("tablet:say", "I met Saroja at the temple today, we used to sing together") },
-  { label: "3 · Will you come for Diwali?", run: () => emit("tablet:say", "Will you come for Diwali?") },
-  { label: "4 · Tell Priya…", run: () => emit("tablet:say", "Tell Priya the jasmine has bloomed") },
-  { label: "5 · Haan", run: () => emit("tablet:say", "Haan, send it") },
+// One page for judges: the simulator, the tablet and the family member's phone side by side, a
+// step bar that walks the story, and a private demo household per browser tab (no sign-up, no
+// tokens). Every demo starts with setup; the steps use the names given there.
+const steps = (n: Names): { label: string; run: () => void | Promise<unknown> }[] => [
+  { label: `1 · Alexa, talk to ${n.user}`, run: () => emit("alexa:say", `Alexa, talk to ${n.user}`) },
+  { label: "2 · A memory", run: () => emit("tablet:say", "I met my old friend at the market today, we used to sing together") },
+  { label: "3 · Will you come home?", run: () => emit("tablet:say", "Will you come home next month?") },
+  { label: `4 · Tell ${n.user}…`, run: () => emit("tablet:say", `Tell ${n.user} the flowers in the garden have bloomed`) },
+  { label: "5 · Yes, send it", run: () => emit("tablet:say", "Yes, send it") },
   { label: "6 · Evening update", run: () => api("/api/digest/run", { body: {} }).then(() => emit("refresh")) },
   { label: "7 · Help, I feel dizzy", run: () => emit("tablet:say", "Help, I feel dizzy") },
 ];
@@ -24,6 +27,7 @@ const STEPS: { label: string; run: () => void | Promise<unknown> }[] = [
 export function Judge() {
   const [tab, setTab] = useState<"demo" | "setup">("demo");
   const [resetting, setResetting] = useState(false);
+  const names = useNames();
 
   const reset = async () => {
     setResetting(true);
@@ -45,7 +49,7 @@ export function Judge() {
           <span className="brand__mark" aria-hidden>H</span>
           <div>
             <h1>Haven</h1>
-            <p>Most AI companions want more of Amma's time. Haven wants more of Priya's calls.</p>
+            <p>Most AI companions want more of your loved one's time. Haven wants more of your calls.</p>
           </div>
         </div>
         <nav className="row">
@@ -55,15 +59,19 @@ export function Judge() {
         </nav>
       </header>
       <p className="disclaimer">
-        Demo household with synthetic data (Kamala, 74, Bengaluru; her daughter Priya). "Digital Priya" is an AI and always says so. "Simulated Alexa+ add-on" is our own MCP client, not an Amazon product. WhatsApp sends are simulated here and mirrored on Priya's phone.
+        {names.configured
+          ? `A private demo household for this browser tab. "${names.companion}" is an AI and always says so. "Simulated Alexa+ add-on" is our own MCP client, not an Amazon product. WhatsApp sends are simulated here and mirrored on ${names.user}'s phone.`
+          : "A private demo household for this browser tab. Haven's companion is an AI and always says so. Start by telling Haven who you are and who it is for."}
       </p>
 
-      {tab === "setup" ? (
+      {names.ready && !names.configured ? (
+        <SetupWizard onDone={() => setTab("demo")} />
+      ) : tab === "setup" ? (
         <Setup />
       ) : (
         <>
           <div className="steps" role="toolbar" aria-label="Demo steps">
-            {STEPS.map((s) => (
+            {steps(names).map((s) => (
               <button key={s.label} className="step" onClick={() => (unlockAudio(), void s.run())}>
                 {s.label}
               </button>

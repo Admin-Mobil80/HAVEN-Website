@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-// Stylised, clearly illustrated "Digital Priya" (not a photo, not photoreal). Five mouth shapes
+// Stylised, clearly illustrated fallback companion (used when the photo avatar is off or fails). Five mouth shapes
 // follow Polly viseme timings; the AI badge is part of the component so it can never be hidden.
 
 export type Mouth = "rest" | "closed" | "narrow" | "open" | "round";

@@ -2,6 +2,7 @@ import { detectCommitment } from "../domain/commitment.js";
 import { guardReply } from "../domain/guards.js";
 import { asksIfReal, declines, isAffirmative } from "../domain/matchers.js";
 import { compilePersona } from "../domain/persona.js";
+import { people } from "../domain/people.js";
 import { classify } from "../domain/safety.js";
 import { CAPS, MOODS, type ActiveSession, type Household, type LogEntry, type SessionRecord } from "../domain/types.js";
 import { capPush, HOUR, istDate, nextId } from "../domain/util.js";
@@ -65,7 +66,7 @@ const DEFAULT_BRAIN_CAP = 300;
 
 // A request in her own words to pass something on: "tell Priya ...", "Priya ko bolo ...".
 const ASKS_TO_SEND = (child: string) =>
-  new RegExp(String.raw`\b(tell|let|ask|message|inform|send)\b.{0,40}\b(${child}|her|my daughter|beti)\b|\b(${child}|beti)\s+(ko|se)\b.{0,40}\b(bolo|bol do|batao|bata do|kaho|keh do)\b`, "i");
+  new RegExp(String.raw`\b(tell|let|ask|message|inform|send)\b.{0,40}\b(${child}|her|him|them|my (daughter|son|grandson|granddaughter|child)|beti|beta)\b|\b(${child}|beti|beta)\s+(ko|se)\b.{0,40}\b(bolo|bol do|batao|bata do|kaho|keh do)\b`, "i");
 const ASKS_FOR_CALL = /\b(call me|ring me|phone me|give me a call|mujhe (call|phone) kar)/i;
 const SOUNDS_PRIVATE = /\b(don'?t|do not|never)\s+(tell|mention|say|share)\b|\b(mat|na) (batana|bataana|batao|bolna|kehna)\b/i;
 
@@ -179,8 +180,9 @@ async function relayDone(hh: string, messageId: string, deps: TurnDeps, now: Dat
   const doc = await load(deps.repo, hh);
   const child = childName(doc);
   if (!out.kind) return { text: "", mode: "relay" };
-  if (out.promise) return { text: `And ${child} says she'll call you tonight, ${doc.elder.calledBy}!`, mode: "relay" };
-  if (out.kind === "voice" || out.kind === "deferral_answer") return { text: `That was the real ${child}, in her own voice.`, mode: "relay" };
+  const U = people(doc).userP;
+  if (out.promise) return { text: `And ${child} says ${U.subj}'ll call you tonight, ${doc.elder.calledBy}!`, mode: "relay" };
+  if (out.kind === "voice" || out.kind === "deferral_answer") return { text: `That was the real ${child}, in ${U.poss} own voice.`, mode: "relay" };
   return { text: "", mode: "relay" };
 }
 
@@ -226,7 +228,7 @@ async function textTurn(hh: string, raw: string, deps: TurnDeps, mcp: LocalMcp, 
     const say =
       doc.persona.mode === "neutral"
         ? `I'm Haven, an AI companion, not a person. Your family reads a short summary every evening.`
-        : `I'm ${name}, an AI version of ${child}, made with her permission. I'm not the real ${child}; she reads a short summary every evening and calls you herself.`;
+        : `I'm ${name}, an AI version of ${child}, made with ${people(doc).userP.poss} permission. I'm not the real ${child}. The real ${child} reads a short summary every evening and calls you in person.`;
     return { text: say, mode: "honesty", disclosed: true, ruleEvent, incident };
   }
 
@@ -250,7 +252,7 @@ async function textTurn(hh: string, raw: string, deps: TurnDeps, mcp: LocalMcp, 
   const commitment = detectCommitment(text, child);
   if (commitment) {
     const r = await mcp.call("agent", "create_deferral", { topic: commitment.topic, question: commitment.question, context: "" });
-    const say = r.ok && typeof r.data.say === "string" ? r.data.say : `That one's for the real ${child}. I'll ask her tonight.`;
+    const say = r.ok && typeof r.data.say === "string" ? r.data.say : `That one's for the real ${child}. I'll ask ${people(doc).userP.obj} tonight.`;
     return withDisclosure({ text: say, mode: "deferral", deferralId: r.ok ? String(r.data.deferral_id) : undefined, pendingReply: clearPending, ruleEvent, incident });
   }
 
@@ -305,7 +307,7 @@ function contextFor(doc: Household, now: Date) {
   const open = doc.deferrals.filter((d) => d.status === "open").map((d) => `- ${d.question}`);
   return [
     `Today (IST): ${istDate(now)}`,
-    `Elder: ${doc.elder.name}, ${doc.elder.age}, ${doc.elder.city}; call her ${doc.elder.calledBy}.`,
+    `Elder: ${doc.elder.name}${doc.elder.age ? `, ${doc.elder.age}` : ""}${doc.elder.city ? `, ${doc.elder.city}` : ""} (${childName(doc)}'s ${doc.elder.relationToUser}); always call ${people(doc).elderP.obj} "${doc.elder.calledBy}".`,
     `Known memories:\n${memories.join("\n") || "- none"}`,
     `Reminders from family:\n${reminders.join("\n") || "- none"}`,
     `Questions already passed to the real family (do not answer them yourself):\n${open.join("\n") || "- none"}`,

@@ -1,6 +1,6 @@
-// Tiny in-page event bus. In judge mode the simulator, the tablet and Priya's phone are three
-// components on one page; this is how "Alexa, talk to Priya" opens the tablet and how the step
-// bar speaks for Amma.
+// Tiny in-page event bus. In judge mode the simulator, the tablet and the family phone are three
+// components on one page; this is how "Alexa, talk to <name>" opens the tablet and how the step
+// bar speaks for the person using the tablet.
 
 export type LogItem = {
   at: string;

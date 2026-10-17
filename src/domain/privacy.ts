@@ -22,12 +22,13 @@ const ACTIVE_INCIDENT = new Set(["open", "acknowledged"]);
 export type ElderProjection = {
   householdId: string;
   demo: boolean;
-  persona: { displayName: string; mode: "child" | "neutral"; isAI: true; badge: string; childName?: string };
-  elder: { name: string; calledBy: string; language: "en-IN" | "hi-IN" };
+  configured: boolean;
+  persona: { displayName: string; mode: "child" | "neutral"; isAI: true; badge: string; childName?: string; childPronouns?: string };
+  elder: { name: string; calledBy: string; pronouns: string; language: "en-IN" | "hi-IN" };
   pendingFamilyMessages: number;
   reminders: { id: string; text: string; due: string; source: Reminder["source"] }[];
   openIncident: { id: string; tier: Incident["tier"]; emergency: boolean; state: Incident["state"]; openedAt: string } | null;
-  familyCalling: { by: string; at: string } | null; // a family member tapped "Call Mum" moments ago
+  familyCalling: { by: string; at: string } | null; // a family member tapped "Call" moments ago
 };
 
 // What Amma's tablet needs. No phone numbers, no other members' details, no family-side data.
@@ -41,8 +42,9 @@ export function elderProjection(doc: Household, now: Date = new Date()): ElderPr
   return {
     householdId: doc.id,
     demo: doc.demo,
-    persona: { displayName, mode: doc.persona.mode, isAI: true, badge: `${displayName} · AI`, childName: neutral ? undefined : child?.name },
-    elder: { name: doc.elder.name, calledBy: doc.elder.calledBy, language: doc.elder.language },
+    configured: doc.configured,
+    persona: { displayName, mode: doc.persona.mode, isAI: true, badge: `${displayName} · AI`, childName: neutral ? undefined : child?.name, childPronouns: neutral ? undefined : child?.pronouns },
+    elder: { name: doc.elder.name, calledBy: doc.elder.calledBy, pronouns: doc.elder.pronouns, language: doc.elder.language },
     pendingFamilyMessages: doc.messages.filter((m) => !m.playedAt).length,
     reminders: [...doc.reminders]
       .sort((a, b) => a.due.localeCompare(b.due))
@@ -57,7 +59,8 @@ export function elderProjection(doc: Household, now: Date = new Date()): ElderPr
 export type FamilyProjection = {
   householdId: string;
   demo: boolean;
-  elder: { name: string; calledBy: string; age: number; city: string; phone: string };
+  elder: { name: string; calledBy: string; relationToUser: string; pronouns: string; age?: number; city: string; phone: string };
+  configured: boolean;
   members: { id: string; name: string; relation: string; role: "primary" | "backup"; waOptIn: boolean }[];
   persona: { displayName: string; mode: "child" | "neutral" };
   consents: { conversationStorage: boolean; shareSummaries: boolean; healthNotes: boolean };
@@ -84,7 +87,8 @@ export function familyProjection(doc: Household, now: Date): FamilyProjection {
   return {
     householdId: doc.id,
     demo: doc.demo,
-    elder: { name: doc.elder.name, calledBy: doc.elder.calledBy, age: doc.elder.age, city: doc.elder.city, phone: doc.elder.phone },
+    configured: doc.configured,
+    elder: { name: doc.elder.name, calledBy: doc.elder.calledBy, relationToUser: doc.elder.relationToUser, pronouns: doc.elder.pronouns, age: doc.elder.age, city: doc.elder.city, phone: doc.elder.phone },
     members: doc.members.map((m) => ({ id: m.id, name: m.name, relation: m.relation, role: m.role, waOptIn: Boolean(m.waOptIn && !m.waOptIn.revokedAt) })),
     persona: { displayName: doc.persona.displayName, mode: doc.persona.mode },
     consents: {

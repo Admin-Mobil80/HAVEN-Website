@@ -11,13 +11,13 @@ const norm = (s: string) => s.toLowerCase().replace(/[^\p{L}\p{N}\s']/gu, " ").r
 const CONCERNS: [RegExp, Concern, string][] = [
   [/\b(didn'?t|did not|haven'?t|have not|not) (eat|eaten|had (my )?(food|lunch|dinner|breakfast))\b|\bnot hungry\b|khana nahi/, "not_eating", "Please try to eat a little something, {calledBy}. Shall I tell {child}?"],
   [/\b(couldn'?t|could not|can'?t|cannot|didn'?t) sleep\b|\bno sleep\b|kept waking|neend nahi/, "poor_sleep", "Oh no, a bad night. Maybe a short rest this afternoon, {calledBy}?"],
-  [/\b(lonely|alone|nobody (visits|comes|talks)|no one (visits|comes|talks)|akel[ia])\b/, "lonely", "I'm here with you, {calledBy}. And {child} will love to hear your voice when she calls."],
+  [/\b(lonely|alone|nobody (visits|comes|talks)|no one (visits|comes|talks)|akel[ia])\b/, "lonely", "I'm here with you, {calledBy}. And {child} will love to hear your voice on the next call."],
   [/\b(sad|low|upset|crying|udaas)\b/, "low_mood", "I'm sorry you feel low today, {calledBy}. Do you want to tell me about it?"],
   [/\b(pain|hurts|aching|dard)\b/, "pain", "I'm sorry it hurts, {calledBy}. Please tell your doctor about the pain, and I'll let {child} know."],
 ];
 
 const TELL_CHILD = (child: string) =>
-  new RegExp(String.raw`^(?:please |can you |could you )?(?:tell|let|ask|message|inform) (?:${child}|her|my daughter|beti)(?: know)?(?: that)?[ ,:]+(.{3,200})$`, "i");
+  new RegExp(String.raw`^(?:please |can you |could you )?(?:tell|let|ask|message|inform) (?:${child}|her|him|them|my (?:daughter|son|grandson|granddaughter|child)|beti|beta)(?: know)?(?: that)?[ ,:]+(.{3,200})$`, "i");
 
 const GREETING = /^(hi|hello|hey|namaste|namaskara|good (morning|afternoon|evening))\b/;
 const BYE = /\b(bye|good night|goodnight|talk later|that'?s all|see you)\b/;
@@ -48,7 +48,7 @@ export function rulesBrain(doc: Household, elderText: string): BrainResult {
 
   if (/\?$/.test(elderText.trim())) return out("Hmm, that's a good question, {calledBy}. I'll ask {child} and tell you.");
   // Steer towards something she loves (from Priya's style card), rotating so it does not repeat.
-  const topics = doc.persona.style.topicsSheLoves;
+  const topics = doc.persona.style.topicsTheyLove;
   const topic = topics.length ? topics[doc.turns.length % topics.length].split(" (")[0] : undefined;
   return out(topic ? `Achha, {calledBy}. And tell me, how is ${topic} these days?` : "Achha, {calledBy}. Tell me more.");
 }

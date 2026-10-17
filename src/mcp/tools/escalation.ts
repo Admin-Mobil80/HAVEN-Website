@@ -23,7 +23,7 @@ export function alertBody(doc: Pick<Household, "elder">, incident: Pick<Incident
   const { elder } = doc;
   const words = incident.elderWords.trim();
   const said = words ? `${elder.name} (${elder.calledBy}) said: "${words}".` : `${elder.name} (${elder.calledBy}) may need help.`;
-  return `${incident.emergency ? "EMERGENCY" : "Urgent"} from Haven. ${said} Please call her now on +${elder.phone}. Haven has told her to call 112 if she is in danger.`;
+  return `${incident.emergency ? "EMERGENCY" : "Urgent"} from Haven. ${said} Please call now${elder.phone ? ` on +${elder.phone}` : ""}. Haven has said to call 112 in danger.`;
 }
 
 export function registerEscalationTools(server: McpServer, ctx: ToolContext) {

@@ -1,11 +1,14 @@
 import express, { Router } from "express";
 import { z } from "zod";
-import { CAPS, DEFER_TOPICS, type FamilyMessage, type Household } from "../domain/types.js";
+import { CAPS, type FamilyMessage, type Household } from "../domain/types.js";
 import { capPush, DAY, istDate, nextId } from "../domain/util.js";
 import { requireHousehold } from "../http/households.js";
 import { signMediaUrl } from "../http/media.js";
 import { householdWriteLimit, type HouseholdLimiter } from "../http/security.js";
 import { mediaKey } from "../store/s3Media.js";
+import { newHousehold } from "../store/seed.js";
+import { SetupBody as NewSetupBody } from "./setupSchema.js";
+import { DEFER_TOPICS as TOPICS, PRONOUNS } from "../domain/types.js";
 import type { Repo } from "../store/repo.js";
 import { apiErrors } from "./api.js";
 
@@ -18,24 +21,25 @@ export type FamilyRouteDeps = {
   now: () => Date;
   media?: { put(key: string, data: Buffer, contentType: string): Promise<void> };
   householdLimit?: HouseholdLimiter;
+  demoTtlSeconds?: number;
 };
 
 const AUDIO_TYPES = /^audio\/(webm|ogg|mp4|mpeg|aac|x-m4a)(;.*)?$/;
 
 const text = (max: number) => z.string().trim().min(1).max(max);
 const SetupBody = z.object({
-  elder: z.object({ name: text(40), calledBy: text(20), city: text(40) }).partial().optional(),
+  elder: z.object({ name: text(40), calledBy: text(30), city: z.string().trim().max(40), relationToUser: text(40), pronouns: z.enum(PRONOUNS) }).partial().optional(),
+  user: z.object({ name: text(40), relation: text(40), pronouns: z.enum(PRONOUNS) }).partial().optional(),
   style: z
     .object({
-      callsElder: text(20),
       phrases: z.array(text(40)).max(8),
       tone: text(120),
-      topicsSheLoves: z.array(text(80)).max(8),
+      topicsTheyLove: z.array(text(80)).max(8),
       neverSays: z.array(text(120)).max(8),
     })
     .partial()
     .optional(),
-  deferTopics: z.array(z.enum(DEFER_TOPICS)).max(DEFER_TOPICS.length).optional(),
+  deferTopics: z.array(z.enum(TOPICS)).max(TOPICS.length).optional(),
   avoidTopics: z.array(text(80)).max(10).optional(),
   goals: z.object({ baselineCallsPerWeek: z.number().int().min(0).max(21), goalCallsPerWeek: z.number().int().min(1).max(21) }).partial().optional(),
   consents: z.object({ shareSummaries: z.boolean(), likeness: z.boolean() }).partial().optional(),
@@ -44,7 +48,9 @@ const SetupBody = z.object({
 export function setupView(doc: Household) {
   const child = doc.members.find((m) => m.id === doc.persona.childMemberId);
   return {
-    elder: { name: doc.elder.name, calledBy: doc.elder.calledBy, city: doc.elder.city, age: doc.elder.age },
+    configured: doc.configured,
+    elder: { name: doc.elder.name, calledBy: doc.elder.calledBy, city: doc.elder.city, relationToUser: doc.elder.relationToUser, pronouns: doc.elder.pronouns },
+    user: { name: child?.name ?? "", relation: child?.relation ?? "", pronouns: child?.pronouns ?? "they" },
     childName: child?.name ?? "",
     displayName: doc.persona.displayName,
     style: doc.persona.style,
@@ -103,6 +109,20 @@ export function familyRouter(deps: FamilyRouteDeps): Router {
     res.status(201).json({ ok: true, ...out });
   });
 
+  // First-run setup for a demo household: replaces it with one built from these answers (who you
+  // are, who it is for, what you call them). The real owner household is set up by an admin route.
+  router.post("/api/setup/new", auth, write, express.json({ limit: "32kb" }), async (req, res) => {
+    const parsed = NewSetupBody.safeParse(req.body ?? {});
+    if (!parsed.success) return void res.status(400).json({ error: "invalid_body", detail: parsed.error.issues.map((i) => `${i.path.join(".")}: ${i.message}`) });
+    const current = await deps.repo.get(hh(res));
+    if (!current) return void res.status(404).json({ error: "household_not_found" });
+    if (!current.demo) return void res.status(403).json({ error: "not_a_demo_household" });
+    const fresh = newHousehold(current.id, deps.now(), parsed.data, { demo: true });
+    fresh.version = current.version + 1;
+    await deps.repo.put(fresh, deps.demoTtlSeconds ? { ttlSeconds: deps.demoTtlSeconds } : undefined);
+    res.status(201).json(setupView(fresh));
+  });
+
   router.get("/api/setup", auth, async (_req, res) => {
     const doc = await deps.repo.get(hh(res));
     if (!doc) return void res.status(404).json({ error: "household_not_found" });
@@ -116,12 +136,17 @@ export function familyRouter(deps: FamilyRouteDeps): Router {
     const at = deps.now().toISOString();
     const view = await deps.repo.update(hh(res), (d) => {
       if (b.elder) Object.assign(d.elder, b.elder);
+      const owner = d.members.find((m) => m.id === d.persona.childMemberId);
+      if (b.user && owner) {
+        Object.assign(owner, b.user);
+        if (b.user.name) d.persona.displayName = `Digital ${b.user.name}`;
+      }
       if (b.style) Object.assign(d.persona.style, b.style);
       if (b.deferTopics) d.persona.deferTopics = b.deferTopics;
       if (b.avoidTopics) d.persona.avoidTopics = b.avoidTopics;
       if (b.goals) Object.assign(d.goals, b.goals);
       if (b.consents?.shareSummaries !== undefined) {
-        d.consents.shareSummaries = b.consents.shareSummaries ? { by: "kamala", at, witnessedBy: primaryId(d) } : d.consents.shareSummaries && { ...d.consents.shareSummaries, revokedAt: at };
+        d.consents.shareSummaries = b.consents.shareSummaries ? { by: "elder", at, witnessedBy: primaryId(d) } : d.consents.shareSummaries && { ...d.consents.shareSummaries, revokedAt: at };
       }
       if (b.consents?.likeness !== undefined) {
         // Revoking the likeness consent switches to the neutral "Haven" companion at once.

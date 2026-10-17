@@ -1,6 +1,6 @@
 import { Router, type RequestHandler } from "express";
 import { requireHousehold, newDemoHouseholdId, signToken } from "../http/households.js";
-import { seedHousehold } from "../store/seed.js";
+import { blankHousehold } from "../store/seed.js";
 import type { Repo } from "../store/repo.js";
 
 export type DemoRouteDeps = {
@@ -12,8 +12,9 @@ export type DemoRouteDeps = {
   sessionLimiter?: RequestHandler; // creating households is the costliest call, so it gets its own limit
 };
 
-// Judge households: one per browser session, seeded with the synthetic Kamala/Priya/Ravi cast
-// and expiring after demoTtlSeconds. The token is returned once and kept in sessionStorage.
+// Judge households: one per browser session, starting blank so every demo begins with setup
+// (who you are, who it is for, what you call them). They expire after demoTtlSeconds. The token is
+// returned once and kept in sessionStorage.
 export function demoRouter(deps: DemoRouteDeps): Router {
   const router = Router();
   const auth = requireHousehold(deps.secret);
@@ -21,7 +22,7 @@ export function demoRouter(deps: DemoRouteDeps): Router {
 
   router.post("/api/demo/session", ...limit, async (_req, res) => {
     const householdId = newDemoHouseholdId();
-    await deps.repo.create(seedHousehold(householdId, deps.now(), { demo: true }), { ttlSeconds: deps.demoTtlSeconds });
+    await deps.repo.create(blankHousehold(householdId, deps.now(), { demo: true }), { ttlSeconds: deps.demoTtlSeconds });
     const token = signToken(householdId, deps.secret);
     res.status(201).set("Cache-Control", "no-store").json({ householdId, token, mcpUrl: `/mcp/h/${token}` });
   });
@@ -32,7 +33,7 @@ export function demoRouter(deps: DemoRouteDeps): Router {
     if (!current) return void res.status(404).json({ error: "household_not_found" });
     // The owner household holds real setup (phones, consents); only demo data may be re-seeded.
     if (!current.demo) return void res.status(403).json({ error: "not_a_demo_household" });
-    const fresh = seedHousehold(householdId, deps.now(), { demo: true });
+    const fresh = blankHousehold(householdId, deps.now(), { demo: true });
     // Bump past the old version so an in-flight update that read the old doc cannot win.
     fresh.version = current.version + 1;
     await deps.repo.put(fresh, householdId === deps.publicDemoId ? undefined : { ttlSeconds: deps.demoTtlSeconds });

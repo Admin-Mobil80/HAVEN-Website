@@ -91,7 +91,7 @@ function clean(sentence: string) {
   return s.length <= MAX_QUESTION ? s : `${s.slice(0, MAX_QUESTION - 3).trimEnd()}...`;
 }
 
-export function detectCommitment(text: string, childName = "Priya"): Commitment | null {
+export function detectCommitment(text: string, childName = ""): Commitment | null {
   const rules = rulesFor(childName);
   for (const sentence of text.match(/[^.!?।\n]+[.!?।]*/g) ?? []) {
     const padded = ` ${normalize(sentence)} `;

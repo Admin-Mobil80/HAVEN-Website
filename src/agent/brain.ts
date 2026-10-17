@@ -91,7 +91,7 @@ export const RESPOND_TOOL: Tool = {
               properties: {
                 type: { type: "string", enum: [...MEMORY_TYPES] },
                 content: { type: "string", maxLength: LIMITS.memoryChars },
-                private: { type: "boolean", description: "true if the elder asked to keep this from the family (\"don't tell Priya\")." },
+                private: { type: "boolean", description: "true if the elder asked to keep this from the family (\"don't tell my son\")." },
               },
               required: ["type", "content"],
             },
@@ -99,7 +99,7 @@ export const RESPOND_TOOL: Tool = {
           send_to_priya: {
             type: "string",
             maxLength: LIMITS.sendChars,
-            description: "Only when the elder explicitly asks you to tell or send the real Priya something: that message, in the elder's words. Otherwise omit.",
+            description: "Only when the elder explicitly asks you to tell or send the real family member something: that message, in the elder's words. Otherwise omit.",
           },
           concern: {
             type: "string",

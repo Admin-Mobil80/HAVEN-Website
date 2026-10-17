@@ -78,11 +78,11 @@ export function declines(text: string) {
 const W = (alts: string) => String.raw`(?<=^|\s)(${alts})(?=\s|$)`;
 
 // "Are you real?", "Are you really Priya?", "Is this really Priya?", "Am I talking to a computer?"
-export function asksIfReal(text: string, childName = "priya") {
+export function asksIfReal(text: string, childName = "") {
   const s = norm(text);
-  const name = escape(norm(childName)) || "priya";
+  const name = escape(norm(childName)) || "(?!)";
   const who = `you|${name}|a person|a real person|human|a human`;
-  const kin = "my (daughter|son|beti|beta)";
+  const kin = "my (daughter|son|grandson|granddaughter|child|beti|beta)";
   return (
     new RegExp(W(String.raw`(are|r) (you|u) (real|a real person|human|a human|a robot|a bot|a computer|an ai|ai|a machine)`)).test(s) ||
     new RegExp(W(String.raw`(are|r) (you|u) (really |actually |truly )?(${name}|${kin})`)).test(s) ||

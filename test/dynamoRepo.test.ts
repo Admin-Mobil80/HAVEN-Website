@@ -256,7 +256,7 @@ test("update retries after a concurrent write and re-runs fn on fresh state", as
   const seen: string[] = [];
   await repo.update("hh1", (doc) => {
     seen.push(doc.elder.city);
-    doc.elder.age += 1;
+    doc.elder.age = (doc.elder.age ?? 0) + 1;
   });
   assert.deepEqual(seen, ["Bengaluru", "Mysuru-2"]);
   const stored = fake.raw("HH#hh1", "DOC")!;

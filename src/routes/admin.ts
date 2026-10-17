@@ -2,7 +2,8 @@ import { timingSafeEqual } from "node:crypto";
 import { Router } from "express";
 import { z } from "zod";
 import { signToken } from "../http/households.js";
-import { seedHousehold } from "../store/seed.js";
+import { newHousehold } from "../store/seed.js";
+import { SetupBody } from "./setupSchema.js";
 import type { Repo } from "../store/repo.js";
 
 // Creates the owner household: the one real household whose members' phones are allowlisted on
@@ -12,10 +13,9 @@ import type { Repo } from "../store/repo.js";
 export const OWNER_ID = "owner";
 
 const phone = z.string().trim().regex(/^\d{10,15}$/, "digits only, with country code, no +");
-const Body = z.object({
-  priyaPhone: phone,
-  raviPhone: phone.optional(),
-  kamalaPhone: phone.optional(),
+const Body = SetupBody.extend({
+  userPhone: phone, // the main user's WhatsApp number (allowlisted on the test number)
+  elderPhone: phone.optional(), // shown in urgent alerts so family can tap to call
   replace: z.boolean().optional(),
 });
 
@@ -37,18 +37,11 @@ export function adminRouter(deps: { repo: Repo; secret: string; adminKey?: strin
     const now = deps.now();
     const at = now.toISOString();
 
-    const doc = seedHousehold(OWNER_ID, now, { demo: false });
-    const priya = doc.members.find((m) => m.id === "priya")!;
-    priya.phone = b.priyaPhone;
-    priya.waOptIn = { by: "priya", at };
-    const ravi = doc.members.find((m) => m.id === "ravi");
-    if (ravi) {
-      if (b.raviPhone) Object.assign(ravi, { phone: b.raviPhone, waOptIn: { by: "ravi", at } });
-      else delete ravi.phone; // no phone: alerts to Ravi stay simulated
-    }
-    if (b.kamalaPhone) doc.elder.phone = b.kamalaPhone;
-    // Seeded call history is demo data; the owner household starts from real zero.
-    doc.contacts = [];
+    const doc = newHousehold(OWNER_ID, now, b, { demo: false });
+    const user = doc.members[0];
+    user.phone = b.userPhone;
+    user.waOptIn = { by: user.id, at };
+    if (b.elderPhone) doc.elder.phone = b.elderPhone;
 
     if (b.replace) await deps.repo.put(doc);
     else {

@@ -233,3 +233,24 @@ test("in a real household a simulated send is not reported as 'told'", async () 
   assert.doesNotMatch(r.text, /been told/);
   assert.match(r.text, /112/);
 });
+
+test("a household set up as Fazil and his mother Jesy ('Ummi') never says Amma or Priya", async () => {
+  const { newHousehold } = await import("../src/store/seed.js");
+  const { compilePersona } = await import("../src/domain/persona.js");
+  const repo = new MemoryRepo();
+  const doc = newHousehold("ummi", new Date(T0), { userName: "Fazil", userPronouns: "he", userRelation: "son", elderName: "Jesy", relationToUser: "mother", calledBy: "Ummi", elderPronouns: "she", thingsTheyLove: ["her roses"] }, { demo: true });
+  await repo.create(doc);
+  const persona = compilePersona(doc);
+  assert.match(persona, /Always call her "Ummi"/);
+  assert.match(persona, /AI version of Fazil, created and approved by him/);
+  const deps: TurnDeps = { repo, notifier: new SimulatedNotifier(), now: () => new Date(T0 + 1000), mediaUrl: (k) => k, brain: "rules" };
+  const texts: string[] = [];
+  for (const input of [{ kind: "session_start" } as const, { kind: "text", text: "Hello" } as const, { kind: "text", text: "Will you come for Eid?" } as const, { kind: "text", text: "Are you real?" } as const, { kind: "text", text: "I feel so lonely" } as const, { kind: "session_end" } as const]) {
+    texts.push((await runTurn("ummi", input, deps)).text);
+  }
+  const all = texts.join(" | ");
+  assert.match(all, /Ummi/);
+  assert.match(all, /Digital Fazil/);
+  assert.doesNotMatch(all + persona, /Amma|Priya|Kamala|Ravi/);
+  assert.match(texts[2], /real Fazil/);
+});

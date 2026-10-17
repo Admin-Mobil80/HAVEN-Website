@@ -214,3 +214,10 @@ label.check input { width: 22px; height: 22px; margin-top: 2px; flex: none; }
   .caption { font-size: 1.3rem; }
   .family--framed { border-width: 0; border-radius: var(--radius); }
 }
+
+/* setup wizard */
+.wizard { max-width: 720px; margin: 0 auto; width: 100%; }
+.wizard fieldset { gap: 12px; }
+.pron { display: flex; gap: 8px; flex-wrap: wrap; }
+.chip.is-on { background: var(--brand); color: var(--brand-ink); border-color: var(--brand); }
+label select { padding: 10px 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface); font: inherit; color: inherit; }

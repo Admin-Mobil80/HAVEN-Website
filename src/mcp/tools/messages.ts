@@ -139,7 +139,7 @@ export function registerMessageTools(server: McpServer, ctx: ToolContext) {
         const { member, elder } = consumed;
         const body =
           kind === "call_request"
-            ? `${elder.name} (${elder.calledBy}) would like you to call her when you can. She said: "${message}"`
+            ? `${elder.name} (${elder.calledBy}) would like you to call when you can, and said: "${message}"`
             : `${elder.name} (${elder.calledBy}) says: "${message}"`;
         // Sent outside repo.update: update may re-run its callback on a conflict.
         const entry = await safeSend(ctx, { householdId: ctx.householdId, member, kind: "elder_reply", body, refId: confirmation_id }, now);

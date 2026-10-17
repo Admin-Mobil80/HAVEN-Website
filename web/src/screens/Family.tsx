@@ -2,13 +2,15 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { api, poll } from "../lib/api";
 import { emit, log, on } from "../lib/bus";
 import type { FamilyState } from "../lib/types";
+import { useNames } from "../lib/names";
 
-// Priya's phone. What she needs before she calls, and one tap to act. In judge mode it also
+// The family member's phone. What they need before they call, and one tap to act. In judge mode it also
 // mirrors what WhatsApp delivered, since judges cannot receive messages from the test number.
 export function Family({ framed }: { framed?: boolean }) {
   const [s, setS] = useState<FamilyState>();
   const [busy, setBusy] = useState("");
   const [note, setNote] = useState("");
+  const n = useNames();
   const refresh = useCallback(async () => setS(await api<FamilyState>("/api/state/family")), []);
   useEffect(() => {
     const off = poll(refresh, 5000);
@@ -44,9 +46,9 @@ export function Family({ framed }: { framed?: boolean }) {
   const mirror = [...s.outbox].reverse().slice(0, 6);
 
   return (
-    <section className={`panel family${framed ? " family--framed" : ""}`} aria-label="Priya's phone">
+    <section className={`panel family${framed ? " family--framed" : ""}`} aria-label={`${n.user}'s phone`}>
       <header className="panel__head">
-        <h2>Priya's phone</h2>
+        <h2>{n.user}'s phone</h2>
         <span className="muted">Haven for family</span>
       </header>
 
@@ -127,7 +129,7 @@ export function Family({ framed }: { framed?: boolean }) {
           <button className="btn" disabled={!!busy} onClick={() => act("I'll call tonight", () => api("/api/call-promise", { body: {} }), `Haven will tell ${amma} you'll call tonight.`)}>
             I'll call tonight
           </button>
-          <button className="btn btn--yes" disabled={!!busy} onClick={() => act("Call Mum", () => api("/api/calls", { body: {} }), `Calling ${amma}… Digital Priya steps aside.`)}>
+          <button className="btn btn--yes" disabled={!!busy} onClick={() => act(`Call ${amma}`, () => api("/api/calls", { body: {} }), `Calling ${amma}… ${n.companion} steps aside.`)}>
             📞 Call {amma}
           </button>
         </div>
@@ -149,7 +151,7 @@ export function Family({ framed }: { framed?: boolean }) {
   );
 }
 
-// Answer one of Amma's questions with a voice note (MediaRecorder) or text.
+// Answer one of their questions with a voice note (MediaRecorder) or text.
 function Question({ id, question, onDone }: { id: string; question: string; onDone: () => void }) {
   const [rec, setRec] = useState<MediaRecorder | null>(null);
   const [text, setText] = useState("");

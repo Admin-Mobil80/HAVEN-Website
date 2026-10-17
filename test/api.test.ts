@@ -17,6 +17,8 @@ async function session() {
   const res = await h.request("POST", "/api/demo/session");
   assert.equal(res.status, 201);
   const s = res.json() as { householdId: string; token: string };
+  // A new demo session is blank (setup first); these tests use the populated fixture instead.
+  await h.repo.put(seedHousehold(s.householdId, new Date(), { demo: true }));
   const auth = { authorization: `Bearer ${s.token}` };
   const get = (path: string) => h.request("GET", path, { headers: auth });
   const post = (path: string, body: object = {}) => h.request("POST", path, { headers: auth, body });
@@ -222,7 +224,8 @@ test("demo reset re-seeds a demo household and refuses the owner household", asy
   assert.equal(res.status, 200);
   const after = await h.repo.get(s.householdId);
   assert.equal(after!.messages.length, 0);
-  assert.equal(after!.contacts.length, 3);
+  assert.equal(after!.contacts.length, 0);
+  assert.equal(after!.configured, false, "reset goes back to setup");
   assert.ok(after!.version > before!.version);
   assert.equal(after!.demo, true);
 
@@ -241,4 +244,22 @@ test("demo session creation is rate limited separately", async () => {
   } finally {
     await limited.close();
   }
+});
+
+test("a new demo starts blank, and setup builds the household from the user's answers", async () => {
+  const res = await h.request("POST", "/api/demo/session");
+  const { token, householdId } = res.json() as { token: string; householdId: string };
+  const auth = { authorization: `Bearer ${token}` };
+  assert.equal((await h.request("GET", "/api/setup", { headers: auth })).json().configured, false);
+  const body = { userName: "Fazil", userPronouns: "he", userRelation: "son", elderName: "Jesy", relationToUser: "mother", calledBy: "Ummi", elderPronouns: "she", thingsTheyLove: ["her roses"] };
+  const r = await h.request("POST", "/api/setup/new", { headers: auth, body });
+  assert.equal(r.status, 201);
+  const doc = (await h.repo.get(householdId))!;
+  assert.equal(doc.configured, true);
+  assert.equal(doc.elder.calledBy, "Ummi");
+  assert.equal(doc.persona.displayName, "Digital Fazil");
+  assert.equal(doc.contacts.length, 0, "no invented call history");
+  const elder = (await h.request("GET", "/api/state/elder", { headers: auth })).json();
+  assert.equal(elder.persona.badge, "Digital Fazil · AI");
+  assert.doesNotMatch(JSON.stringify(doc), /Amma|Priya|Kamala|Ravi/);
 });

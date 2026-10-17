@@ -39,7 +39,7 @@ const POSITIVE: [text: string, topic: DeferTopic, question?: string][] = [
 
 for (const [text, topic, question] of POSITIVE) {
   test(`detects ${topic}: ${JSON.stringify(text)}`, () => {
-    const r = detectCommitment(text);
+    const r = detectCommitment(text, "Priya");
     assert.ok(r, "expected a commitment");
     assert.equal(r.topic, topic);
     assert.equal(r.question, question ?? text);
@@ -95,7 +95,7 @@ const NEGATIVE = [
 
 for (const text of NEGATIVE) {
   test(`ignores ${JSON.stringify(text)}`, () => {
-    assert.equal(detectCommitment(text), null);
+    assert.equal(detectCommitment(text, "Priya"), null);
   });
 }
 

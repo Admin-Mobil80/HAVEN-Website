@@ -6,10 +6,8 @@ import { emit, log, on } from "../lib/bus";
 import { callTool } from "../lib/mcp";
 import { canListen, listen } from "../lib/speech";
 import type { ElderState, PlayedMessage, TurnResponse } from "../lib/types";
+import { forms, useNames } from "../lib/names";
 
-const DEFAULT_CHIPS = ["I met Saroja at the temple today", "Tell Priya the jasmine has bloomed", "Will you come for Diwali?", "Are you real?"];
-
-// Amma's tablet. Large type, captions always on, one big talk button, no timers she must race.
 // Stable function identity that always calls the latest closure.
 function useCallbackRef<A extends unknown[], R>(fn: (...a: A) => R) {
   const ref = useRef(fn);
@@ -17,7 +15,11 @@ function useCallbackRef<A extends unknown[], R>(fn: (...a: A) => R) {
   return useCallback((...a: A) => ref.current(...a), []);
 }
 
-export function Tablet({ chips = DEFAULT_CHIPS, compact }: { chips?: string[]; compact?: boolean }) {
+// The tablet for the person Haven keeps company. Large type, captions always on, one big talk
+// button, no timers to race.
+export function Tablet({ chips: chipsProp, compact }: { chips?: string[]; compact?: boolean }) {
+  const n = useNames();
+  const chips = chipsProp ?? ["I met my old friend today", `Tell ${n.user} the flowers have bloomed`, "Will you come home next month?", "Are you real?"];
   const [elder, setElder] = useState<ElderState>();
   const [open, setOpen] = useState(false);
   const [state, setState] = useState<AvatarState>("idle");
@@ -143,7 +145,7 @@ export function Tablet({ chips = DEFAULT_CHIPS, compact }: { chips?: string[]; c
     }
   };
 
-  // A real recording or note from Priya: played as herself, with the avatar stepped back.
+  // A real recording or note from the family member: played as them, with the avatar stepped back.
   const playFamily = async () => {
     unlockAudio();
     const r = await callTool<{ message: PlayedMessage | null }>("play_family_message", {});
@@ -159,13 +161,14 @@ export function Tablet({ chips = DEFAULT_CHIPS, compact }: { chips?: string[]; c
 
   const incident = elder?.openIncident;
   const calling = elder?.familyCalling;
-  const badge = elder?.persona.badge ?? "Digital Priya · AI";
+  const badge = elder?.persona.badge ?? `${n.companion} · AI`;
+  const childP = forms((elder?.persona.childPronouns as "she" | "he" | "they" | undefined) ?? n.setup?.user.pronouns);
   const child = elder?.persona.childName ?? "your family";
 
   return (
-    <section className={`panel tablet${compact ? " tablet--compact" : ""}`} aria-label="Amma's tablet">
+    <section className={`panel tablet${compact ? " tablet--compact" : ""}`} aria-label={`${n.calledBy}'s tablet`}>
       <header className="panel__head">
-        <h2>Amma's tablet</h2>
+        <h2>{n.calledBy}'s tablet</h2>
         <span className={`status status--${state}`}>{state === "listening" ? "Listening…" : state === "thinking" ? "Thinking…" : state === "speaking" ? "Speaking" : open ? "Ready" : "Asleep"}</span>
       </header>
 
@@ -188,7 +191,7 @@ export function Tablet({ chips = DEFAULT_CHIPS, compact }: { chips?: string[]; c
         )}
         {relay && (
           <div className="realcard" role="status">
-            <p className="realcard__kicker">From the real {child}, {relay.audioUrl ? "in her own voice" : "a note"}</p>
+            <p className="realcard__kicker">From the real {child}, {relay.audioUrl ? `in ${childP.poss} own voice` : "a note"}</p>
             {relay.question && <p className="realcard__q">You asked: "{relay.question}"</p>}
             {relay.text && <p className="realcard__text">{relay.text}</p>}
           </div>
@@ -196,14 +199,14 @@ export function Tablet({ chips = DEFAULT_CHIPS, compact }: { chips?: string[]; c
       </div>
 
       <p className="caption" aria-live="polite">
-        {caption || (open ? "" : `Say "Alexa, talk to Priya", or tap the button.`)}
+        {caption || (open ? "" : `Say "Alexa, talk to ${n.user}", or tap the button.`)}
       </p>
       {heard && <p className="heard">You: {heard}</p>}
       {error && <p className="error">{error}</p>}
 
       {!open ? (
         <button className="btn btn--huge" onClick={start}>
-          Talk to {child === "your family" ? "Priya" : child}
+          Talk to {child === "your family" ? n.user : child}
         </button>
       ) : (
         <div className="tablet__controls">
@@ -234,7 +237,7 @@ export function Tablet({ chips = DEFAULT_CHIPS, compact }: { chips?: string[]; c
               setTyped("");
             }}
           >
-            <input value={typed} onChange={(e) => setTyped(e.target.value)} placeholder="Or type here…" aria-label="Type to Digital Priya" maxLength={500} />
+            <input value={typed} onChange={(e) => setTyped(e.target.value)} placeholder="Or type here…" aria-label={`Type to ${n.companion}`} maxLength={500} />
             <button className="btn" type="submit" disabled={!typed.trim()}>Send</button>
           </form>
           <div className="chips" aria-label="Suggestions">

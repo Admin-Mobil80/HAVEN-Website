@@ -3,7 +3,7 @@ import { requireHousehold } from "../http/households.js";
 import { householdWriteLimit, type HouseholdLimiter } from "../http/security.js";
 import { runDigest, type DigestDeps } from "../jobs/digest.js";
 import { istDate } from "../domain/util.js";
-import { seedHousehold } from "../store/seed.js";
+import { blankHousehold } from "../store/seed.js";
 import { apiErrors } from "./api.js";
 
 export type EventsDeps = DigestDeps & {
@@ -25,7 +25,7 @@ export function eventsRouter(deps: EventsDeps): Router {
     const type = (req.body as { type?: unknown } | undefined)?.type;
     if (type === "warm") return void res.json({ ok: true });
     if (type === "reset_demo") {
-      await deps.repo.put(seedHousehold(deps.publicDemoId, deps.now(), { demo: true }));
+      await deps.repo.put(blankHousehold(deps.publicDemoId, deps.now(), { demo: true }));
       return void res.json({ ok: true, reset: deps.publicDemoId });
     }
     if (type === "digest") {

@@ -1,7 +1,7 @@
 import { createHmac, randomBytes, timingSafeEqual } from "node:crypto";
 import type { RequestHandler } from "express";
 import type { Household } from "../domain/types.js";
-import { seedHousehold } from "../store/seed.js";
+import { blankHousehold } from "../store/seed.js";
 import type { Repo } from "../store/repo.js";
 
 // Household ids are path-safe so they can travel inside /mcp/h/<token> and DynamoDB keys.
@@ -70,7 +70,7 @@ export async function ensurePublicDemoCached(repo: Repo, id: string, now: Date):
 export async function ensurePublicDemo(repo: Repo, id: string, now: Date): Promise<Household> {
   const existing = await repo.get(id);
   if (existing) return existing;
-  const doc = seedHousehold(id, now, { demo: true });
+  const doc = blankHousehold(id, now, { demo: true });
   try {
     await repo.create(doc);
     return doc;

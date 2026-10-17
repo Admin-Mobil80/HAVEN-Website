@@ -206,7 +206,7 @@ test("admin: owner household needs the admin key and maps the phones", async () 
   const repo = new MemoryRepo();
   const h = await startApp({ repo, adminKey: "admin-key-123" });
   try {
-    const body = { priyaPhone: PRIYA, raviPhone: "919800000003" };
+    const body = { userName: "Fazil", userPronouns: "he", userRelation: "son", elderName: "Jesy", relationToUser: "mother", calledBy: "Ummi", elderPronouns: "she", userPhone: PRIYA };
     assert.equal((await h.request("POST", "/api/admin/owner", { body })).status, 401);
     const r = await h.request("POST", "/api/admin/owner", { headers: { "x-haven-admin": "admin-key-123" }, body });
     assert.equal(r.status, 201);

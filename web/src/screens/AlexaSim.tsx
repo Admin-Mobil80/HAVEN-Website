@@ -3,6 +3,7 @@ import { speakBrowser, unlockAudio } from "../lib/audio";
 import { emit, log, on } from "../lib/bus";
 import { callTool, connect } from "../lib/mcp";
 import { canListen, listen } from "../lib/speech";
+import { useNames } from "../lib/names";
 
 // "Simulated Alexa+ add-on": a real MCP client of Haven's server. It routes a few fixed intents
 // itself (as Alexa+ would) and hands the conversation to the tablet. Not an Alexa product and no
@@ -11,6 +12,8 @@ export function AlexaSim() {
   const [busy, setBusy] = useState(false);
   const [last, setLast] = useState("");
   const [typed, setTyped] = useState("");
+  const n = useNames();
+  const talkTo = `Alexa, talk to ${n.user}`;
 
   const reply = async (text: string) => {
     setLast(text);
@@ -21,7 +24,8 @@ export function AlexaSim() {
     const u = utterance.toLowerCase();
     setBusy(true);
     try {
-      if (/talk to (priya|haven)|open (haven|priya)/.test(u)) {
+      const who = n.user.toLowerCase();
+      if (u.includes(`talk to ${who}`) || /talk to haven|open haven/.test(u) || (who && u.includes(`open ${who}`))) {
         const tools = await connect();
         log({ source: "alexa-sim", dir: "•", title: `connected: ${tools.length} tools` });
         const [mem, rem, peek] = await Promise.all([
@@ -30,9 +34,9 @@ export function AlexaSim() {
           callTool<{ message: unknown; remaining: number }>("play_family_message", { peek: true }),
         ]);
         log({ source: "alexa-sim", dir: "•", title: `context: ${mem.data.memories?.length ?? 0} memories, ${rem.data.reminders?.length ?? 0} reminders, ${peek.data.remaining ?? 0} family messages` });
-        await reply("Opening Digital Priya, an AI version of Priya, on your screen.");
+        await reply(`Opening ${n.companion}, an AI version of ${n.user}, on your screen.`);
         emit("tablet:open");
-      } else if (/message|anything from (priya|family)/.test(u)) {
+      } else if (/message|anything from/.test(u)) {
         const r = await callTool<{ remaining: number }>("play_family_message", { peek: true });
         await reply(r.data.remaining ? `You have ${r.data.remaining} message${r.data.remaining > 1 ? "s" : ""} from family. I'll play it on your screen.` : "No new messages from family right now.");
         if (r.data.remaining) emit("tablet:open");
@@ -45,7 +49,7 @@ export function AlexaSim() {
         const list = r.data.reminders?.map((x) => x.text) ?? [];
         await reply(list.length ? `Today: ${list.join(". ")}.` : "No reminders for today.");
       } else {
-        await reply("You can say: talk to Priya, any messages from Priya, or what are my reminders.");
+        await reply(`You can say: talk to ${n.user}, any messages, or what are my reminders.`);
       }
     } catch (e) {
       await reply("Sorry, something went wrong.");
@@ -64,7 +68,7 @@ export function AlexaSim() {
 
   const mic = async () => {
     unlockAudio();
-    if (!canListen) return handle("Alexa, talk to Priya");
+    if (!canListen) return handle(talkTo);
     setLast("Listening…");
     const text = await listen({ lang: "en-IN" }).done.catch(() => "");
     if (text) await handle(text);
@@ -78,10 +82,10 @@ export function AlexaSim() {
         <span className="muted">real MCP client</span>
       </header>
       <div className={`ring${busy ? " is-busy" : ""}`} aria-hidden />
-      <p className="alexa__last" aria-live="polite">{last || "Try: “Alexa, talk to Priya”"}</p>
+      <p className="alexa__last" aria-live="polite">{last || `Try: “${talkTo}”`}</p>
       <div className="row row--wrap">
-        <button className="btn btn--primary" disabled={busy} onClick={() => (unlockAudio(), void handle("Alexa, talk to Priya"))}>
-          "Alexa, talk to Priya"
+        <button className="btn btn--primary" disabled={busy} onClick={() => (unlockAudio(), void handle(talkTo))}>
+          "{talkTo}"
         </button>
         <button className="btn" disabled={busy} onClick={mic}>🎤 Speak</button>
       </div>
@@ -94,7 +98,7 @@ export function AlexaSim() {
           setTyped("");
         }}
       >
-        <input value={typed} onChange={(e) => setTyped(e.target.value)} placeholder="Any messages from Priya?" aria-label="Say something to the simulator" maxLength={200} />
+        <input value={typed} onChange={(e) => setTyped(e.target.value)} placeholder="Any messages for me?" aria-label="Say something to the simulator" maxLength={200} />
         <button className="btn" disabled={busy || !typed.trim()}>Send</button>
       </form>
     </section>

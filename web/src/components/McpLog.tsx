@@ -32,7 +32,7 @@ export function McpLog() {
         <span className="muted">spec 2025-11-25 · Streamable HTTP</span>
       </header>
       <div className="log__body" role="log" aria-live="polite">
-        {items.length === 0 && <p className="muted">Say "Alexa, talk to Priya" to see the MCP calls.</p>}
+        {items.length === 0 && <p className="muted">Start with "Alexa, talk to …" to see the MCP calls.</p>}
         {items.map((it, i) => (
           <div key={i} className={`log__row log__row--${it.source}${it.isError ? " log__row--error" : ""}`}>
             <button className="log__line" onClick={() => setOpen(open === i ? null : i)} aria-expanded={open === i}>

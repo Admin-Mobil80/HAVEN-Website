@@ -6,20 +6,27 @@ export type ISODate = string;
 
 export type ConsentRecord = { by: string; at: ISODate; witnessedBy?: string; revokedAt?: ISODate };
 
+export const PRONOUNS = ["she", "he", "they"] as const;
+export type Pronouns = (typeof PRONOUNS)[number];
+
+// The person Haven keeps company: anyone who is lonely, not only a mother.
 export type Elder = {
-  name: string; // "Kamala"
-  calledBy: string; // what the child calls her: "Amma"
-  age: number;
+  name: string;
+  calledBy: string; // what the main user calls them ("Ummi", "Appa", "Nani"); the only source for it
+  relationToUser: string; // "mother", "father", "grandmother", "friend", ...
+  pronouns: Pronouns;
+  age?: number;
   city: string;
-  phone: string; // shown in urgent alerts so the child can tap to call
+  phone: string; // shown in urgent alerts so family can tap to call
   language: "en-IN" | "hi-IN";
 };
 
 export type Member = {
   id: string; // stable id, e.g. "priya"
   name: string;
-  relation: string; // "daughter (Mumbai)"
+  relation: string; // their relation to the elder: "son", "daughter", "grandson", "neighbour"
   role: "primary" | "backup";
+  pronouns?: Pronouns;
   phone?: string; // E.164 without "+", e.g. "9198xxxxxxxx"
   waOptIn?: ConsentRecord; // WhatsApp opt-in, required before any real send
   lastInboundAt?: ISODate; // last inbound WhatsApp message (opens the 24 h window)
@@ -29,17 +36,16 @@ export const DEFER_TOPICS = ["plans", "visit", "money", "health", "family", "pro
 export type DeferTopic = (typeof DEFER_TOPICS)[number];
 
 export type StyleCard = {
-  callsElder: string; // "Amma"
-  phrases: string[]; // "achha", "arre Amma"
+  phrases: string[]; // words the main user really uses with them: "achha", "inshallah"
   tone: string; // "warm, teasing, short sentences"
-  topicsSheLoves: string[];
+  topicsTheyLove: string[];
   neverSays: string[]; // "never promises dates"
 };
 
 export type Persona = {
   mode: "child" | "neutral"; // neutral = plain "Haven" companion (consent revoked or dementia safeguard)
-  childMemberId: string; // whose digital version this is
-  displayName: string; // "Digital Priya"
+  childMemberId: string; // the member whose AI version this is (the main user who set Haven up)
+  displayName: string; // "Digital <their name>"
   style: StyleCard;
   deferTopics: DeferTopic[];
   avoidTopics: string[]; // things the avatar must never store or raise
@@ -211,6 +217,7 @@ export type Household = {
   turns: Turn[]; // last N turns only (capped)
   seq: number; // id counter
   session?: ActiveSession; // the tablet conversation in progress, if any
+  configured: boolean; // false until the main user has finished setup
 };
 
 // The conversation currently open on the tablet. Written to a SessionRecord when it ends.
