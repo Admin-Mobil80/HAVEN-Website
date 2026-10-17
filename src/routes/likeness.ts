@@ -24,7 +24,7 @@ export type LikenessDeps = {
   pollyPcm?: (text: string) => Promise<Buffer>;
   media?: { put(key: string, data: Buffer, contentType: string): Promise<void> };
   householdLimit?: HouseholdLimiter;
-  limits?: { ttsCharsPerDay?: number; clonesPerDay?: number; avatarsPerDay?: number };
+  limits?: { ttsCharsPerDay?: number; clonesPerDay?: number; avatarsPerDay?: number; avatarSessionsPerDay?: number };
 };
 
 const AUDIO = /^audio\/(webm|ogg|mp4|mpeg|aac|x-m4a|wav|x-wav)(;.*)?$/;
@@ -35,7 +35,7 @@ export function likenessRouter(deps: LikenessDeps): Router {
   const auth = requireHousehold(deps.secret);
   const write = householdWriteLimit(deps.householdLimit);
   const hh = (res: Response) => res.locals.householdId as string;
-  const limits = { ttsCharsPerDay: 20000, clonesPerDay: 15, avatarsPerDay: 15, ...deps.limits };
+  const limits = { ttsCharsPerDay: 20000, clonesPerDay: 15, avatarsPerDay: 15, avatarSessionsPerDay: 60, ...deps.limits };
   const fail = (res: Response, err: unknown) => {
     if (err instanceof ElevenError || err instanceof AnamError) {
       console.warn(JSON.stringify({ msg: "likeness_provider_error", provider: err.name, status: err.status, error: err.message.slice(0, 200) }));
@@ -152,6 +152,8 @@ export function likenessRouter(deps: LikenessDeps): Router {
     const anam = await deps.anam?.();
     const doc = await deps.repo.get(hh(res));
     if (!anam || !doc?.persona.avatar || doc.persona.mode === "neutral") return void res.status(409).json({ error: "no_photo_avatar" });
+    const sessions = await deps.repo.incrCounter(`AVSESSION#${doc.id}#${istDate(deps.now())}`, 1, 2 * 24 * 3600);
+    if (sessions > limits.avatarSessionsPerDay) return void res.status(429).json({ error: "daily_avatar_session_limit" });
     try {
       res.set("Cache-Control", "no-store").json({ sessionToken: await anam.sessionToken(doc.persona.avatar.avatarId, `haven-${doc.id.slice(-10)}`) });
     } catch (err) {

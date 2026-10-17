@@ -7,7 +7,7 @@ import { callTool } from "../lib/mcp";
 import { canListen, listen, type Listening } from "../lib/speech";
 import type { ElderState, PlayedMessage, TurnResponse } from "../lib/types";
 import { forms, useNames } from "../lib/names";
-import { isLive, speakPhoto, startPhotoAvatar } from "../lib/anam";
+import { isLive, speakPhoto, startPhotoAvatar, stopPhotoAvatar } from "../lib/anam";
 
 // Stable function identity that always calls the latest closure.
 function useCallbackRef<A extends unknown[], R>(fn: (...a: A) => R) {
@@ -34,6 +34,9 @@ export function Tablet({ chips: chipsProp, compact }: { chips?: string[]; compac
   const [callEnded, setCallEnded] = useState<string>();
   // The photo-real face: "off" (illustrated avatar), "connecting", "live", or "failed" (fallback).
   const [photo, setPhoto] = useState<"off" | "connecting" | "live" | "failed">("off");
+  const photoRef = useRef(photo);
+  photoRef.current = photo;
+  const lastActive = useRef(Date.now());
   const busy = useRef(false);
   const openRef = useRef(false);
 
@@ -95,6 +98,8 @@ export function Tablet({ chips: chipsProp, compact }: { chips?: string[]; compac
   );
   const runTurn = useCallbackRef(async (body: Record<string, unknown>) => {
     busy.current = true;
+    lastActive.current = Date.now();
+    if (photoRef.current === "off") await startPhoto(); // reconnect after an idle close (no-op without a photo avatar)
     {
       setError("");
       setState("thinking");
@@ -137,12 +142,31 @@ export function Tablet({ chips: chipsProp, compact }: { chips?: string[]; compac
     setPhoto("connecting");
     await new Promise((r) => requestAnimationFrame(() => r(undefined))); // let the <video> mount
     try {
-      await startPhotoAvatar("haven-video", () => setPhoto("failed"));
+      await startPhotoAvatar("haven-video", () => setPhoto("off"));
       setPhoto("live");
     } catch (e) {
       console.warn("photo avatar unavailable, using the illustrated one", e);
       setPhoto("failed");
     }
+  }, []);
+
+  // The photo avatar is billed per minute: close it after 5 quiet minutes, when the tab is
+  // hidden, and on leaving the screen. The next turn reconnects it.
+  useEffect(() => {
+    const park = () => {
+      if (!isLive()) return;
+      stopPhotoAvatar();
+      setPhoto("off");
+      log({ source: "tablet", dir: "•", title: "photo avatar closed to save minutes" });
+    };
+    const idle = setInterval(() => !busy.current && Date.now() - lastActive.current > 5 * 60_000 && park(), 30_000);
+    const hidden = () => document.visibilityState === "hidden" && park();
+    document.addEventListener("visibilitychange", hidden);
+    return () => {
+      clearInterval(idle);
+      document.removeEventListener("visibilitychange", hidden);
+      stopPhotoAvatar();
+    };
   }, []);
 
   const start = useCallback(async () => {

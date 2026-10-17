@@ -41,6 +41,7 @@ export class Anam {
   }
 
   // Avatar-only session: no Anam LLM, no Anam voice. AI disclosure on, session replay off.
+  // Anam ends it after 15 minutes; the tablet also closes it after 5 idle minutes.
   async sessionToken(avatarId: string, label: string): Promise<string> {
     const body = await this.call(
       "/v1/auth/session-token",
@@ -49,7 +50,7 @@ export class Anam {
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
           clientLabel: label.slice(0, 60),
-          personaConfig: { avatarId, avatarModel: "cara-4", enableAudioPassthrough: true },
+          personaConfig: { avatarId, avatarModel: "cara-4", enableAudioPassthrough: true, maxSessionLengthSeconds: 900 }, // billed per minute: hard stop at 15 min
           sessionOptions: { showAIAvatarDisclosure: true, sessionReplay: { enableSessionReplay: false } },
         }),
       },

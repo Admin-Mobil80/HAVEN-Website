@@ -60,6 +60,11 @@ test("photo avatar: needs consent, then the tablet can get a session token", asy
     assert.equal((await repo.get("demo-lk"))!.persona.avatar?.avatarId, "av1");
     assert.equal((await h.request("GET", "/api/state/elder", { headers: auth })).json().photoAvatar, true);
     assert.equal((await h.request("POST", "/api/avatar/session", { headers: auth })).json().sessionToken, "tok123");
+    // Sessions are billed per minute: a daily cap per household stops a runaway reconnect.
+    for (let i = 0; i < 59; i++) await h.request("POST", "/api/avatar/session", { headers: auth });
+    const over = await h.request("POST", "/api/avatar/session", { headers: auth });
+    assert.equal(over.status, 429);
+    assert.equal(over.json().error, "daily_avatar_session_limit");
   } finally {
     await h.close();
   }
