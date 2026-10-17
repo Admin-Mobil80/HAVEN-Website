@@ -3,7 +3,7 @@ import { api } from "../lib/api";
 import { emit } from "../lib/bus";
 import { useNames } from "../lib/names";
 
-type Voices = { available: boolean; current: { name: string; source: string } | null; library: { voiceId: string; publicOwnerId: string; name: string; accent?: string; gender?: string; language?: string; previewUrl?: string }[] };
+type Voices = { available: boolean; libraryError?: string; current: { name: string; source: string } | null; library: { voiceId: string; publicOwnerId: string; name: string; accent?: string; gender?: string; language?: string; previewUrl?: string }[] };
 
 // The companion's face and voice, both from the main user and both with explicit consent.
 // Everything here is optional: without it the illustrated avatar and the default voice are used.
@@ -49,6 +49,7 @@ export function Likeness() {
           ) : (
             <>
               <Recorder user={n.user} relation={n.setup?.elder.relationToUser ?? "loved one"} calledBy={n.calledBy} busy={busy} run={run} />
+              {voices?.libraryError && <p className="error">Voice service error: {voices.libraryError}</p>}
               <details>
                 <summary>Or pick a voice</summary>
                 <ul className="voices">

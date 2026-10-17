@@ -74,8 +74,8 @@ export async function api<T>(path: string, init: { method?: string; body?: unkno
     headers["content-type"] = "application/json";
   }
   const r = await fetch(path, { method: init.method ?? (body ? "POST" : "GET"), headers, body });
-  const data = (await r.json().catch(() => ({}))) as { error?: string };
-  if (!r.ok) throw new ApiError(r.status, data.error ?? `http_${r.status}`);
+  const data = (await r.json().catch(() => ({}))) as { error?: string; detail?: unknown };
+  if (!r.ok) throw new ApiError(r.status, [data.error ?? `http_${r.status}`, typeof data.detail === "string" ? data.detail : ""].filter(Boolean).join(": "));
   return data as T;
 }
 

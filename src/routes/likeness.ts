@@ -50,17 +50,20 @@ export function likenessRouter(deps: LikenessDeps): Router {
     if (!doc) return void res.status(404).json({ error: "household_not_found" });
     const eleven = await deps.eleven?.();
     let library: LibraryVoice[] = [];
+    let libraryError: string | undefined;
     if (eleven) {
       if (!libraryCache || Date.now() - libraryCache.at > 10 * 60_000) {
+        const note = (e: Error) => ((libraryError = e.message.slice(0, 200)), [] as LibraryVoice[]);
         const [en, hi] = await Promise.all([
-          eleven.libraryVoices({ language: "en", accent: "indian", pageSize: 18 }).catch(() => []),
-          eleven.libraryVoices({ language: "hi", pageSize: 12 }).catch(() => []),
+          eleven.libraryVoices({ language: "en", accent: "indian", pageSize: 18 }).catch(note),
+          eleven.libraryVoices({ language: "hi", pageSize: 12 }).catch(note),
         ]);
-        libraryCache = { at: Date.now(), voices: [...en, ...hi] };
-      }
-      library = libraryCache.voices;
+        // Only cache a good answer, so a fixed API key is picked up on the next request.
+        if (!libraryError) libraryCache = { at: Date.now(), voices: [...en, ...hi] };
+        library = [...en, ...hi];
+      } else library = libraryCache.voices;
     }
-    res.set("Cache-Control", "no-store").json({ available: Boolean(eleven), current: doc.persona.voice ? { name: doc.persona.voice.name, source: doc.persona.voice.source } : null, library });
+    res.set("Cache-Control", "no-store").json({ available: Boolean(eleven), current: doc.persona.voice ? { name: doc.persona.voice.name, source: doc.persona.voice.source } : null, library, libraryError });
   });
 
   const SelectBody = z.object({ voiceId: z.string().trim().min(1).max(64), publicOwnerId: z.string().trim().min(1).max(128), name: z.string().trim().min(1).max(60) });

@@ -74,7 +74,7 @@ export function SetupWizard({ onDone }: { onDone: () => void }) {
 
       <fieldset>
         <legend>You</legend>
-        <label>Your name<input value={f.userName} onChange={(e) => set({ userName: e.target.value })} placeholder="e.g. Fazil" autoFocus required maxLength={40} /></label>
+        <label>Your name<input value={f.userName} onChange={(e) => set({ userName: e.target.value })} placeholder="Your first name" autoFocus required maxLength={40} /></label>
         <label>
           You are {f.elderName ? `${f.elderName}'s` : "their"}
           <select value={f.userRelation} onChange={(e) => set({ userRelation: e.target.value })}>
@@ -86,14 +86,14 @@ export function SetupWizard({ onDone }: { onDone: () => void }) {
 
       <fieldset>
         <legend>Who Haven is for</legend>
-        <label>{E.Subj === "They" ? "Their" : E.poss[0].toUpperCase() + E.poss.slice(1)} name<input value={f.elderName} onChange={(e) => set({ elderName: e.target.value })} placeholder="e.g. Jesy" required maxLength={40} /></label>
+        <label>{E.Subj === "They" ? "Their" : E.poss[0].toUpperCase() + E.poss.slice(1)} name<input value={f.elderName} onChange={(e) => set({ elderName: e.target.value })} placeholder="Their first name" required maxLength={40} /></label>
         <label>
           {f.elderName || "They"} {f.elderName ? "is" : "are"} your
           <select value={f.relationToUser} onChange={(e) => set({ relationToUser: e.target.value })}>
             {ELDER_RELATIONS.map((r) => <option key={r}>{r}</option>)}
           </select>
         </label>
-        <label>What do you call {E.obj}?<input value={f.calledBy} onChange={(e) => set({ calledBy: e.target.value })} placeholder="e.g. Ummi, Appa, Nani" maxLength={30} /></label>
+        <label>What do you call {E.obj}?<input value={f.calledBy} onChange={(e) => set({ calledBy: e.target.value })} placeholder="e.g. Amma, Appa, Nani, or their name" maxLength={30} /></label>
         {pronounPicker(f.elderPronouns, (p) => set({ elderPronouns: p }), "Their pronouns")}
         <label>City (optional)<input value={f.city} onChange={(e) => set({ city: e.target.value })} maxLength={40} /></label>
         <label>Things {them} loves to talk about (comma-separated)<textarea rows={2} value={f.loves} onChange={(e) => set({ loves: e.target.value })} placeholder="e.g. the garden, old songs, cooking" /></label>

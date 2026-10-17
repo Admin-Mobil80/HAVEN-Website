@@ -6,6 +6,13 @@ import { forms, type Pronouns, type SetupView } from "../lib/names";
 const TOPICS = ["plans", "visit", "money", "health", "family", "promise"] as const;
 const lines = (s: string) => s.split("\n").map((x) => x.trim()).filter(Boolean);
 
+// A one-item-per-line box. It keeps exactly what was typed (blank lines included) while editing,
+// so Enter starts a new line; the parent only ever sees the cleaned list.
+function LinesField({ value, onChange, rows }: { value: string[]; onChange: (v: string[]) => void; rows: number }) {
+  const [raw, setRaw] = useState(value.join("\n"));
+  return <textarea rows={rows} value={raw} onChange={(e) => (setRaw(e.target.value), onChange(lines(e.target.value)))} />;
+}
+
 // "Teach Haven about <them>": who they are, how the main user talks to them, what the companion
 // must always pass back, and the consents. Pre-filled from the household's setup.
 export function Setup() {
@@ -56,7 +63,7 @@ export function Setup() {
           <label>{E.Subj === "They" ? "They are" : `${E.Subj} is`} your<input value={v.elder.relationToUser} onChange={(e) => elder({ relationToUser: e.target.value })} /></label>
           {pron(v.elder.pronouns, (p) => elder({ pronouns: p }))}
           <label>City<input value={v.elder.city} onChange={(e) => elder({ city: e.target.value })} /></label>
-          <label>Things {them} loves (one per line)<textarea rows={4} value={v.style.topicsTheyLove.join("\n")} onChange={(e) => style({ topicsTheyLove: lines(e.target.value) })} /></label>
+          <label>Things {them} loves (one per line)<LinesField rows={4} value={v.style.topicsTheyLove} onChange={(v) => style({ topicsTheyLove: v })} /></label>
         </fieldset>
 
         <fieldset>
@@ -64,9 +71,9 @@ export function Setup() {
           <label>Your name<input value={v.user.name} onChange={(e) => user({ name: e.target.value })} /></label>
           <label>You are {E.poss}<input value={v.user.relation} onChange={(e) => user({ relation: e.target.value })} /></label>
           {pron(v.user.pronouns, (p) => user({ pronouns: p }))}
-          <label>Words you use with {E.obj} (one per line)<textarea rows={3} value={v.style.phrases.join("\n")} onChange={(e) => style({ phrases: lines(e.target.value) })} /></label>
+          <label>Words you use with {E.obj} (one per line)<LinesField rows={3} value={v.style.phrases} onChange={(v) => style({ phrases: v })} /></label>
           <label>Tone<input value={v.style.tone} onChange={(e) => style({ tone: e.target.value })} /></label>
-          <label>{v.displayName} must never (one per line)<textarea rows={3} value={v.style.neverSays.join("\n")} onChange={(e) => style({ neverSays: lines(e.target.value) })} /></label>
+          <label>{v.displayName} must never (one per line)<LinesField rows={3} value={v.style.neverSays} onChange={(v) => style({ neverSays: v })} /></label>
         </fieldset>
 
         <fieldset>
@@ -78,7 +85,7 @@ export function Setup() {
               {t}
             </label>
           ))}
-          <label>Topics to avoid (one per line)<textarea rows={2} value={v.avoidTopics.join("\n")} onChange={(e) => set({ avoidTopics: lines(e.target.value) })} /></label>
+          <label>Topics to avoid (one per line)<LinesField rows={2} value={v.avoidTopics} onChange={(v) => set({ avoidTopics: v })} /></label>
         </fieldset>
 
         <fieldset>
