@@ -101,7 +101,7 @@ describe("HavenStack", () => {
       Runtime: "nodejs22.x",
       Architectures: ["arm64"],
       MemorySize: 1024,
-      Timeout: 30,
+      Timeout: 120,
       Layers: [DEFAULTS.lwaLayerArn],
       FunctionName: Match.absent(),
       ReservedConcurrentExecutions: Match.absent(),

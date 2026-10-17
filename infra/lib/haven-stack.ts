@@ -86,7 +86,8 @@ export class HavenStack extends Stack {
       runtime: lambda.Runtime.NODEJS_22_X,
       architecture: lambda.Architecture.ARM_64,
       memorySize: 1024,
-      timeout: Duration.seconds(30),
+      // 120 s: building a photo avatar (Anam) or cloning a voice can take close to a minute.
+      timeout: Duration.seconds(120),
       code: lambda.Code.fromAsset(props.lambdaAssetPath),
       handler: "run.sh",
       layers: [lambda.LayerVersion.fromLayerVersionArn(this, "LwaLayer", lwaLayerArn)],
