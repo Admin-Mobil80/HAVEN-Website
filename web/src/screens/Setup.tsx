@@ -9,7 +9,7 @@ const lines = (s: string) => s.split("\n").map((x) => x.trim()).filter(Boolean);
 // A one-item-per-line box. It keeps exactly what was typed (blank lines included) while editing,
 // so Enter starts a new line; the parent only ever sees the cleaned list.
 function LinesField({ value, onChange, rows }: { value: string[]; onChange: (v: string[]) => void; rows: number }) {
-  const [raw, setRaw] = useState(value.join("\n"));
+  const [raw, setRaw] = useState((value ?? []).join("\n"));
   return <textarea rows={rows} value={raw} onChange={(e) => (setRaw(e.target.value), onChange(lines(e.target.value)))} />;
 }
 

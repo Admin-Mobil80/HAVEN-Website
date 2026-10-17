@@ -450,3 +450,21 @@ test("incrCounter adds to a window another caller restarted first", async () => 
   assert.equal(await repo.incrCounter("BUDGET#day", 1, 60), 5);
   assert.equal(raced, true);
 });
+
+test("households stored by an older version are upgraded on read", async () => {
+  const { MemoryRepo } = await import("../src/store/memoryRepo.js");
+  const repo = new MemoryRepo();
+  const old = seedHousehold("old", new Date(T0)) as unknown as Record<string, any>;
+  old.persona.style.topicsSheLoves = old.persona.style.topicsTheyLove;
+  old.persona.style.callsElder = "Amma";
+  delete old.persona.style.topicsTheyLove;
+  delete old.elder.pronouns;
+  delete old.elder.relationToUser;
+  delete old.configured;
+  await repo.put(old as never);
+  const doc = (await repo.get("old"))!;
+  assert.ok(Array.isArray(doc.persona.style.topicsTheyLove) && doc.persona.style.topicsTheyLove.length > 0);
+  assert.equal(doc.elder.pronouns, "she");
+  assert.equal(doc.configured, true);
+  assert.equal((doc.persona.style as unknown as Record<string, unknown>).topicsSheLoves, undefined);
+});

@@ -1,5 +1,6 @@
 import type { Household, LogEntry, SessionRecord } from "../domain/types.js";
 import { NotFoundError, type Repo } from "./repo.js";
+import { upgradeDoc } from "../domain/upgrade.js";
 
 // In-process repo for tests and the no-keys local demo. Same semantics as dynamoRepo:
 // documents are deep-copied in and out, so callers can never mutate stored state by accident.
@@ -13,7 +14,7 @@ export class MemoryRepo implements Repo {
 
   async get(householdId: string) {
     const doc = this.docs.get(householdId);
-    return doc ? structuredClone(doc) : undefined;
+    return doc ? upgradeDoc(structuredClone(doc)) : undefined;
   }
 
   async create(doc: Household) {
@@ -28,7 +29,7 @@ export class MemoryRepo implements Repo {
   async update<T>(householdId: string, fn: (doc: Household) => T | Promise<T>): Promise<T> {
     const current = this.docs.get(householdId);
     if (!current) throw new NotFoundError(householdId);
-    const draft = structuredClone(current);
+    const draft = upgradeDoc(structuredClone(current));
     const result = await fn(draft);
     draft.version = current.version + 1;
     this.docs.set(householdId, draft);

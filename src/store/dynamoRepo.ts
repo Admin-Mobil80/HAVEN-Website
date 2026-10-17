@@ -1,4 +1,5 @@
 import { randomBytes } from "node:crypto";
+import { upgradeDoc } from "../domain/upgrade.js";
 import { setTimeout as sleep } from "node:timers/promises";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import {
@@ -72,7 +73,8 @@ export class DynamoRepo implements Repo {
   }
 
   async get(householdId: string) {
-    return (await this.readDoc(householdId))?.doc;
+    const doc = (await this.readDoc(householdId))?.doc;
+    return doc ? upgradeDoc(doc) : undefined;
   }
 
   async create(doc: Household, opts: { ttlSeconds?: number } = {}) {
@@ -95,7 +97,7 @@ export class DynamoRepo implements Repo {
     for (let attempt = 0; ; attempt++) {
       const current = await this.readDoc(householdId);
       if (!current) throw new NotFoundError(householdId);
-      const draft = structuredClone(current.doc);
+      const draft = upgradeDoc(structuredClone(current.doc));
       const result = await fn(draft);
       draft.version = current.version + 1;
       try {
