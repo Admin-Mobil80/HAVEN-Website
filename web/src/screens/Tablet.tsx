@@ -4,7 +4,7 @@ import { api, poll } from "../lib/api";
 import { playBase64, playSrc, speakBrowser, unlockAudio } from "../lib/audio";
 import { emit, log, on } from "../lib/bus";
 import { callTool } from "../lib/mcp";
-import { canListen, listen } from "../lib/speech";
+import { canListen, listen, type Listening } from "../lib/speech";
 import type { ElderState, PlayedMessage, TurnResponse } from "../lib/types";
 import { forms, useNames } from "../lib/names";
 import { isLive, speakPhoto, startPhotoAvatar } from "../lib/anam";
@@ -163,18 +163,27 @@ export function Tablet({ chips: chipsProp, compact }: { chips?: string[]; compac
     return () => off();
   }, [say]);
 
+  // Tap once to speak; tap again ("Done") to finish early. Otherwise it finishes after a pause.
+  const listening = useRef<Listening | null>(null);
   const talk = async () => {
     unlockAudio();
     if (!canListen) return;
+    if (listening.current) return listening.current.stop();
     setState("listening");
     setHeard("");
+    setError("");
     try {
-      const text = await listen({ onInterim: setHeard }).done;
+      listening.current = listen({ lang: elderRef.current?.elder.language === "hi-IN" ? "hi-IN" : "en-IN", onInterim: setHeard });
+      const text = await listening.current.done;
+      listening.current = null;
       setState("idle");
       if (text) await say(text);
-    } catch {
+      else setError("I didn't catch that. Tap and try again, a little closer to the microphone.");
+    } catch (e) {
+      listening.current = null;
       setState("idle");
-      setError("The microphone isn't available. You can type or tap a suggestion below.");
+      const denied = /not-allowed|service-not-allowed/.test((e as Error).message);
+      setError(denied ? "The microphone is blocked. Allow it in the browser's address bar, or type below." : "The microphone isn't available. You can type or tap a suggestion below.");
     }
   };
 
@@ -272,7 +281,7 @@ export function Tablet({ chips: chipsProp, compact }: { chips?: string[]; compac
           )}
           {canListen && (
             <button className={`btn btn--mic${state === "listening" ? " is-on" : ""}`} onClick={talk} disabled={state === "thinking" || state === "speaking"} aria-label="Tap and speak">
-              🎤 Tap and speak
+              {state === "listening" ? "✓ Done" : "🎤 Tap and speak"}
             </button>
           )}
           <form
