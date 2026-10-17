@@ -87,10 +87,19 @@ async function main() {
   const media = new S3MediaStore(requireEnv("MEDIA_BUCKET"));
   const systemVoice = process.env.POLLY_VOICE_SYSTEM?.trim() || "Brian";
   // Voice and avatar providers: keys from SSM, read on first use (so they can be added after deploy).
-  let elevenCache: ElevenLabs | undefined;
-  let anamCache: Anam | undefined;
-  const eleven = async () => (elevenCache ??= await optionalSecret("elevenlabs-api-key").then((k) => (k ? new ElevenLabs(k) : undefined)));
-  const anam = async () => (anamCache ??= await optionalSecret("anam-api-key").then((k) => (k ? new Anam(k) : undefined)));
+  // Re-read every 5 minutes, so a key that is added or replaced in SSM works without a restart.
+  const fresh = <T,>(name: string, make: (key: string) => T) => {
+    let cached: { at: number; key?: string; value?: T } | undefined;
+    return async () => {
+      if (!cached || Date.now() - cached.at > 5 * 60_000) {
+        const key = await optionalSecret(name);
+        cached = { at: Date.now(), key, value: key ? (key === cached?.key ? cached.value : make(key)) : undefined };
+      }
+      return cached.value;
+    };
+  };
+  const eleven = fresh("elevenlabs-api-key", (k) => new ElevenLabs(k));
+  const anam = fresh("anam-api-key", (k) => new Anam(k));
   const app = createApp({
     repo: new DynamoRepo({ tableName: requireEnv("TABLE_NAME") }),
     notifier: whatsapp?.notifier ?? new SimulatedNotifier(),
