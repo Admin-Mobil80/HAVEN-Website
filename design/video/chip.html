@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Haven · Chip</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&family=JetBrains+Mono:wght@400;500&display=block" rel="stylesheet">
+<style>
+  /* Chroma-key plate: pure #00ff00, no shadows or transparency, so the key stays clean. */
+  html, body { margin: 0; height: 100%; overflow: hidden; background: #00ff00; cursor: none; }
+  #stage { position: absolute; left: 50%; top: 50%; width: 1920px; height: 1080px; transform: translate(-50%, -50%) scale(var(--s, 1)); background: #00ff00; }
+  .chip {
+    position: absolute; max-width: 1240px; box-sizing: border-box;
+    padding: 22px 30px 24px; border-radius: 20px; background: #1c1a17; border: 2px solid #36322d;
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  .bl { left: 72px; bottom: 72px; } .br { right: 72px; bottom: 72px; }
+  .tl { left: 72px; top: 72px; }    .tr { right: 72px; top: 72px; }
+  .label { display: flex; align-items: center; gap: 12px; font-family: "Plus Jakarta Sans", system-ui, sans-serif; font-size: 22px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: #ffb690; }
+  .label i { width: 12px; height: 12px; border-radius: 50%; background: #ffb690; }
+  .detail { font-family: "JetBrains Mono", ui-monospace, Menlo, monospace; font-size: 30px; line-height: 1.4; color: #ece6dc; }
+  /* Slide in without fading, so no frame is semi-transparent over the green. */
+  @keyframes slide { from { transform: translateY(var(--from)); } to { transform: none; } }
+  .bl, .br { --from: 300px; } .tl, .tr { --from: -300px; }
+  .play .chip { animation: slide .45s cubic-bezier(.2,.9,.3,1) .2s both; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div class="chip"><div class="label"><i></i>Under the hood</div><div class="detail"></div></div>
+</div>
+<script>
+  // chip.html?t=<detail text>&pos=bl|br|tl|tr (default bl). Optional &label=<top line>.
+  const q = new URLSearchParams(location.search);
+  const chip = document.querySelector(".chip");
+  chip.classList.add(["bl", "br", "tl", "tr"].includes(q.get("pos")) ? q.get("pos") : "bl");
+  chip.querySelector(".detail").textContent = q.get("t") || "MCP 2025-11-25 · Streamable HTTP · 8 tools";
+  if (q.get("label")) chip.querySelector(".label").lastChild.textContent = q.get("label");
+
+  // Plays on load; Space restarts the slide-in.
+  const stage = document.getElementById("stage");
+  const fit = () => stage.style.setProperty("--s", Math.min(innerWidth / 1920, innerHeight / 1080));
+  addEventListener("resize", fit); fit();
+  const play = () => { stage.classList.remove("play"); void stage.offsetWidth; stage.classList.add("play"); };
+  document.fonts.ready.then(play);
+  addEventListener("keydown", (e) => { if (e.code === "Space") { e.preventDefault(); play(); } });
+</script>
+</body>
+</html>

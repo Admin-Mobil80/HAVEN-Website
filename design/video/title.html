@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Haven · Title</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=block" rel="stylesheet">
+<style>
+  :root { --bg: #fdfbf7; --ink: #23211e; --muted: #68625b; --brand: #9a4100; --brand-ring: #bd5611; --brand-soft: #ffdbcb; }
+  html, body { margin: 0; height: 100%; overflow: hidden; background: var(--bg); cursor: none; }
+  #stage {
+    position: absolute; left: 50%; top: 50%; width: 1920px; height: 1080px;
+    transform: translate(-50%, -50%) scale(var(--s, 1)); background: var(--bg);
+    font-family: "Plus Jakarta Sans", system-ui, sans-serif; color: var(--ink);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+  }
+  .brand { display: flex; align-items: center; gap: 36px; }
+  .mark { width: 150px; height: 150px; }
+  .mark .draw { fill: none; stroke: var(--brand); stroke-width: 9; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 600; stroke-dashoffset: 600; }
+  .mark .glow { fill: var(--brand-soft); opacity: 0; }
+  .mark .heart { fill: var(--brand-ring); opacity: 0; transform-origin: 75px 92px; }
+  .word { font-size: 168px; font-weight: 800; letter-spacing: -0.04em; line-height: 1; opacity: 0; }
+  .tag { margin-top: 72px; text-align: center; font-size: 46px; font-weight: 500; line-height: 1.4; color: var(--muted); }
+  .tag span { display: block; opacity: 0; }
+  .tag span + span { color: var(--brand); font-weight: 700; }
+
+  @keyframes draw { to { stroke-dashoffset: 0; } }
+  @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes pop { from { opacity: 0; transform: scale(.4); } to { opacity: 1; transform: none; } }
+  @keyframes in { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+
+  /* Timeline (s): mark draws 0.2-1.2, wordmark 0.6, tagline 1.7 and 2.6, hold to 5. */
+  .play .mark .draw { animation: draw 1s ease-in-out .2s forwards; }
+  .play .mark .glow { animation: fade .6s ease-out .9s both; }
+  .play .mark .heart { animation: pop .5s cubic-bezier(.3,1.6,.6,1) 1.1s both; }
+  .play .word { animation: in .8s ease-out .6s both; }
+  .play .tag span:first-child { animation: in .8s ease-out 1.7s both; }
+  .play .tag span + span { animation: in .8s ease-out 2.6s both; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div class="brand">
+    <!-- Haven's own mark: a simple house with a heart in the doorway. Not a stock logo. -->
+    <svg class="mark" viewBox="0 0 150 150" aria-hidden="true">
+      <path class="glow" d="M30 70 L75 30 L120 70 V124 H30 Z"/>
+      <path class="draw" d="M18 74 L75 24 L132 74 M32 62 V126 H118 V62"/>
+      <path class="heart" d="M75 112 C58 100 52 92 52 84 C52 77 57 72 63 72 C68 72 72 75 75 79 C78 75 82 72 87 72 C93 72 98 77 98 84 C98 92 92 100 75 112 Z"/>
+    </svg>
+    <div class="word">Haven</div>
+  </div>
+  <div class="tag">
+    <span>Most AI companions want more of your loved one's time.</span>
+    <span>Haven wants more of your calls.</span>
+  </div>
+</div>
+<script>
+  // Plays on load; Space restarts from the first frame (start the recorder, then press Space).
+  const stage = document.getElementById("stage");
+  const fit = () => stage.style.setProperty("--s", Math.min(innerWidth / 1920, innerHeight / 1080));
+  addEventListener("resize", fit); fit();
+  const play = () => { stage.classList.remove("play"); void stage.offsetWidth; stage.classList.add("play"); };
+  document.fonts.ready.then(play);
+  addEventListener("keydown", (e) => { if (e.code === "Space") { e.preventDefault(); play(); } });
+</script>
+</body>
+</html>

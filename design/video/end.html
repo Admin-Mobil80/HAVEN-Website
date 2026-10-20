@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Haven · End</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=block" rel="stylesheet">
+<style>
+  :root { --bg: #fdfbf7; --ink: #23211e; --muted: #68625b; --brand: #9a4100; --brand-ring: #bd5611; --brand-soft: #ffdbcb; --line: #eae5dd; }
+  html, body { margin: 0; height: 100%; overflow: hidden; background: var(--bg); cursor: none; }
+  #stage {
+    position: absolute; left: 50%; top: 50%; width: 1920px; height: 1080px;
+    transform: translate(-50%, -50%) scale(var(--s, 1)); background: var(--bg);
+    font-family: "Plus Jakarta Sans", system-ui, sans-serif; color: var(--ink);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+  }
+  .quote { text-align: center; font-size: 96px; font-weight: 700; letter-spacing: -0.03em; line-height: 1.18; }
+  .quote span { display: block; opacity: 0; }
+  .quote span + span { color: var(--brand); font-weight: 800; }
+  .foot { margin-top: 110px; display: flex; flex-direction: column; align-items: center; gap: 26px; }
+  .brand { display: flex; align-items: center; gap: 16px; font-size: 40px; font-weight: 800; letter-spacing: -0.03em; opacity: 0; }
+  .brand svg { width: 52px; height: 52px; }
+  .url { font-family: "JetBrains Mono", ui-monospace, Menlo, monospace; font-size: 30px; color: var(--ink); padding: 18px 30px; border: 2px solid var(--line); border-radius: 16px; background: #fff; opacity: 0; }
+  .oss { font-size: 30px; font-weight: 600; color: var(--muted); opacity: 0; }
+
+  @keyframes in { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+  @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+
+  /* Timeline (s): 0.3 first sentence, 1.5 second, 3.0 mark, 3.4 URL, 4.0 licence, hold to 7. */
+  .play .quote span:first-child { animation: in .9s ease-out .3s both; }
+  .play .quote span + span { animation: in .9s ease-out 1.5s both; }
+  .play .brand { animation: fade .7s ease-out 3.0s both; }
+  .play .url { animation: fade .7s ease-out 3.4s both; }
+  .play .oss { animation: fade .7s ease-out 4.0s both; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div class="quote">
+    <span>Haven didn't replace the call.</span>
+    <span>It started it.</span>
+  </div>
+  <div class="foot">
+    <div class="brand">
+      <svg viewBox="0 0 150 150" aria-hidden="true">
+        <path d="M30 70 L75 30 L120 70 V124 H30 Z" fill="var(--brand-soft)"/>
+        <path d="M18 74 L75 24 L132 74 M32 62 V126 H118 V62" fill="none" stroke="var(--brand)" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M75 112 C58 100 52 92 52 84 C52 77 57 72 63 72 C68 72 72 75 75 79 C78 75 82 72 87 72 C93 72 98 77 98 84 C98 92 92 100 75 112 Z" fill="var(--brand-ring)"/>
+      </svg>
+      Haven
+    </div>
+    <div class="url">https://uzm23d4tzykddxqnkq4lld5zva0ixbbl.lambda-url.ap-south-1.on.aws/</div>
+    <div class="oss">Open source · MIT</div>
+  </div>
+</div>
+<script>
+  // Plays on load; Space restarts from the first frame (start the recorder, then press Space).
+  const stage = document.getElementById("stage");
+  const fit = () => stage.style.setProperty("--s", Math.min(innerWidth / 1920, innerHeight / 1080));
+  addEventListener("resize", fit); fit();
+  const play = () => { stage.classList.remove("play"); void stage.offsetWidth; stage.classList.add("play"); };
+  document.fonts.ready.then(play);
+  addEventListener("keydown", (e) => { if (e.code === "Space") { e.preventDefault(); play(); } });
+</script>
+</body>
+</html>

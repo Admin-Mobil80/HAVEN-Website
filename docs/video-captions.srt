@@ -1,0 +1,194 @@
+1
+00:00:01,000 --> 00:00:04,600
+There's someone you love
+who you don't call enough.
+
+2
+00:00:05,200 --> 00:00:09,200
+Not because you don't care.
+Because life gets full.
+
+3
+00:00:12,200 --> 00:00:15,000
+Most AI companions want more
+of their time.
+
+4
+00:00:15,000 --> 00:00:18,000
+Haven wants more of your calls.
+
+5
+00:00:18,500 --> 00:00:21,600
+Set it up for anyone you care about.
+
+6
+00:00:21,600 --> 00:00:25,000
+Your face, your voice,
+always with consent,
+
+7
+00:00:25,000 --> 00:00:27,500
+and always labelled AI.
+
+8
+00:00:30,500 --> 00:00:34,200
+Meet Margaret in Seattle,
+and her son, Daniel.
+
+9
+00:00:36,000 --> 00:00:38,000
+She just asks Alexa.
+
+10
+00:00:38,000 --> 00:00:43,200
+Haven answers as an Alexa+ add-on,
+through a real MCP server.
+
+11
+00:00:43,500 --> 00:00:45,000
+[Digital Daniel] Hello Mom!
+
+12
+00:00:45,000 --> 00:00:48,000
+It's Digital Daniel,
+the AI version of Daniel.
+
+13
+00:00:48,000 --> 00:00:51,300
+She talks, he listens,
+and it remembers.
+
+14
+00:00:51,500 --> 00:00:55,000
+[Margaret] I met my old friend
+at the market, we used to sing together.
+
+15
+00:00:55,000 --> 00:01:01,800
+[Digital Daniel] TODO: transcribe
+the live reply from take C
+
+16
+00:01:02,000 --> 00:01:04,800
+It never pretends to be him.
+
+17
+00:01:05,000 --> 00:01:08,400
+[Digital Daniel] I'm Digital Daniel,
+an AI version of Daniel,
+
+18
+00:01:08,400 --> 00:01:11,800
+made with his permission.
+I'm not the real Daniel.
+
+19
+00:01:12,000 --> 00:01:15,500
+Some questions only the real Daniel
+can answer…
+
+20
+00:01:15,500 --> 00:01:18,200
+[Digital Daniel] That one's for
+the real Daniel, Mom.
+
+21
+00:01:18,200 --> 00:01:21,000
+I can't promise that,
+but I'll ask Daniel tonight.
+
+22
+00:01:21,000 --> 00:01:24,200
+…so he does, in his own voice.
+
+23
+00:01:29,000 --> 00:01:31,400
+[The real Daniel] I'll be home
+on the 7th, Mom.
+
+24
+00:01:31,400 --> 00:01:34,600
+And she hears him, not the AI.
+
+25
+00:01:37,500 --> 00:01:42,000
+[Digital Daniel] Shall I send this to
+Daniel: "TODO: message from take D"?
+
+26
+00:01:42,000 --> 00:01:44,500
+Nothing leaves without her yes.
+
+27
+00:01:44,500 --> 00:01:47,000
+[Digital Daniel] Done.
+I've sent it to Daniel.
+
+28
+00:01:48,000 --> 00:01:50,400
+[Digital Daniel]
+Daniel has been told.
+
+29
+00:01:50,400 --> 00:01:53,000
+If you are in danger,
+call 911 now.
+
+30
+00:01:53,000 --> 00:01:58,000
+If something's wrong, no AI decides.
+Rules reach Daniel in seconds.
+
+31
+00:02:01,000 --> 00:02:06,800
+Every evening, Daniel gets what mattered
+in her day, and what to ask.
+
+32
+00:02:07,000 --> 00:02:10,400
+So tonight he doesn't ask,
+"How are you?"
+
+33
+00:02:10,400 --> 00:02:14,600
+He asks about her old friend,
+and the songs.
+
+34
+00:02:20,500 --> 00:02:25,200
+Under the hood: one AWS Lambda
+serves a real MCP server.
+
+35
+00:02:25,200 --> 00:02:29,200
+Every turn checks deterministic
+safety rules first, then Bedrock,
+
+36
+00:02:29,200 --> 00:02:33,600
+with two fallbacks,
+so she always gets an answer.
+
+37
+00:02:33,600 --> 00:02:36,200
+Voices come from Polly or ElevenLabs,
+
+38
+00:02:36,200 --> 00:02:39,600
+and the live face from Anam
+only while speaking.
+
+39
+00:02:39,600 --> 00:02:42,700
+State lives in DynamoDB,
+recordings in S3,
+
+40
+00:02:42,700 --> 00:02:45,500
+and the evening update
+runs on EventBridge.
+
+41
+00:02:47,000 --> 00:02:50,600
+Haven didn't replace the call.
+It started it.

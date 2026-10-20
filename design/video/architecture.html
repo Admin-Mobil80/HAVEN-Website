@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Haven · Architecture</title>
+<!--
+  Matches the deployed stack: infra/lib/haven-stack.ts, src/lambda/main.ts and README.md.
+  - One Lambda behind a Function URL runs the web app, /api and /mcp (Express on the Lambda Web Adapter).
+  - The turn engine (src/agent/turn.ts) calls the MCP tools through an in-process MCP client; the tablet
+    posts each turn to /api/turn, the simulated Alexa+ client posts to /mcp.
+  - Bedrock order: openai.gpt-oss-120b-1:0 -> apac.amazon.nova-lite-v1:0 -> rules brain.
+  - EventBridge Scheduler invokes the Lambda for the 21:00 IST digest, which is sent via the WhatsApp Cloud API.
+  Options: ?wpm=140 (narration pace; the timeline scales to it), ?captions=1 (rehearsal captions).
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=block" rel="stylesheet">
+<style>
+  :root {
+    --bg: #fdfbf7; --surface: #ffffff; --line: #eae5dd; --line-strong: #d5cfc7;
+    --ink: #23211e; --muted: #68625b;
+    --brand: #9a4100; --brand-ring: #bd5611; --brand-soft: #ffdbcb;
+    --real: #1d4e89; --real-soft: #e3edfb;
+    --good: #2a674c; --good-soft: #d7f3e4;
+    --mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+  }
+  html, body { margin: 0; height: 100%; overflow: hidden; background: var(--bg); cursor: none; }
+  #stage {
+    position: absolute; left: 50%; top: 50%; width: 1920px; height: 1080px;
+    transform: translate(-50%, -50%) scale(var(--s, 1)); background: var(--bg);
+    font-family: "Plus Jakarta Sans", system-ui, sans-serif; color: var(--ink);
+  }
+  .head { position: absolute; left: 80px; top: 64px; }
+  .kicker { font-size: 22px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; color: var(--brand); }
+  .title { margin-top: 8px; font-size: 46px; font-weight: 700; letter-spacing: -0.02em; }
+  .title small { font-size: 28px; font-weight: 500; color: var(--muted); letter-spacing: 0; margin-left: 12px; }
+
+  svg.edges { position: absolute; inset: 0; width: 1920px; height: 1080px; overflow: visible; }
+
+  /* Every node and edge has three states: hidden-ish (default), .on (current beat), .done (visited). */
+  .node, .group, .row, .edge, .elabel { transition: opacity .45s ease, border-color .45s ease, background-color .45s ease, box-shadow .45s ease, transform .45s ease, stroke .45s ease; }
+  .node {
+    position: absolute; box-sizing: border-box; padding: 18px 18px; border-radius: 20px;
+    background: var(--surface); border: 3px solid var(--line-strong);
+    display: flex; flex-direction: column; justify-content: center; gap: 8px; opacity: .28;
+  }
+  .node h3 { margin: 0; font-size: 25px; font-weight: 700; line-height: 1.2; letter-spacing: -0.01em; }
+  .node p { margin: 0; font-family: var(--mono); font-size: 17px; line-height: 1.35; color: var(--muted); }
+  .node.done, .group.done, .row.done { opacity: 1; }
+  .node.on { opacity: 1; border-color: var(--tone); background: var(--tone-soft); box-shadow: 0 0 0 10px color-mix(in srgb, var(--tone) 16%, transparent), 0 16px 40px rgb(35 33 30 / .12); transform: translateY(-4px); }
+  .node.done:not(.on) { border-color: color-mix(in srgb, var(--tone) 45%, var(--line-strong)); }
+  .ai     { --tone: var(--brand-ring); --tone-soft: #fff1e8; }
+  .family { --tone: var(--real); --tone-soft: var(--real-soft); }
+  .infra  { --tone: var(--good); --tone-soft: var(--good-soft); }
+
+  .group {
+    position: absolute; box-sizing: border-box; border-radius: 28px; border: 3px dashed var(--line-strong);
+    background: rgb(255 255 255 / .4); opacity: .28;
+  }
+  .group .glabel { position: absolute; left: 22px; top: 14px; font-size: 21px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+  .group.on { opacity: 1; border-color: var(--real); background: rgb(227 237 251 / .55); }
+  .group.on .glabel, .group.done .glabel { color: var(--real); }
+
+  /* The Bedrock chain: three rows, each lit on its own. */
+  .chain { padding: 16px 16px; gap: 0; justify-content: flex-start; }
+  .chain h3 { margin-bottom: 8px; }
+  .row { font-family: var(--mono); font-size: 18px; line-height: 1.3; padding: 9px 12px; border-radius: 12px; opacity: .35; border: 2px solid transparent; }
+  .row + .row { margin-top: 6px; }
+  .row em { font-style: normal; color: var(--muted); font-size: 15px; display: block; }
+  .row.on { opacity: 1; background: #fff; border-color: var(--brand-ring); }
+
+  .tablet, .phone { align-items: center; text-align: center; padding: 14px 10px; }
+  .device { width: 64px; height: 84px; border-radius: 12px; border: 5px solid var(--ink); box-sizing: border-box; display: grid; place-items: center; }
+  .phone .device { width: 46px; height: 82px; border-radius: 12px; }
+  .device b { width: 22px; height: 22px; border-radius: 50%; background: var(--tone); }
+
+  .edge { fill: none; stroke: var(--line-strong); stroke-width: 4; stroke-linecap: round; opacity: .45; }
+  .edge.done { opacity: 1; stroke: #a49d93; }
+  .edge.on { opacity: 1; stroke: var(--brand-ring); stroke-width: 6; stroke-dasharray: 14 12; animation: flow .6s linear infinite; }
+  .edge.on.fam { stroke: var(--real); }
+  .edge.on.inf { stroke: var(--good); }
+  @keyframes flow { to { stroke-dashoffset: -26; } }
+  .elabel { font-family: var(--mono); font-size: 18px; fill: var(--muted); opacity: .4; }
+  .elabel.on, .elabel.done { opacity: 1; }
+  .elabel.on { fill: var(--ink); }
+
+  .intro { opacity: 0; }
+  .play .intro { animation: fade .8s ease-out both; }
+  @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+
+  .captions { position: absolute; left: 80px; right: 80px; bottom: 40px; font-size: 26px; line-height: 1.45; color: var(--muted); display: none; }
+  .captions.show { display: block; }
+  .captions span.said { color: var(--ink); }
+  .captions span.now { color: var(--brand); font-weight: 700; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div class="intro">
+    <div class="head">
+      <div class="kicker">Under the hood</div>
+      <div class="title">Haven on AWS <small>ap-south-1 (Mumbai) · one stack, defined in CDK</small></div>
+    </div>
+
+    <svg class="edges" viewBox="0 0 1920 1080" aria-hidden="true">
+      <defs>
+        <marker id="arrow" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+          <path d="M0 0 L10 5 L0 10 Z" fill="#a49d93"/>
+        </marker>
+      </defs>
+      <!-- Request path, left to right -->
+      <path id="e-alexa" class="edge" d="M240 470 H300" marker-end="url(#arrow)"/>
+      <text id="l-alexa" class="elabel" x="270" y="452" text-anchor="middle">/mcp</text>
+      <path id="e-mcp" class="edge" d="M500 470 H522" marker-start="url(#arrow)" marker-end="url(#arrow)"/>
+      <path id="e-safety" class="edge" d="M720 470 H742" marker-end="url(#arrow)"/>
+      <path id="e-bedrock" class="edge" d="M940 470 H1000" marker-end="url(#arrow)"/>
+      <path id="e-voice" class="edge" d="M1240 470 H1270" marker-end="url(#arrow)"/>
+      <path id="e-face" class="edge" d="M1470 470 H1500" marker-end="url(#arrow)"/>
+      <path id="e-tablet" class="edge" d="M1700 470 H1730" marker-end="url(#arrow)"/>
+      <!-- Each turn: the tablet's mic posts to /api/turn on the same Lambda -->
+      <path id="e-turn" class="edge" d="M1805 375 V270 Q1805 250 1785 250 H670 Q650 250 650 270 V372" marker-end="url(#arrow)"/>
+      <text id="l-turn" class="elabel" x="1230" y="236" text-anchor="middle">every turn: mic → POST /api/turn</text>
+      <!-- Stores -->
+      <path id="e-ddb" class="edge inf" d="M400 640 V712" marker-start="url(#arrow)" marker-end="url(#arrow)"/>
+      <path id="e-s3" class="edge inf" d="M620 640 V712" marker-start="url(#arrow)" marker-end="url(#arrow)"/>
+      <path id="e-eb" class="edge inf" d="M840 712 V640" marker-end="url(#arrow)"/>
+      <text id="l-eb" class="elabel" x="826" y="684" text-anchor="end">invoke</text>
+      <!-- Family channel -->
+      <path id="e-wa" class="edge fam" d="M920 640 V676 Q920 690 934 690 H1470 Q1484 690 1484 704 V712" marker-end="url(#arrow)"/>
+      <text id="l-wa" class="elabel" x="1200" y="676" text-anchor="middle">evening update + alerts</text>
+      <path id="e-phone" class="edge fam" d="M1700 795 H1730" marker-end="url(#arrow)"/>
+    </svg>
+
+    <div id="g-lambda" class="group" style="left:285px; top:300px; width:670px; height:340px;">
+      <div class="glabel">AWS Lambda (Function URL)</div>
+    </div>
+
+    <div id="n-alexa" class="node family" style="left:45px; top:375px; width:195px; height:190px;">
+      <h3>Simulated Alexa+<br>add-on</h3><p>(MCP client)</p>
+    </div>
+    <div id="n-mcp" class="node ai" style="left:305px; top:375px; width:195px; height:190px;">
+      <h3>MCP server</h3><p>8 tools<br>spec 2025-11-25</p>
+    </div>
+    <div id="n-turn" class="node ai" style="left:525px; top:375px; width:195px; height:190px;">
+      <h3>Turn engine</h3><p>in-process MCP client</p>
+    </div>
+    <div id="n-safety" class="node infra" style="left:745px; top:375px; width:195px; height:190px;">
+      <h3>Safety rules</h3><p>no LLM<br>always first</p>
+    </div>
+    <div id="n-bedrock" class="node ai chain" style="left:1005px; top:340px; width:235px; height:260px;">
+      <h3>Bedrock</h3>
+      <div id="r-gpt" class="row">gpt-oss-120b</div>
+      <div id="r-nova" class="row">→ Nova Lite<em>fallback 1</em></div>
+      <div id="r-rules" class="row">→ rules brain<em>fallback 2</em></div>
+    </div>
+    <div id="n-voice" class="node ai" style="left:1275px; top:375px; width:195px; height:190px;">
+      <h3>Voice</h3><p>Polly /<br>ElevenLabs</p>
+    </div>
+    <div id="n-face" class="node ai" style="left:1505px; top:375px; width:195px; height:190px;">
+      <h3>Live face</h3><p>Anam<br>only while speaking</p>
+    </div>
+    <div id="n-tablet" class="node family tablet" style="left:1735px; top:375px; width:140px; height:190px;">
+      <div class="device"><b></b></div><h3 style="font-size:21px">Mom's tablet</h3>
+    </div>
+
+    <div id="n-ddb" class="node infra" style="left:305px; top:715px; width:195px; height:160px;">
+      <h3>DynamoDB</h3><p>one table · state</p>
+    </div>
+    <div id="n-s3" class="node infra" style="left:525px; top:715px; width:195px; height:160px;">
+      <h3>S3</h3><p>voice notes · photos</p>
+    </div>
+    <div id="n-eb" class="node infra" style="left:745px; top:715px; width:195px; height:160px;">
+      <h3>EventBridge Scheduler</h3><p>9 pm digest</p>
+    </div>
+    <div id="n-wa" class="node family" style="left:1275px; top:715px; width:425px; height:160px;">
+      <h3>WhatsApp Cloud API<br>→ family phone</h3><p>alerts · digest · voice notes</p>
+    </div>
+    <div id="n-phone" class="node family phone" style="left:1735px; top:715px; width:140px; height:160px;">
+      <div class="device"><b></b></div><h3 style="font-size:21px">Daniel's phone</h3>
+    </div>
+  </div>
+
+  <div class="captions" id="captions"></div>
+</div>
+<script>
+  // Narration, about 59 words; at 140 wpm it runs 25.3 s, and the page holds the final frame to 26 s.
+  const NARRATION = "Under the hood: one AWS Lambda serves a real MCP server. Every turn checks deterministic safety rules first, then Bedrock, with two fallbacks so she's never left without an answer. Voices come from Polly or ElevenLabs, and the live face from Anam only while speaking. State lives in DynamoDB, recordings in S3, and the evening update runs on EventBridge.";
+  const WORDS = NARRATION.split(/\s+/);
+  const q = new URLSearchParams(location.search);
+  const WPM = Number(q.get("wpm")) || 140;
+  const SEC_PER_WORD = 60 / WPM;
+  const END = Math.max(26, WORDS.length * SEC_PER_WORD + 0.7);
+
+  // Beats, keyed by the narration word (0-based) where they start. Each beat lights its ids;
+  // the previous beat's ids stay lit as "done". Word indexes: "one"=3, "real"=8, "Every"=11,
+  // "deterministic"=14, "Bedrock,"=19, "two"=21, "she's"=24, "Voices"=30, "live"=38, "only"=42,
+  // "in"=47 (DynamoDB), "in"=50 (S3), "evening"=54, "on"=57 (EventBridge, then WhatsApp).
+  const BEATS = [
+    [3,  ["g-lambda"]],
+    [8,  ["n-alexa", "e-alexa", "l-alexa", "n-mcp"]],
+    [11, ["n-tablet", "e-turn", "l-turn", "n-turn", "e-mcp"]],
+    [14, ["e-safety", "n-safety"]],
+    [19, ["e-bedrock", "n-bedrock", "r-gpt"]],
+    [21, ["r-nova"]],
+    [24, ["r-rules"]],
+    [30, ["e-voice", "n-voice"]],
+    [38, ["e-face", "n-face"]],
+    [42, ["e-tablet", "n-tablet"]],
+    [47, ["e-ddb", "n-ddb"]],
+    [50, ["e-s3", "n-s3"]],
+    [54, ["n-eb", "e-eb", "l-eb"]],
+    [57, ["e-wa", "l-wa", "n-wa", "e-phone", "n-phone"]],
+  ];
+  const ALL = [...new Set(BEATS.flatMap(([, ids]) => ids))];
+  const el = (id) => document.getElementById(id);
+
+  const caps = el("captions");
+  if (q.get("captions")) {
+    caps.classList.add("show");
+    caps.innerHTML = WORDS.map((w) => `<span>${w}</span>`).join(" ");
+  }
+  const capSpans = [...caps.children];
+
+  const stage = document.getElementById("stage");
+  const fit = () => stage.style.setProperty("--s", Math.min(innerWidth / 1920, innerHeight / 1080));
+  addEventListener("resize", fit); fit();
+
+  let t0 = 0, raf = 0;
+  function render(t) {
+    const word = t / SEC_PER_WORD;
+    let current = -1;
+    BEATS.forEach(([w], i) => { if (word >= w) current = i; });
+    const finished = t >= WORDS.length * SEC_PER_WORD + 0.4;
+    const on = new Set(current >= 0 && !finished ? BEATS[current][1] : []);
+    const done = new Set(BEATS.slice(0, current + 1).flatMap(([, ids]) => ids));
+    for (const id of ALL) {
+      el(id).classList.toggle("on", on.has(id));
+      el(id).classList.toggle("done", done.has(id));
+    }
+    capSpans.forEach((s, i) => { s.className = i < Math.floor(word) ? "said" : i === Math.floor(word) ? "now" : ""; });
+  }
+  function tick(now) {
+    const t = (now - t0) / 1000;
+    render(Math.min(t, END));
+    if (t < END) raf = requestAnimationFrame(tick);
+  }
+  function play() {
+    cancelAnimationFrame(raf);
+    stage.classList.remove("play"); void stage.offsetWidth; stage.classList.add("play");
+    t0 = performance.now();
+    raf = requestAnimationFrame(tick);
+  }
+  addEventListener("keydown", (e) => { if (e.code === "Space") { e.preventDefault(); play(); } });
+  // For checking a single moment: ?at=12.5 freezes the diagram at that second.
+  if (q.get("at")) document.fonts.ready.then(() => { stage.classList.add("play"); render(Number(q.get("at"))); });
+  else document.fonts.ready.then(play);
+</script>
+</body>
+</html>
