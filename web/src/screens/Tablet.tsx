@@ -272,7 +272,9 @@ export function Tablet({ chips: chipsProp, compact }: { chips?: string[]; compac
   const incident = elder?.openIncident;
   const calling = elder?.familyCalling;
   const badge = elder?.persona.badge ?? `${n.companion} · AI`;
-  const childP = forms((elder?.persona.childPronouns as "she" | "he" | "they" | undefined) ?? n.setup?.user.pronouns);
+  const childPronouns = (elder?.persona.childPronouns as "she" | "he" | "they" | undefined) ?? n.setup?.user.pronouns;
+  const childP = forms(childPronouns);
+  const look = elder?.persona.mode === "neutral" ? "they" : childPronouns;
   const child = elder?.persona.childName ?? "your family";
 
   const statusKey = state === "idle" ? (open ? "ready" : "asleep") : state;
@@ -299,7 +301,7 @@ export function Tablet({ chips: chipsProp, compact }: { chips?: string[]; compac
               <div className="avatar__badge" aria-label="This is an AI"><Icon name="smart_toy" fill />{badge}</div>
             </div>
           ) : (
-            <Avatar mouth={mouth} state={state} badge={badge} dim={Boolean(relay)} />
+            <Avatar mouth={mouth} state={state} badge={badge} dim={Boolean(relay)} look={look} />
           )}
           {relay && (
             <div className="realcard" role="status">

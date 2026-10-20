@@ -125,11 +125,11 @@ async function main() {
     // Hosted: Bedrock brain (rules brain on failure or past the daily cap) and Polly speech.
     brain: process.env.HAVEN_BRAIN === "rules" ? "rules" : "bedrock",
     // The household's chosen ElevenLabs voice when set (mouth shapes from its character timings),
-    // otherwise Polly Kajal with visemes.
+    // otherwise Polly with visemes (an American voice for a US household, else Kajal).
     speak:
       process.env.HAVEN_SPEECH === "off"
         ? undefined
-        : async (text, voice) => {
+        : async (text, voice, fallback) => {
             const el = voice ? await eleven() : undefined;
             if (el && voice) {
               try {
@@ -139,9 +139,9 @@ async function main() {
                 console.warn(JSON.stringify({ msg: "elevenlabs_failed_fallback_polly", error: (err as Error).message.slice(0, 200) }));
               }
             }
-            return speak(text);
+            return speak(text, fallback ?? {});
           },
-    likeness: { eleven, anam, pollyPcm: (text) => pcm16(text) },
+    likeness: { eleven, anam, pollyPcm: (text, voice) => pcm16(text, voice ?? {}) },
     dailyBrainCap: Number(process.env.DAILY_BRAIN_CAP) || undefined,
   });
 

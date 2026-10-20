@@ -44,7 +44,7 @@ export function AlexaSim() {
       } else if (/help|ambulance|i fell|emergency/.test(u)) {
         // Safety goes straight to the deterministic path: no conversation, no LLM.
         emit("tablet:say", utterance);
-        await reply("I'm alerting your family now. If you are in danger, call 112.");
+        await reply(`I'm alerting your family now. If you are in danger, call ${n.setup?.elder.language === "en-US" ? "911" : "112"}.`);
       } else if (/remind|reminder/.test(u)) {
         const r = await callTool<{ reminders: { text: string }[] }>("get_reminders", { window: "today" });
         const list = r.data.reminders?.map((x) => x.text) ?? [];

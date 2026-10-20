@@ -2,7 +2,7 @@ import { detectCommitment } from "../domain/commitment.js";
 import { guardReply } from "../domain/guards.js";
 import { asksIfReal, declines, isAffirmative } from "../domain/matchers.js";
 import { compilePersona } from "../domain/persona.js";
-import { emergencyNumber, people } from "../domain/people.js";
+import { emergencyNumber, people, pollyVoice } from "../domain/people.js";
 import { classify } from "../domain/safety.js";
 import { CAPS, MOODS, type ActiveSession, type Household, type LogEntry, type SessionRecord, type VoiceChoice } from "../domain/types.js";
 import { capPush, HOUR, istDate, nextId } from "../domain/util.js";
@@ -29,6 +29,7 @@ import { rulesBrain } from "./rulesBrain.js";
 export type SpeakFn = (
   text: string,
   voice?: VoiceChoice,
+  fallback?: { voiceId: string; languageCode: string }, // the Polly voice to use without (or after) a custom one
 ) => Promise<{ audio: Buffer; contentType: string; marks?: SpeechMark[]; mouths?: { t: number; mouth: Mouth }[] }>;
 
 export type TurnDeps = {
@@ -106,10 +107,10 @@ export async function runTurn(householdId: string, input: TurnInput, deps: TurnD
       if (reply.pendingReply !== undefined) session.pendingReply = reply.pendingReply ?? undefined;
     }
     if (text) capPush(doc.turns, { id: nextId(doc, "t"), at: now.toISOString(), speaker: "avatar", text }, CAPS.turns);
-    return { familyPending: doc.messages.filter((m) => !m.playedAt).length, speaker: displayName(doc), voice: doc.persona.voice };
+    return { familyPending: doc.messages.filter((m) => !m.playedAt).length, speaker: displayName(doc), voice: doc.persona.voice, fallback: pollyVoice(doc) };
   });
 
-  const speech = text && input.speech !== "none" ? await speakSafely(deps.speak, text, after.voice) : undefined;
+  const speech = text && input.speech !== "none" ? await speakSafely(deps.speak, text, after.voice, after.fallback) : undefined;
   return {
     text,
     mode,
@@ -355,10 +356,10 @@ async function load(repo: Repo, hh: string) {
 const childName = (doc: Household) => doc.members.find((m) => m.id === doc.persona.childMemberId)?.name ?? "your family";
 const displayName = (doc: Household) => (doc.persona.mode === "neutral" ? "Haven" : doc.persona.displayName);
 
-async function speakSafely(speak: SpeakFn | undefined, text: string, voice?: VoiceChoice) {
+async function speakSafely(speak: SpeakFn | undefined, text: string, voice?: VoiceChoice, fallback?: { voiceId: string; languageCode: string }) {
   if (!speak) return undefined;
   try {
-    return await speak(text, voice);
+    return await speak(text, voice, fallback);
   } catch (err) {
     console.warn("speech failed, tablet will use browser speech:", (err as Error).message);
     return undefined;

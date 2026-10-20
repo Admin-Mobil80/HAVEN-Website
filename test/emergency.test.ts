@@ -18,3 +18,13 @@ test("the emergency number follows the household: 911 in the US, 112 otherwise",
   const out = guardReply("I have called an ambulance for you.", { childName: "Daniel", calledBy: "Mom", emergency: "911" });
   assert.match(out.text, /please call 911 now/);
 });
+
+test("the built-in voice is American for a US household and follows the companion's pronouns", async () => {
+  const { pollyVoice } = await import("../src/domain/people.js");
+  const us = demoPresetHousehold("demo-us2", new Date());
+  assert.deepEqual(pollyVoice(us), { voiceId: "Matthew", languageCode: "en-US" });
+  us.persona.mode = "neutral";
+  assert.equal(pollyVoice(us)?.voiceId, "Joanna");
+  us.elder.language = "en-IN";
+  assert.equal(pollyVoice(us), undefined, "India keeps the default voice");
+});

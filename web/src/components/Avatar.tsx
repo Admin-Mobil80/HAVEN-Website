@@ -1,10 +1,13 @@
 import { useEffect, useState } from "react";
 
 // Stylised, clearly illustrated fallback companion (used when the photo avatar is off or fails). Five mouth shapes
-// follow Polly viseme timings; the AI badge is part of the component so it can never be hidden.
+// follow Polly viseme timings; the AI badge is part of the component so it can never be hidden. The look follows the
+// pronouns of the person the companion stands in for: "she" and "he" get feminine and masculine styling, "they" (and
+// the neutral Haven companion) a neither-way look.
 
 export type Mouth = "rest" | "closed" | "narrow" | "open" | "round";
 export type AvatarState = "idle" | "listening" | "thinking" | "speaking";
+export type AvatarLook = "she" | "he" | "they";
 
 const MOUTHS: Record<Mouth, string> = {
   rest: "M128 214 Q150 226 172 214 Q150 220 128 214 Z",
@@ -14,7 +17,23 @@ const MOUTHS: Record<Mouth, string> = {
   round: "M140 208 Q150 204 160 208 Q166 222 150 230 Q134 222 140 208 Z",
 };
 
-export function Avatar({ mouth, state, badge, dim }: { mouth: Mouth; state: AvatarState; badge: string; dim?: boolean }) {
+// back hair is drawn behind the face, the fringe over it
+const HAIR: Record<AvatarLook, { back: string; fringe: string }> = {
+  she: {
+    back: "M70 170 Q62 70 150 58 Q238 70 230 170 Q236 250 210 290 L90 290 Q64 250 70 170 Z",
+    fringe: "M88 150 Q96 86 150 84 Q206 86 214 150 Q196 112 150 108 Q112 110 88 150 Z",
+  },
+  he: {
+    back: "M82 172 Q74 80 150 70 Q226 80 218 172 Q212 128 150 120 Q88 128 82 172 Z",
+    fringe: "M90 146 Q90 90 150 86 Q210 90 210 146 Q204 118 176 112 Q146 106 122 116 Q100 126 90 146 Z",
+  },
+  they: {
+    back: "M72 172 Q64 70 150 60 Q236 70 228 172 Q232 216 210 232 L90 232 Q68 216 72 172 Z",
+    fringe: "M88 152 Q94 88 150 86 Q208 88 212 152 Q200 118 164 110 Q120 106 88 152 Z",
+  },
+};
+
+export function Avatar({ mouth, state, badge, dim, look = "they" }: { mouth: Mouth; state: AvatarState; badge: string; dim?: boolean; look?: AvatarLook }) {
   const [blink, setBlink] = useState(false);
   useEffect(() => {
     let t: ReturnType<typeof setTimeout>;
@@ -40,23 +59,43 @@ export function Avatar({ mouth, state, badge, dim }: { mouth: Mouth; state: Avat
         </defs>
         <circle cx="150" cy="160" r="148" fill="url(#bg)" />
         {/* hair, back */}
-        <path d="M70 170 Q62 70 150 58 Q238 70 230 170 Q236 250 210 290 L90 290 Q64 250 70 170 Z" fill="var(--hair)" />
-        {/* neck and kurta */}
+        <path d={HAIR[look].back} fill="var(--hair)" />
+        {/* neck and top: a round-neck jumper, over a shirt collar for "he" */}
         <path d="M128 240 L172 240 L176 276 L124 276 Z" fill="var(--skin-shade)" />
-        <path d="M72 330 Q78 278 124 268 L150 292 L176 268 Q222 278 228 330 Z" fill="var(--kurta)" />
-        <path d="M124 268 L150 292 L176 268" fill="none" stroke="var(--kurta-trim)" strokeWidth="5" />
+        <path d="M70 330 Q76 278 122 266 Q150 286 178 266 Q224 278 230 330 Z" fill="var(--top)" />
+        {look === "he" ? (
+          <>
+            <path d="M126 262 L150 284 L136 298 L116 272 Z" fill="var(--collar)" />
+            <path d="M174 262 L150 284 L164 298 L184 272 Z" fill="var(--collar)" />
+          </>
+        ) : (
+          <path d="M122 266 Q150 286 178 266" fill="none" stroke="var(--top-trim)" strokeWidth="5" strokeLinecap="round" />
+        )}
         {/* face */}
-        <ellipse cx="150" cy="168" rx="62" ry="76" fill="var(--skin)" />
-        {/* ears + earrings */}
+        <ellipse cx="150" cy="168" rx={look === "he" ? 64 : 62} ry="76" fill="var(--skin)" />
+        {/* ears, with small studs for "she" */}
         <ellipse cx="88" cy="176" rx="9" ry="15" fill="var(--skin-shade)" />
         <ellipse cx="212" cy="176" rx="9" ry="15" fill="var(--skin-shade)" />
-        <circle cx="88" cy="196" r="4.5" fill="var(--gold)" />
-        <circle cx="212" cy="196" r="4.5" fill="var(--gold)" />
+        {look === "she" && (
+          <>
+            <circle cx="88" cy="194" r="4" fill="var(--gold)" />
+            <circle cx="212" cy="194" r="4" fill="var(--gold)" />
+          </>
+        )}
         {/* hair, fringe */}
-        <path d="M88 150 Q96 86 150 84 Q206 86 214 150 Q196 112 150 108 Q112 110 88 150 Z" fill="var(--hair)" />
+        <path d={HAIR[look].fringe} fill="var(--hair)" />
         {/* brows */}
-        <path d="M112 146 Q126 138 138 145" stroke="var(--hair)" strokeWidth="4" fill="none" strokeLinecap="round" />
-        <path d="M162 145 Q174 138 188 146" stroke="var(--hair)" strokeWidth="4" fill="none" strokeLinecap="round" />
+        {look === "he" ? (
+          <>
+            <path d="M110 146 Q124 140 139 144" stroke="var(--hair)" strokeWidth="6" fill="none" strokeLinecap="round" />
+            <path d="M161 144 Q176 140 190 146" stroke="var(--hair)" strokeWidth="6" fill="none" strokeLinecap="round" />
+          </>
+        ) : (
+          <>
+            <path d="M112 146 Q126 138 138 145" stroke="var(--hair)" strokeWidth="4" fill="none" strokeLinecap="round" />
+            <path d="M162 145 Q174 138 188 146" stroke="var(--hair)" strokeWidth="4" fill="none" strokeLinecap="round" />
+          </>
+        )}
         {/* eyes */}
         {blink ? (
           <>
@@ -75,10 +114,10 @@ export function Avatar({ mouth, state, badge, dim }: { mouth: Mouth; state: Avat
         )}
         {/* nose, cheeks */}
         <path d="M150 172 Q146 192 141 196 Q150 200 158 196" stroke="var(--skin-line)" strokeWidth="2.5" fill="none" strokeLinecap="round" />
-        <circle cx="112" cy="196" r="10" fill="var(--blush)" opacity="0.45" />
-        <circle cx="188" cy="196" r="10" fill="var(--blush)" opacity="0.45" />
+        <circle cx="112" cy="196" r="10" fill="var(--blush)" opacity={look === "he" ? 0.2 : 0.45} />
+        <circle cx="188" cy="196" r="10" fill="var(--blush)" opacity={look === "he" ? 0.2 : 0.45} />
         {/* mouth */}
-        <path d={MOUTHS[mouth]} fill="var(--lips)" stroke="var(--lips-line)" strokeWidth="1.5" />
+        <path d={MOUTHS[mouth]} fill={look === "she" ? "var(--lips)" : "var(--lips-soft)"} stroke="var(--lips-line)" strokeWidth="1.5" />
         {mouth === "open" && <path d="M138 214 Q150 222 162 214" stroke="#fff" strokeWidth="3" fill="none" opacity="0.8" />}
       </svg>
       <div className="avatar__badge" aria-label="This is an AI">

@@ -22,7 +22,7 @@ async function app() {
     pcm: async () => (calls.push("pcm"), Buffer.alloc(3200)),
   } as unknown as ElevenLabs;
   const anam = { createAvatar: async () => (calls.push("avatar"), "av1"), sessionToken: async () => "tok123" } as unknown as Anam;
-  const h = await startApp({ repo, likeness: { eleven: async () => eleven, anam: async () => anam, pollyPcm: async () => Buffer.alloc(1600), limits: { avatarSessionsPerDay: 5 } } });
+  const h = await startApp({ repo, likeness: { eleven: async () => eleven, anam: async () => anam, pollyPcm: async (_t: string, v?: { voiceId: string }) => (calls.push(`polly:${v?.voiceId ?? "default"}`), Buffer.alloc(1600)), limits: { avatarSessionsPerDay: 5 } } });
   const auth = { authorization: `Bearer ${signToken("demo-lk", SECRET)}` };
   return { h, repo, calls, auth };
 }
@@ -93,7 +93,7 @@ test("character timings become mouth shapes", () => {
 });
 
 test("Start demo: a fictional household with a stock face and voice, and its still on the tablet", async () => {
-  const { h, repo, auth } = await app();
+  const { h, repo, calls, auth } = await app();
   try {
     const view = (await h.request("POST", "/api/setup/demo", { headers: auth })).json();
     assert.equal(view.user.name, "Daniel");
@@ -104,6 +104,9 @@ test("Start demo: a fictional household with a stock face and voice, and its sti
     const elder = (await h.request("GET", "/api/state/elder", { headers: auth })).json();
     assert.equal(elder.photoAvatar, true);
     assert.equal(elder.photoUrl, "/demo/digital-daniel.webp");
+    await repo.update("demo-lk", (d) => void (d.persona.voice = undefined));
+    await h.request("POST", "/api/tts", { headers: auth, body: { text: "Hi Mom" } });
+    assert.ok(calls.includes("polly:Matthew"), "a US demo without a custom voice speaks with an American voice");
   } finally {
     await h.close();
   }

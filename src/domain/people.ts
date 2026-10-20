@@ -15,6 +15,14 @@ export function forms(p: Pronouns | undefined): Forms {
 
 const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
+// The built-in (Polly) voice when there is no custom voice, or it fails: American for a US household
+// (male or female after the person the companion stands in for), otherwise the default Indian voice.
+export function pollyVoice(doc: Household): { voiceId: string; languageCode: string } | undefined {
+  if (doc.elder.language !== "en-US") return undefined;
+  const p = doc.persona.mode === "neutral" ? "they" : owner(doc)?.pronouns;
+  return { voiceId: p === "he" ? "Matthew" : "Joanna", languageCode: "en-US" };
+}
+
 // The number to tell them to call in danger: 911 for a US household, 112 (India's and Europe's) otherwise.
 export const emergencyNumber = (elder: { language?: string }) => (elder.language === "en-US" ? "911" : "112");
 

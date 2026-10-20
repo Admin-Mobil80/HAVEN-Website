@@ -57,9 +57,11 @@
   --hair: #2b1a12;
   --lips: #a4433b;
   --lips-line: #7c2f29;
+  --lips-soft: #a0574a;
   --blush: #e07a63;
-  --kurta: #0f766e;
-  --kurta-trim: #fbbf24;
+  --top: #b8673d;
+  --top-trim: #f3d3bd;
+  --collar: #fbf5ec;
   --gold: #e8b33c;
   --pupil: #1b120c;
   color-scheme: light;
@@ -101,6 +103,9 @@
     --bezel-edge: #2a2622;
     --avatar-bg: #3a2a1e;
     --avatar-glow: #4a3626;
+    --top: #a85a32;
+    --top-trim: #e6c2a8;
+    --collar: #e9dfd2;
     color-scheme: dark;
   }
 }

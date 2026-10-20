@@ -1,6 +1,6 @@
 import express, { Router, type Response } from "express";
 import { z } from "zod";
-import { people } from "../domain/people.js";
+import { people, pollyVoice } from "../domain/people.js";
 import { istDate } from "../domain/util.js";
 import { requireHousehold } from "../http/households.js";
 import { householdWriteLimit, type HouseholdLimiter } from "../http/security.js";
@@ -21,7 +21,7 @@ export type LikenessDeps = {
   now: () => Date;
   eleven?: () => Promise<ElevenLabs | undefined>;
   anam?: () => Promise<Anam | undefined>;
-  pollyPcm?: (text: string) => Promise<Buffer>;
+  pollyPcm?: (text: string, voice?: { voiceId: string; languageCode: string }) => Promise<Buffer>;
   media?: { put(key: string, data: Buffer, contentType: string): Promise<void> };
   householdLimit?: HouseholdLimiter;
   limits?: { ttsCharsPerDay?: number; clonesPerDay?: number; avatarsPerDay?: number; avatarSessionsPerDay?: number; demoClonesKept?: number };
@@ -182,7 +182,7 @@ export function likenessRouter(deps: LikenessDeps): Router {
           return undefined;
         });
       }
-      audio ??= await deps.pollyPcm?.(b.data.text);
+      audio ??= await deps.pollyPcm?.(b.data.text, pollyVoice(doc));
       if (!audio) return void res.status(503).json({ error: "speech_unavailable" });
       res.set({ "Content-Type": "application/octet-stream", "Cache-Control": "no-store", "X-Audio-Format": "pcm_s16le;rate=16000;channels=1" }).send(audio);
     } catch (err) {
