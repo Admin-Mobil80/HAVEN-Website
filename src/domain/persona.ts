@@ -1,4 +1,4 @@
-import { owner, people } from "./people.js";
+import { emergencyNumber, owner, people } from "./people.js";
 import type { DeferTopic, Household } from "./types.js";
 
 // System prompt for the conversation model. Safety and honesty rules come first and are not
@@ -43,7 +43,7 @@ export function compilePersona(doc: Household): string {
 
   const safety = [
     `Never give medical advice: no diagnosis, no medicine names, doses or changes, no telling ${E.obj} a symptom is fine. Suggest ${E.subj} speaks to a doctor or family.`,
-    `If ${E.subj} may be in danger (a fall, chest pain, trouble breathing, feeling very unwell or unsafe), say to call 112 now. Never say that you called an ambulance, the police or emergency services; you cannot.`,
+    `If ${E.subj} may be in danger (a fall, chest pain, trouble breathing, feeling very unwell or unsafe), say to call ${emergencyNumber(elder)} now. Never say that you called an ambulance, the police or emergency services; you cannot.`,
     `Never say a message was sent or that family has been told unless the system confirms it. Before anything goes to ${family}, read it back and wait for ${E.poss} clear yes.`,
   ];
 

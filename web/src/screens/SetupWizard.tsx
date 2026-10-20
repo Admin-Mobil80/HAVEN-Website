@@ -2,6 +2,7 @@ import { useState } from "react";
 import { api } from "../lib/api";
 import { emit } from "../lib/bus";
 import { forms, type Pronouns } from "../lib/names";
+import { Icon } from "../components/Icon";
 
 const USER_RELATIONS = ["son", "daughter", "grandson", "granddaughter", "nephew", "niece", "friend", "neighbour", "other"];
 const ELDER_RELATIONS = ["mother", "father", "grandmother", "grandfather", "aunt", "uncle", "friend", "neighbour", "other"];
@@ -26,22 +27,41 @@ export function SetupWizard({ onDone }: { onDone: (how: "demo" | "own") => void 
   };
   if (own) return <OwnSetup onDone={() => onDone("own")} onBack={() => setOwn(false)} />;
   return (
-    <section className="panel wizard" aria-label="Start Haven">
-      <header className="panel__head">
+    <section className="wizard" aria-label="Start Haven">
+      <div className="hero">
+        <span className="pill pill--brand"><Icon name="favorite" fill />Makes families call more, not less</span>
         <h2>Welcome to Haven</h2>
-      </header>
-      <p>Haven keeps someone you love company when you can't be there, and tells you each evening what to talk about when you call. It speaks as a clearly labelled AI version of you.</p>
+        <p>
+          Haven keeps someone you love company when you can't be there. They talk to a clearly labelled AI version of you, and each evening you get a short update with ideas for
+          your next call, plus an urgent alert if something is wrong.
+        </p>
+      </div>
       <div className="choices">
-        <button className="choice" onClick={startDemo} disabled={busy}>
-          <img src="/demo/digital-daniel.webp" alt="" />
-          <strong>{busy ? "Starting…" : "Start demo"}</strong>
-          <span>Meet Digital Daniel, keeping his mother Margaret company in Seattle. A fictional family with a stock AI face and voice. Ready in one click.</span>
-        </button>
-        <button className="choice" onClick={() => setOwn(true)} disabled={busy}>
-          <span className="choice__icon" aria-hidden>＋</span>
-          <strong>Create your own</strong>
-          <span>Enter your name and who Haven is for, then add your own photo and voice. About two minutes.</span>
-        </button>
+        <article className="choice">
+          <div className="choice__media">
+            <img src="/demo/digital-daniel.webp" alt="Digital Daniel, the demo companion" />
+            <span className="avatar__badge"><Icon name="smart_toy" fill />Digital Daniel · AI</span>
+          </div>
+          <p className="kicker">Ready-made demo</p>
+          <h3>Start demo</h3>
+          <p>Meet Digital Daniel, keeping his mother Margaret company in Seattle. A fictional family with a stock AI face and voice. Ready in one click.</p>
+          <button className="btn btn--primary" onClick={startDemo} disabled={busy}>
+            {busy ? "Starting…" : "Start demo"}
+            <Icon name="arrow_forward" />
+          </button>
+        </article>
+        <article className="choice choice--own">
+          <div className="choice__media">
+            <span className="choice__plus"><Icon name="add" /></span>
+          </div>
+          <p className="kicker">Your own family</p>
+          <h3>Create your own</h3>
+          <p>Enter your name and who Haven is for, then add your own photo and voice. About two minutes.</p>
+          <button className="btn" onClick={() => setOwn(true)} disabled={busy}>
+            Create your own
+            <Icon name="arrow_forward" />
+          </button>
+        </article>
       </div>
       {err && <p className="error">{err}</p>}
     </section>
@@ -100,6 +120,7 @@ function OwnSetup({ onDone, onBack }: { onDone: () => void; onBack: () => void }
     <div className="pron" role="radiogroup" aria-label={label}>
       {(["she", "he", "they"] as Pronouns[]).map((p) => (
         <button type="button" key={p} className={`chip${value === p ? " is-on" : ""}`} aria-pressed={value === p} onClick={() => onChange(p)}>
+          {value === p && <Icon name="check" />}
           {p}/{forms(p).obj}
         </button>
       ))}
@@ -107,14 +128,23 @@ function OwnSetup({ onDone, onBack }: { onDone: () => void; onBack: () => void }
   );
 
   return (
-    <form className="panel wizard" onSubmit={submit} aria-label="Set up Haven">
-      <header className="panel__head">
-        <h2>Create your own</h2>
-        <span className="muted">takes a minute</span>
-      </header>
+    <form className="wizard wizard--form" onSubmit={submit} aria-label="Create your own">
+      <button type="button" className="btn btn--ghost backlink" onClick={onBack}><Icon name="arrow_back" />Back to start</button>
+      <div>
+        <h2 className="row" style={{ fontSize: "2rem", fontWeight: 700, gap: 12, flexWrap: "wrap" }}>
+          Create your own <span className="pill pill--real"><Icon name="schedule" />takes about 2 minutes</span>
+        </h2>
+        <p className="muted" style={{ fontSize: "1.05rem", marginTop: 6 }}>Set up a clearly labelled AI companion for someone you love. It keeps them company and reminds you to call more often.</p>
+      </div>
 
-      <fieldset>
-        <legend>You</legend>
+      <section className="formcard" aria-label="About you">
+        <div className="formcard__head">
+          <Icon name="person" />
+          <div>
+            <h3>About you</h3>
+            <p>The family member setting this up</p>
+          </div>
+        </div>
         <label>Your name<input value={f.userName} onChange={(e) => set({ userName: e.target.value })} placeholder="Your first name" autoFocus required maxLength={40} /></label>
         <label>
           You are {f.elderName ? `${f.elderName}'s` : "their"}
@@ -122,36 +152,52 @@ function OwnSetup({ onDone, onBack }: { onDone: () => void; onBack: () => void }
             {USER_RELATIONS.map((r) => <option key={r}>{r}</option>)}
           </select>
         </label>
-        {pronounPicker(f.userPronouns, (p) => set({ userPronouns: p }), "Your pronouns")}
-      </fieldset>
+        <div className="row row--wrap" style={{ gap: 8 }}>
+          <span className="kicker">Your pronouns</span>
+          {pronounPicker(f.userPronouns, (p) => set({ userPronouns: p }), "Your pronouns")}
+        </div>
+      </section>
 
-      <fieldset>
-        <legend>Who Haven is for</legend>
+      <section className="formcard formcard--for" aria-label="Who Haven is for">
+        <div className="formcard__head">
+          <Icon name="favorite" />
+          <div>
+            <h3>Who Haven is for</h3>
+            <p>Your parent, relative or friend who will talk to the companion</p>
+          </div>
+        </div>
         <label>{E.Subj === "They" ? "Their" : E.poss[0].toUpperCase() + E.poss.slice(1)} name<input value={f.elderName} onChange={(e) => set({ elderName: e.target.value })} placeholder="Their first name" required maxLength={40} /></label>
-        <label>
-          {f.elderName || "They"} {f.elderName ? "is" : "are"} your
-          <select value={f.relationToUser} onChange={(e) => set({ relationToUser: e.target.value })}>
-            {ELDER_RELATIONS.map((r) => <option key={r}>{r}</option>)}
-          </select>
-        </label>
-        <label>What do you call {E.obj}?<input value={f.calledBy} onChange={(e) => set({ calledBy: e.target.value })} placeholder="e.g. Amma, Appa, Nani, or their name" maxLength={30} /></label>
-        {pronounPicker(f.elderPronouns, (p) => set({ elderPronouns: p }), "Their pronouns")}
-        <label>City (optional)<input value={f.city} onChange={(e) => set({ city: e.target.value })} maxLength={40} /></label>
-        <label>
-          {E.Subj} {E.Subj === "They" ? "speak" : "speaks"}
-          <select value={f.language} onChange={(e) => set({ language: e.target.value })}>
-            <option value="en-US">English (US)</option>
-            <option value="en-IN">English (India)</option>
-            <option value="hi-IN">Hindi</option>
-          </select>
-        </label>
-        <label>Things {them} loves to talk about (comma-separated)<textarea rows={2} value={f.loves} onChange={(e) => set({ loves: e.target.value })} placeholder="e.g. the garden, old songs, cooking" /></label>
-      </fieldset>
+        <div className="two">
+          <label>
+            {f.elderName || "They"} {f.elderName ? "is" : "are"} your
+            <select value={f.relationToUser} onChange={(e) => set({ relationToUser: e.target.value })}>
+              {ELDER_RELATIONS.map((r) => <option key={r}>{r}</option>)}
+            </select>
+          </label>
+          <label>What do you call {E.obj}?<input value={f.calledBy} onChange={(e) => set({ calledBy: e.target.value })} placeholder="e.g. Mom, Grandma, or a name" maxLength={30} /></label>
+        </div>
+        <div className="row row--wrap" style={{ gap: 8 }}>
+          <span className="kicker">{E.Subj === "They" ? "Their" : E.poss[0].toUpperCase() + E.poss.slice(1)} pronouns</span>
+          {pronounPicker(f.elderPronouns, (p) => set({ elderPronouns: p }), "Their pronouns")}
+        </div>
+        <div className="two">
+          <label>City (optional)<input value={f.city} onChange={(e) => set({ city: e.target.value })} maxLength={40} /></label>
+          <label>
+            {E.Subj} {E.Subj === "They" ? "speak" : "speaks"}
+            <select value={f.language} onChange={(e) => set({ language: e.target.value })}>
+              <option value="en-US">English (US)</option>
+              <option value="en-IN">English (India)</option>
+              <option value="hi-IN">Hindi</option>
+            </select>
+          </label>
+        </div>
+        <label>Things {them} loves to talk about (comma-separated)<textarea rows={3} value={f.loves} onChange={(e) => set({ loves: e.target.value })} placeholder="e.g. the garden, old songs, cooking" /></label>
+        <p className="helper"><Icon name="lightbulb" />{f.userName.trim() ? `Digital ${f.userName.trim()}` : "Your companion"} uses these to start warm, familiar conversations.</p>
+      </section>
 
       {err && <p className="error">{err}</p>}
-      <button className="btn btn--primary btn--huge" disabled={busy}>{busy ? "Setting up…" : `Create Digital ${f.userName.trim() || "me"}`}</button>
-      <p className="muted">Next you can add your photo and voice. You can change anything later in Setup.</p>
-      <button type="button" className="btn btn--ghost" onClick={onBack}>← Back</button>
+      <button className="btn btn--huge" disabled={busy}>{busy ? "Setting up…" : `Create Digital ${f.userName.trim() || "me"}`}<Icon name="arrow_forward" /></button>
+      <p className="muted" style={{ textAlign: "center" }}>Next you can add your photo and voice. You can change anything later in Setup.</p>
     </form>
   );
 }

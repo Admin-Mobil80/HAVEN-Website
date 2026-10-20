@@ -7,6 +7,7 @@ import { callTool } from "../lib/mcp";
 import { canListen, listen, speechLang, type Listening } from "../lib/speech";
 import type { ElderState, PlayedMessage, TurnResponse } from "../lib/types";
 import { forms, useNames } from "../lib/names";
+import { Icon } from "../components/Icon";
 import { cuePhoto, isLive, speakPhoto, startPhotoAvatar, stopPhotoAvatar } from "../lib/anam";
 
 // Stable function identity that always calls the latest closure.
@@ -69,7 +70,8 @@ export function Tablet({ chips: chipsProp, compact }: { chips?: string[]; compac
     if (connecting.current) return connecting.current;
     setPhoto("connecting");
     const t0 = performance.now();
-    connecting.current = startPhotoAvatar("haven-video", () => (setPhoto("off"), setVideoOn(false)))
+    connecting.current = new Promise((r) => requestAnimationFrame(() => r(undefined))) // let the tablet re-render awake first
+      .then(() => startPhotoAvatar("haven-video", () => (setPhoto("off"), setVideoOn(false))))
       .then(() => {
         setPhoto("live");
         log({ source: "tablet", dir: "•", title: `photo avatar connected in ${Math.round(performance.now() - t0)} ms` });
@@ -273,101 +275,141 @@ export function Tablet({ chips: chipsProp, compact }: { chips?: string[]; compac
   const childP = forms((elder?.persona.childPronouns as "she" | "he" | "they" | undefined) ?? n.setup?.user.pronouns);
   const child = elder?.persona.childName ?? "your family";
 
+  const statusKey = state === "idle" ? (open ? "ready" : "asleep") : state;
+  const statusText = { asleep: "Asleep", ready: "Ready", listening: "Listening…", thinking: "Thinking…", speaking: "Speaking" }[statusKey];
+  const emergency = elder?.elder.language === "en-US" ? "911" : "112";
+  const hour = new Date().getHours();
+  const greeting = hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
+  const who = child === "your family" ? n.user : child;
+  const sayKicker = state === "listening" ? "Listening to you…" : state === "thinking" ? `${n.companion} is thinking…` : `${n.companion} says:`;
+
   return (
     <section className={`panel tablet${compact ? " tablet--compact" : ""}`} aria-label={`${n.calledBy}'s tablet`}>
-      <header className="panel__head">
-        <h2>{n.calledBy}'s tablet</h2>
-        <span className={`status status--${state}`}>{state === "listening" ? "Listening…" : state === "thinking" ? "Thinking…" : state === "speaking" ? "Speaking" : open ? "Ready" : "Asleep"}</span>
+      <header className="tablet__bar">
+        <h2><Icon name="home" fill />{n.calledBy}'s tablet</h2>
+        <span className={`status status--${statusKey}`} role="status">{statusText}</span>
       </header>
 
-      <div className="tablet__stage">
-        {incident ? (
-          <div className="overlay overlay--safety" role="alert">
-            <p className="overlay__kicker">Haven Safety</p>
-            <p className="overlay__big">{incident.state === "acknowledged" ? `${child} has seen your alert.` : `${child} has been alerted.`}</p>
-            <p>If you are hurt or in danger, call <strong>112</strong> now.</p>
-          </div>
-        ) : calling && calling.at !== callEnded ? (
-          <div className="overlay overlay--call" role="status">
-            <div className="overlay__icon" aria-hidden>📞</div>
-            <p className="overlay__big">The real {calling.by} is calling!</p>
-            <p>I'll step aside. Enjoy your chat, {elder?.elder.calledBy}.</p>
-            <button className="btn" onClick={() => setCallEnded(calling.at)}>Call ended</button>
-          </div>
-        ) : (
-          elder?.photoAvatar && photo !== "failed" ? (
-            <div className={`photoav${relay ? " avatar--dim" : ""}`}>
+      <div className="tablet__body">
+        <div className="tablet__stage">
+          {elder?.photoAvatar && photo !== "failed" ? (
+            <div className={`photoav${open ? "" : " photoav--asleep"}${relay ? " avatar--dim" : ""}`}>
               {elder.photoUrl && <img src={elder.photoUrl} alt={`${n.companion}${open ? "" : ", asleep"}`} />}
               <video id="haven-video" className={videoOn ? "is-on" : ""} autoPlay playsInline />
-              <div className="avatar__badge" aria-label="This is an AI">{badge}</div>
+              <div className="avatar__badge" aria-label="This is an AI"><Icon name="smart_toy" fill />{badge}</div>
             </div>
           ) : (
             <Avatar mouth={mouth} state={state} badge={badge} dim={Boolean(relay)} />
-          )
-        )}
-        {relay && (
-          <div className="realcard" role="status">
-            <p className="realcard__kicker">From the real {child}, {relay.audioUrl ? `in ${childP.poss} own voice` : "a note"}</p>
-            {relay.question && <p className="realcard__q">You asked: "{relay.question}"</p>}
-            {relay.text && <p className="realcard__text">{relay.text}</p>}
-          </div>
-        )}
-      </div>
-
-      <p className="caption" aria-live="polite">
-        {caption || (open ? "" : `Say "Alexa, talk to ${n.user}", or tap the button.`)}
-      </p>
-      {heard && <p className="heard">You: {heard}</p>}
-      {error && <p className="error">{error}</p>}
-
-      {!open ? (
-        <button className="btn btn--huge" onClick={start}>
-          Talk to {child === "your family" ? n.user : child}
-        </button>
-      ) : (
-        <div className="tablet__controls">
-          {elder && elder.pendingFamilyMessages > 0 && !relay && (
-            <button className="btn btn--real" onClick={playFamily}>
-              ▶ A message from the real {child}
-            </button>
           )}
-          {confirm && (
-            <div className="confirm">
-              <p>Send to {confirm.to}: "{confirm.message}"?</p>
-              <div className="row">
-                <button className="btn btn--yes" onClick={() => say("Haan, send it")}>Haan, send it</button>
-                <button className="btn btn--no" onClick={() => say("No, leave it")}>No</button>
-              </div>
+          {relay && (
+            <div className="realcard" role="status">
+              <p className="realcard__kicker"><Icon name="verified" fill />The real {child}, {relay.audioUrl ? `in ${childP.poss} own voice` : "a note"}</p>
+              {relay.question && <p className="realcard__q">You asked: "{relay.question}"</p>}
+              {relay.text && <p className="realcard__text">{relay.text}</p>}
             </div>
           )}
-          {canListen && (
-            <button className={`btn btn--mic${state === "listening" ? " is-on" : ""}`} onClick={talk} disabled={state === "thinking" || state === "speaking"} aria-label="Tap and speak">
-              {state === "listening" ? "✓ Done" : "🎤 Tap and speak"}
-            </button>
-          )}
-          <form
-            className="typebox"
-            onSubmit={(e) => {
-              e.preventDefault();
-              void say(typed);
-              setTyped("");
-            }}
-          >
-            <input value={typed} onChange={(e) => setTyped(e.target.value)} placeholder="Or type here…" aria-label={`Type to ${n.companion}`} maxLength={500} />
-            <button className="btn" type="submit" disabled={!typed.trim()}>Send</button>
-          </form>
-          <div className="chips" aria-label="Suggestions">
-            {chips.map((c) => (
-              <button key={c} className="chip" onClick={() => say(c)}>
-                {c}
-              </button>
-            ))}
-            <button className="chip chip--end" onClick={() => ((openRef.current = false), setOpen(false), void turn({ event: "session_end" }))} disabled={state !== "idle"}>
-              Bye for now
-            </button>
-          </div>
+          {incident ? (
+            <div className="overlay overlay--safety" role="alert">
+              <p className="overlay__kicker"><Icon name="shield_with_heart" fill />Haven Safety</p>
+              <p className="overlay__big">{incident.state === "acknowledged" ? `${child} has seen your alert.` : `${child} has been alerted.`}</p>
+              <p>If you are hurt or in danger, call <strong>{emergency}</strong> now.</p>
+            </div>
+          ) : calling && calling.at !== callEnded ? (
+            <div className="overlay overlay--call" role="status">
+              <div className="overlay__icon"><Icon name="call" fill /></div>
+              <p className="overlay__big">The real {calling.by} is calling!</p>
+              <p>I'll step aside. Enjoy your chat, {elder?.elder.calledBy}.</p>
+              <button className="btn" onClick={() => setCallEnded(calling.at)}><Icon name="call_end" />Call ended</button>
+            </div>
+          ) : null}
         </div>
-      )}
+
+        {!open ? (
+          <>
+            <div className="hello">
+              <h3>{greeting}, {n.calledBy}.</h3>
+              <p>Say <strong>"Alexa, talk to {n.user}"</strong>, or tap the button below whenever you'd like company.</p>
+            </div>
+            {error && <p className="error">{error}</p>}
+            <button className="btn btn--huge btn--go" onClick={start}>
+              <Icon name="mic" fill />Talk to {who}
+            </button>
+          </>
+        ) : (
+          <>
+            <div className={`saycard saycard--${state}`} aria-live="polite">
+              <p className="saycard__kicker">
+                {state === "thinking" ? <span className="thinking-dots" aria-hidden><span /><span /><span /></span> : <Icon name={state === "listening" ? "graphic_eq" : "smart_toy"} fill />}
+                {sayKicker}
+              </p>
+              {state === "listening" ? (
+                <p className="caption">{heard ? `"${heard}"` : "Go ahead, I'm listening. No rush."}</p>
+              ) : (
+                <>
+                  {heard && <p className="saycard__heard"><Icon name="history" />{n.calledBy}: <i>"{heard}"</i></p>}
+                  <p className="caption">{caption}</p>
+                </>
+              )}
+            </div>
+            {error && <p className="error">{error}</p>}
+
+            <div className="tablet__controls">
+              {elder && elder.pendingFamilyMessages > 0 && !relay && (
+                <div className="familymsg">
+                  <span className="familymsg__icon"><Icon name="play_circle" fill /></span>
+                  <div className="familymsg__text">
+                    <p className="kicker"><Icon name="verified" fill />The real family</p>
+                    <p>A message from the real {child}</p>
+                  </div>
+                  <button className="btn btn--real" onClick={playFamily}><Icon name="play_arrow" fill />Play</button>
+                </div>
+              )}
+              {confirm && (
+                <div className="confirm">
+                  <p className="kicker"><Icon name="send" />Before I send it</p>
+                  <p className="confirm__q">Send to {confirm.to}: "{confirm.message}"?</p>
+                  <div className="row">
+                    <button className="btn btn--yes" onClick={() => say("Yes, send it")}><Icon name="check" />Yes, send it</button>
+                    <button className="btn btn--no" onClick={() => say("No, leave it")}><Icon name="close" />No</button>
+                  </div>
+                </div>
+              )}
+              {canListen &&
+                (state === "listening" ? (
+                  <button className="btn btn--huge btn--soft" onClick={talk} aria-label="I'm done speaking" style={{ color: "var(--ink)" }}>
+                    <Icon name="check_circle" fill />I'm done speaking
+                  </button>
+                ) : (
+                  <button className="btn btn--huge" onClick={talk} disabled={state === "thinking" || state === "speaking"} aria-label="Tap and speak">
+                    <Icon name="mic" fill />Tap and speak
+                  </button>
+                ))}
+              <form
+                className="typebox"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  void say(typed);
+                  setTyped("");
+                }}
+              >
+                <input value={typed} onChange={(e) => setTyped(e.target.value)} placeholder="Or type here…" aria-label={`Type to ${n.companion}`} maxLength={500} />
+                <button className="btn" type="submit" disabled={!typed.trim()} aria-label="Send"><Icon name="send" /></button>
+              </form>
+              <p className="kicker">Quick answers</p>
+              <div className="quick" aria-label="Suggestions">
+                {chips.map((c) => (
+                  <button key={c} onClick={() => say(c)}>
+                    "{c}"
+                  </button>
+                ))}
+              </div>
+              <button className="btn btn--ghost tablet__end" onClick={() => ((openRef.current = false), setOpen(false), void turn({ event: "session_end" }))} disabled={state !== "idle"}>
+                <Icon name="waving_hand" />Bye for now
+              </button>
+            </div>
+          </>
+        )}
+      </div>
     </section>
   );
 }

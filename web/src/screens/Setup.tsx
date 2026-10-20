@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { api } from "../lib/api";
 import { emit } from "../lib/bus";
 import { forms, type Pronouns, type SetupView } from "../lib/names";
+import { Icon } from "../components/Icon";
 
 const TOPICS = ["plans", "visit", "money", "health", "family", "promise"] as const;
 const lines = (s: string) => s.split("\n").map((x) => x.trim()).filter(Boolean);
@@ -43,6 +44,7 @@ export function Setup() {
     <div className="pron" role="radiogroup">
       {(["she", "he", "they"] as Pronouns[]).map((p) => (
         <button type="button" key={p} className={`chip${value === p ? " is-on" : ""}`} aria-pressed={value === p} onClick={() => onChange(p)}>
+          {value === p && <Icon name="check" />}
           {p}/{forms(p).obj}
         </button>
       ))}
@@ -52,12 +54,12 @@ export function Setup() {
   return (
     <section className="panel setup" aria-label={`Teach Haven about ${them}`}>
       <header className="panel__head">
-        <h2>Teach Haven about {them}</h2>
-        <span className="muted">only {v.user.name} can change this</span>
+        <h2><Icon name="tune" />Teach Haven about {them}</h2>
+        <span className="pill pill--good"><Icon name="verified_user" />only {v.user.name} can change this</span>
       </header>
       <div className="setup__grid">
         <fieldset>
-          <legend>{them}</legend>
+          <legend><Icon name="favorite" />{them}</legend>
           <label>Name<input value={v.elder.name} onChange={(e) => elder({ name: e.target.value })} /></label>
           <label>You call {E.obj}<input value={v.elder.calledBy} onChange={(e) => elder({ calledBy: e.target.value })} /></label>
           <label>{E.Subj === "They" ? "They are" : `${E.Subj} is`} your<input value={v.elder.relationToUser} onChange={(e) => elder({ relationToUser: e.target.value })} /></label>
@@ -67,7 +69,7 @@ export function Setup() {
         </fieldset>
 
         <fieldset>
-          <legend>You</legend>
+          <legend><Icon name="person" />You</legend>
           <label>Your name<input value={v.user.name} onChange={(e) => user({ name: e.target.value })} /></label>
           <label>You are {E.poss}<input value={v.user.relation} onChange={(e) => user({ relation: e.target.value })} /></label>
           {pron(v.user.pronouns, (p) => user({ pronouns: p }))}
@@ -77,8 +79,8 @@ export function Setup() {
         </fieldset>
 
         <fieldset>
-          <legend>Always pass these to the real you</legend>
-          <p className="muted">{v.displayName} says "let me check with the real {v.user.name}" instead of answering.</p>
+          <legend><Icon name="shield_with_heart" />Always pass these to the real you</legend>
+          <p className="helper"><Icon name="lightbulb" />{v.displayName} says "let me check with the real {v.user.name}" instead of answering.</p>
           {TOPICS.map((t) => (
             <label key={t} className="check">
               <input type="checkbox" checked={v.deferTopics.includes(t)} onChange={(e) => set({ deferTopics: e.target.checked ? [...v.deferTopics, t] : v.deferTopics.filter((x) => x !== t) })} />
@@ -89,7 +91,7 @@ export function Setup() {
         </fieldset>
 
         <fieldset>
-          <legend>Calls and consent</legend>
+          <legend><Icon name="call" />Calls and consent</legend>
           <label>Calls a week today<input type="number" min={0} max={21} value={v.goals.baselineCallsPerWeek} onChange={(e) => set({ goals: { ...v.goals, baselineCallsPerWeek: Number(e.target.value) } })} /></label>
           <label>Your goal<input type="number" min={1} max={21} value={v.goals.goalCallsPerWeek} onChange={(e) => set({ goals: { ...v.goals, goalCallsPerWeek: Number(e.target.value) } })} /></label>
           <label className="check">
@@ -103,7 +105,7 @@ export function Setup() {
         </fieldset>
       </div>
       <div className="row">
-        <button className="btn btn--primary" onClick={save}>Save</button>
+        <button className="btn btn--primary" onClick={save}><Icon name="check" />Save</button>
         {saved && <span className="note" role="status">{saved}</span>}
       </div>
     </section>

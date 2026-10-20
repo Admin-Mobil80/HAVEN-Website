@@ -1,0 +1,722 @@
+<!DOCTYPE html><html class="h-full bg-surface-container-low" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Haven - Elder Tablet Interface Explorer</title>
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "surface-container": "#f3ede8",
+            "tertiary-fixed-dim": "#95d4b3",
+            "on-secondary-fixed": "#001c3b",
+            "on-primary-fixed-variant": "#783100",
+            "inverse-on-surface": "#f6f0ea",
+            "on-primary-container": "#fffbff",
+            "surface-container-low": "#f9f3ed",
+            "inverse-surface": "#32302d",
+            "on-tertiary-container": "#f5fff7",
+            "outline": "#8a7267",
+            "error": "#ba1a1a",
+            "inverse-primary": "#ffb690",
+            "secondary-fixed": "#d5e3ff",
+            "secondary-fixed-dim": "#a7c8ff",
+            "surface-variant": "#e7e1dc",
+            "primary-container": "#bd5611",
+            "surface-container-lowest": "#ffffff",
+            "primary": "#9a4100",
+            "on-error-container": "#93000a",
+            "on-tertiary-fixed-variant": "#0e5138",
+            "surface-container-highest": "#e7e1dc",
+            "surface-dim": "#dfd9d4",
+            "surface-container-high": "#ede7e2",
+            "surface-bright": "#fef8f3",
+            "on-secondary-container": "#194b86",
+            "secondary": "#325f9b",
+            "on-secondary-fixed-variant": "#124782",
+            "on-background": "#1d1b18",
+            "outline-variant": "#ddc1b3",
+            "tertiary-container": "#448064",
+            "on-surface-variant": "#574238",
+            "primary-fixed": "#ffdbcb",
+            "tertiary": "#2a674c",
+            "on-tertiary": "#ffffff",
+            "on-secondary": "#ffffff",
+            "on-error": "#ffffff",
+            "on-primary": "#ffffff",
+            "tertiary-fixed": "#b1f0ce",
+            "on-primary-fixed": "#341100",
+            "error-container": "#ffdad6",
+            "background": "#fef8f3",
+            "surface-tint": "#9e4300",
+            "surface": "#fef8f3",
+            "on-tertiary-fixed": "#002114",
+            "secondary-container": "#93bdff",
+            "on-surface": "#1d1b18",
+            "primary-fixed-dim": "#ffb690"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "fontFamily": {
+            "display-lg": ["Plus Jakarta Sans"],
+            "headline-lg": ["Plus Jakarta Sans"],
+            "headline-md": ["Plus Jakarta Sans"],
+            "headline-sm": ["Plus Jakarta Sans"],
+            "body-xl": ["Plus Jakarta Sans"],
+            "body-lg": ["Plus Jakarta Sans"],
+            "body-md": ["Plus Jakarta Sans"],
+            "label-lg": ["Plus Jakarta Sans"],
+            "label-md": ["Plus Jakarta Sans"],
+            "label-sm": ["Plus Jakarta Sans"]
+          },
+          "fontSize": {
+            "display-lg": ["40px", { "lineHeight": "52px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+            "headline-lg": ["32px", { "lineHeight": "44px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+            "headline-md": ["24px", { "lineHeight": "34px", "letterSpacing": "0em", "fontWeight": "600" }],
+            "headline-sm": ["20px", { "lineHeight": "30px", "letterSpacing": "0.01em", "fontWeight": "600" }],
+            "body-xl": ["22px", { "lineHeight": "36px", "letterSpacing": "0.01em", "fontWeight": "400" }],
+            "body-lg": ["19px", { "lineHeight": "32px", "letterSpacing": "0.01em", "fontWeight": "400" }],
+            "body-md": ["17px", { "lineHeight": "28px", "letterSpacing": "0.01em", "fontWeight": "400" }],
+            "label-lg": ["18px", { "lineHeight": "26px", "letterSpacing": "0.02em", "fontWeight": "600" }],
+            "label-md": ["16px", { "lineHeight": "24px", "letterSpacing": "0.03em", "fontWeight": "600" }],
+            "label-sm": ["14px", { "lineHeight": "20px", "letterSpacing": "0.04em", "fontWeight": "700" }]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 500, 'GRAD' 0, 'opsz' 28;
+      display: inline-block;
+      vertical-align: middle;
+      line-height: 1;
+    }
+    .material-symbols-outlined.fill-icon {
+      font-variation-settings: 'FILL' 1, 'wght' 600, 'GRAD' 0, 'opsz' 28;
+    }
+    
+    @keyframes gentlePulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.04); opacity: 0.85; }
+    }
+    @keyframes barWave {
+      0%, 100% { height: 14px; }
+      50% { height: 42px; }
+    }
+    .animate-gentle-pulse {
+      animation: gentlePulse 3.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+    .wave-bar {
+      animation: barWave 1.2s ease-in-out infinite;
+    }
+    .wave-bar:nth-child(2) { animation-delay: 0.15s; }
+    .wave-bar:nth-child(3) { animation-delay: 0.3s; }
+    .wave-bar:nth-child(4) { animation-delay: 0.45s; }
+    .wave-bar:nth-child(5) { animation-delay: 0.6s; }
+    .wave-bar:nth-child(6) { animation-delay: 0.25s; }
+  </style>
+</head>
+<body class="min-h-screen bg-surface-container-low text-on-surface antialiased flex flex-col font-body-md selection:bg-primary-fixed selection:text-on-primary-fixed">
+<!-- Top App Bar (Shared Components Standard) -->
+<header class="w-full bg-surface-container-lowest border-b border-outline-variant shadow-sm z-30">
+<div class="w-full max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+<div class="flex items-center gap-3">
+<span class="text-headline-md font-headline-md font-bold text-primary tracking-tight">Haven</span>
+<span class="px-2.5 py-0.5 rounded-full text-label-sm font-label-sm bg-surface-container text-on-surface-variant border border-outline-variant">Screen 5 · Tablet Hub</span>
+</div>
+<nav class="hidden lg:flex items-center gap-8">
+<a class="text-on-surface-variant hover:text-on-surface pb-2 transition-all font-label-md text-label-md" href="#">Interactive Demo</a>
+<a class="text-on-surface-variant hover:text-on-surface pb-2 transition-all font-label-md text-label-md" href="#">Setup &amp; Customization</a>
+<a class="border-b-2 border-primary text-primary font-bold pb-2 transition-all font-label-md text-label-md" href="#">Family View</a>
+<a class="text-on-surface-variant hover:text-on-surface pb-2 transition-all font-label-md text-label-md" href="#">Household Logs</a>
+</nav>
+<div class="flex items-center gap-3">
+<button class="flex items-center gap-2 px-4 py-2 text-label-md font-label-md text-on-surface-variant hover:bg-surface-container rounded-lg transition-colors border border-outline-variant" onclick="resetToDefault()" type="button">
+<span class="material-symbols-outlined text-[20px]">refresh</span>
+<span>Reset Demo</span>
+</button>
+<button class="flex items-center gap-2 px-4 py-2 text-label-md font-label-md bg-error text-on-error rounded-lg shadow-sm hover:opacity-90 active:scale-[0.98] transition-transform" type="button">
+<span class="material-symbols-outlined text-[20px] fill-icon">sos</span>
+<span>Emergency Call</span>
+</button>
+</div>
+</div>
+</header>
+<!-- Interactive State Switcher for Judges & Testers -->
+<section class="bg-surface-container py-3 px-4 border-b border-outline-variant sticky top-0 z-20 shadow-sm">
+<div class="max-w-7xl mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[22px]">tune</span>
+<span class="text-label-sm font-label-sm uppercase tracking-wider text-on-surface-variant">Elder Hub State Switcher (1024×768 Standalone Display):</span>
+</div>
+<!-- Segmented Buttons for 8 States -->
+<div class="flex flex-wrap gap-1.5 w-full md:w-auto" id="state-selector-bar">
+<button class="state-tab-btn px-3 py-1.5 rounded-lg text-label-sm font-label-sm transition-all border border-outline-variant bg-surface-container-lowest text-primary font-bold shadow-sm" data-state="asleep" onclick="setTabletState('asleep')">
+          1. Asleep
+        </button>
+<button class="state-tab-btn px-3 py-1.5 rounded-lg text-label-sm font-label-sm transition-all border border-transparent text-on-surface-variant hover:bg-surface-container-high" data-state="listening" onclick="setTabletState('listening')">
+          2. Listening
+        </button>
+<button class="state-tab-btn px-3 py-1.5 rounded-lg text-label-sm font-label-sm transition-all border border-transparent text-on-surface-variant hover:bg-surface-container-high" data-state="thinking" onclick="setTabletState('thinking')">
+          3. Thinking
+        </button>
+<button class="state-tab-btn px-3 py-1.5 rounded-lg text-label-sm font-label-sm transition-all border border-transparent text-on-surface-variant hover:bg-surface-container-high" data-state="speaking" onclick="setTabletState('speaking')">
+          4. Speaking
+        </button>
+<button class="state-tab-btn px-3 py-1.5 rounded-lg text-label-sm font-label-sm transition-all border border-transparent text-on-surface-variant hover:bg-surface-container-high" data-state="family_message" onclick="setTabletState('family_message')">
+          5. Real Family Voice
+        </button>
+<button class="state-tab-btn px-3 py-1.5 rounded-lg text-label-sm font-label-sm transition-all border border-transparent text-on-surface-variant hover:bg-surface-container-high" data-state="calling" onclick="setTabletState('calling')">
+          6. Family Calling
+        </button>
+<button class="state-tab-btn px-3 py-1.5 rounded-lg text-label-sm font-label-sm transition-all border border-transparent text-on-surface-variant hover:bg-surface-container-high" data-state="safety_alert" onclick="setTabletState('safety_alert')">
+          7. Safety Alert
+        </button>
+<button class="state-tab-btn px-3 py-1.5 rounded-lg text-label-sm font-label-sm transition-all border border-transparent text-on-surface-variant hover:bg-surface-container-high" data-state="confirm_send" onclick="setTabletState('confirm_send')">
+          8. Confirm Sending
+        </button>
+</div>
+</div>
+</section>
+<!-- Main Tablet Frame Presentation (Simulating Echo Show 15 / 1024x768 Elder Hub) -->
+<main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 flex flex-col items-center justify-center">
+<!-- Physical Tablet Bezel Container (Strict 4:3 / Landscape Hub Ratio) -->
+<div class="w-full max-w-[1024px] bg-[#23211E] rounded-[2.5rem] p-4 sm:p-6 shadow-[0_24px_50px_rgba(35,33,30,0.25)] border-[6px] border-[#38332E] relative flex flex-col">
+<!-- Built-in Tablet Screen Wrapper -->
+<div class="w-full bg-surface-bright rounded-[1.75rem] overflow-hidden border border-outline-variant flex flex-col min-h-[640px] relative shadow-inner">
+<!-- Status Bar (Senior-Optimized Legibility) -->
+<div class="w-full bg-surface-container-lowest px-6 sm:px-8 py-3.5 border-b border-outline-variant flex items-center justify-between text-on-surface">
+<!-- Left: Brand + Active State Pill -->
+<div class="flex items-center gap-3">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[28px] fill-icon">cottage</span>
+<span class="font-bold text-headline-sm tracking-tight text-on-surface">Haven Hub</span>
+</div>
+<div class="h-5 w-[1.5px] bg-outline-variant mx-1"></div>
+<!-- Dynamic State Badge -->
+<div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-surface-container text-on-surface font-label-md border border-outline-variant" id="status-pill-container">
+<span class="w-3 h-3 rounded-full bg-tertiary" id="status-indicator-dot"></span>
+<span class="font-bold" id="status-pill-text">Asleep (Standby)</span>
+</div>
+</div>
+<!-- Center: High Legibility Time -->
+<div class="hidden sm:flex items-center gap-1.5 text-headline-sm font-headline-sm font-bold text-on-surface">
+<span class="material-symbols-outlined text-on-surface-variant text-[22px]">schedule</span>
+<span>10:42 AM</span>
+</div>
+<!-- Right: Hardware Diagnostics -->
+<div class="flex items-center gap-4 text-on-surface">
+<div class="flex items-center gap-1.5" title="Volume set to High">
+<span class="material-symbols-outlined text-[26px] text-on-surface-variant">volume_up</span>
+<span class="text-label-md font-bold">100%</span>
+</div>
+<div class="flex items-center gap-1 text-on-surface-variant" title="WiFi Strong Connection">
+<span class="material-symbols-outlined text-[24px]">wifi</span>
+</div>
+<div class="flex items-center gap-1.5" title="Battery Level">
+<span class="text-label-md font-bold">98%</span>
+<span class="material-symbols-outlined text-[24px] text-tertiary fill-icon">battery_charging_full</span>
+</div>
+</div>
+</div>
+<!-- Dynamic Content Canvas for All 8 Tablet States -->
+<div class="flex-1 p-6 sm:p-10 flex flex-col justify-between relative overflow-hidden bg-surface">
+<!-- ============================================== -->
+<!-- STATE 1: ASLEEP (Default Idle Standby) -->
+<!-- ============================================== -->
+<div class="tablet-view flex-1 flex flex-col justify-between items-center text-center max-w-3xl mx-auto py-2" id="view-asleep">
+<!-- AI Companion Card Hero -->
+<div class="flex flex-col items-center">
+<!-- Companion Portrait with Warm Terracotta Accent & Badge -->
+<div class="relative mb-5">
+<div class="w-36 h-36 sm:w-44 sm:h-44 rounded-full p-1.5 bg-gradient-to-b from-[#bd5611] to-[#ddc1b3] shadow-md">
+<img class="w-full h-full object-cover rounded-full" data-alt="A warm, reassuring portrait of Daniel, a kind man in his late 30s with gentle smiling eyes, wearing an earthy wool sweater, bathed in soft morning window light against a cozy neutral linen room, captured in high-definition photography with soft focus background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAsLO_8PW7nq4yStWsdRK2La3Qy-qFRxtOjEg-wssX-Y6V9Ksjk7_A-go-eZZF07ga8G_NDwAhkw5uc8naqGqrXEk7E7SSm479fWvPIIDCqFoVpqN0Qy2QIfqzc2XeQEKNLI4jLJySqTT28HSNKQJoygCso3EEj-DoDGMwEJfbqG3zMihHJCTQdOfXfEoG5TBaej1OiaIHDwmk1zfjphJtc9UFy-KLpMve3Fvi_eJi8YJTZuYIKSdGt">
+</div>
+<!-- Non-Negotiable AI Provenance Badge -->
+<div class="absolute -bottom-2 left-1/2 -translate-x-1/2 whitespace-nowrap bg-surface-container-lowest border-2 border-primary-container px-4 py-1.5 rounded-full shadow-md flex items-center gap-1.5">
+<span class="material-symbols-outlined text-primary text-[20px] fill-icon">smart_toy</span>
+<span class="text-label-md font-label-md font-bold text-primary">Digital Daniel · AI</span>
+</div>
+</div>
+<h1 class="text-display-lg font-display-lg text-on-surface mt-4 tracking-tight">
+                Good morning, Mom.
+              </h1>
+<p class="text-body-xl font-body-xl text-on-surface-variant max-w-xl mt-3">
+                Say <strong class="text-on-surface font-bold">"Alexa, talk to Daniel"</strong>, or touch the green button below whenever you'd like company.
+              </p>
+</div>
+<!-- Single Massive 72px Primary Touch Target -->
+<div class="w-full max-w-lg mt-6">
+<button class="w-full min-h-[76px] rounded-2xl bg-tertiary hover:bg-[#1f523c] active:scale-[0.98] text-on-tertiary flex items-center justify-center gap-3 px-8 text-headline-sm font-headline-sm font-bold shadow-md transition-all focus-visible:outline focus-visible:outline-4 focus-visible:outline-secondary" onclick="setTabletState('listening')">
+<span class="material-symbols-outlined text-[34px] fill-icon">mic</span>
+<span>Talk to Daniel</span>
+</button>
+<p class="text-label-sm font-label-sm text-on-surface-variant mt-2 text-center">Touch anywhere on the button to begin</p>
+</div>
+</div>
+<!-- ============================================== -->
+<!-- STATE 2: LISTENING (Active Voice Input) -->
+<!-- ============================================== -->
+<div class="tablet-view hidden flex-1 flex flex-col justify-between items-center text-center max-w-3xl mx-auto py-2" id="view-listening">
+<div class="flex flex-col items-center w-full">
+<!-- Pulsing Companion Visual Indicator -->
+<div class="relative mb-4">
+<div class="w-32 h-32 sm:w-36 sm:h-36 rounded-full p-1 bg-surface-container ring-4 ring-tertiary ring-offset-4 animate-gentle-pulse">
+<img class="w-full h-full object-cover rounded-full" data-alt="A portrait of Daniel looking attentively with an open, encouraging smile, framed in high key warm lighting, warm tones matching physical stationary aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAcEKu8si9ZqJQ9ESVTO0ZyeT_zynMGMHBCYWGLH2o482lOxpAeg8yKM6ZK1LXqJkd9b-uh04YkN3kaNDBOPd1WkhalVPFrQ3af2YYzLGtIPygeBkNk1JiIVG2NU_NkknbuwlAstk0bcWOOICfcxZfSWI_w84SOQPgozBLPIa6i7wY2PGUsyMawjkknZtQGoZy02AAZNxEi1pxvav8QnAbds2SRitfHSAFPh6ByDbCfpSWM4XBDSJCW">
+</div>
+<div class="absolute -bottom-2 left-1/2 -translate-x-1/2 whitespace-nowrap bg-surface-container-lowest border border-outline px-3.5 py-1 rounded-full shadow-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-primary text-[18px]">smart_toy</span>
+<span class="text-label-sm font-bold text-primary">Digital Daniel · AI</span>
+</div>
+</div>
+<!-- Animated Listening Bar Cluster -->
+<div class="inline-flex items-center gap-3 px-6 py-2.5 rounded-full bg-tertiary-fixed text-on-tertiary-fixed border border-tertiary mb-4">
+<div class="flex items-center gap-1.5 h-8">
+<span class="wave-bar w-1.5 bg-tertiary rounded-full"></span>
+<span class="wave-bar w-1.5 bg-tertiary rounded-full"></span>
+<span class="wave-bar w-1.5 bg-tertiary rounded-full"></span>
+<span class="wave-bar w-1.5 bg-tertiary rounded-full"></span>
+<span class="wave-bar w-1.5 bg-tertiary rounded-full"></span>
+</div>
+<span class="text-headline-sm font-headline-sm font-bold text-tertiary">Listening to you…</span>
+</div>
+<!-- Live High-Legibility Speech Transcript Box -->
+<div class="w-full bg-surface-container-lowest p-6 sm:p-7 rounded-2xl border-2 border-outline-variant shadow-sm text-left max-w-2xl">
+<span class="text-label-sm font-bold text-on-surface-variant block mb-2 uppercase tracking-wider">What Daniel hears:</span>
+<p class="text-display-lg-mobile sm:text-headline-md font-bold text-on-surface leading-snug">
+                  "I was just out in the garden looking at the yellow roses..."
+                </p>
+<div class="flex items-center gap-2 mt-3 text-tertiary text-label-md font-bold">
+<span class="w-2.5 h-2.5 rounded-full bg-tertiary animate-ping"></span>
+<span>Keep speaking normally, no rush</span>
+</div>
+</div>
+</div>
+<!-- Massive Done Speaking Button -->
+<div class="w-full max-w-lg mt-6">
+<button class="w-full min-h-[76px] rounded-2xl bg-surface-container-lowest border-2 border-outline hover:bg-surface-container text-on-surface flex items-center justify-center gap-3 px-8 text-headline-sm font-headline-sm font-bold shadow-md transition-all active:scale-[0.98]" onclick="setTabletState('thinking')">
+<span class="material-symbols-outlined text-[32px] text-tertiary fill-icon">check_circle</span>
+<span>I'm Done Speaking</span>
+</button>
+</div>
+</div>
+<!-- ============================================== -->
+<!-- STATE 3: THINKING (AI Processing Prompt) -->
+<!-- ============================================== -->
+<div class="tablet-view hidden flex-1 flex flex-col justify-between items-center text-center max-w-3xl mx-auto py-4" id="view-thinking">
+<div class="flex flex-col items-center w-full my-auto">
+<!-- Soft Glowing Thinking Animation Container -->
+<div class="relative mb-6">
+<div class="w-36 h-36 sm:w-44 sm:h-44 rounded-full p-2 bg-surface-container ring-4 ring-primary-container ring-opacity-40 animate-pulse flex items-center justify-center">
+<img class="w-full h-full object-cover rounded-full opacity-90" data-alt="A portrait of Daniel smiling pensively with a warm thoughtful gaze, soft light illuminating his features against a cozy warm home interior background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC6cWsl9JZJQv44CvyF6vtbrCRG2DZHtLiodEzBm2LxOaZ3s6A0rWeDhCFYseOWvh91Mcpe8XEcO-6X-pm4uF1LNvm60c5PsmF3_OUOsvdXdk_9VVCnPG9FNyMtaK3QwjhefwiGej_M6cXwRPtIMgbmbGFZOPCY4zCaBoDx1QnwN6BL_OuHb_YZra68y-r_4kYLD3LrLqIS9mRj7ZAyr_v5iFmRuIkung0L12tQZwKDCHRR-SzFn_YD">
+</div>
+<div class="absolute inset-0 rounded-full border-4 border-dashed border-primary animate-spin" style="animation-duration: 16s;"></div>
+</div>
+<!-- Thinking Pill Banner -->
+<div class="inline-flex items-center gap-2.5 px-6 py-2 rounded-full bg-primary-fixed text-on-primary-fixed border border-primary-container mb-4">
+<span class="material-symbols-outlined text-primary text-[24px]">psychology</span>
+<span class="text-headline-sm font-headline-sm font-bold">Daniel is thinking…</span>
+</div>
+<!-- Reassuring Status Caption -->
+<p class="text-body-xl font-body-xl text-on-surface max-w-lg mt-2 font-medium">
+                "Daniel is remembering Mom's favorite songs and garden stories..."
+              </p>
+<div class="flex items-center gap-2 mt-6 text-on-surface-variant text-label-md">
+<span class="material-symbols-outlined text-[20px]">hearing</span>
+<span>Processing with compassionate ambient memory</span>
+</div>
+</div>
+<!-- Soft Cancel Button (64px) -->
+<div class="w-full max-w-xs mt-4">
+<button class="w-full min-h-[64px] rounded-xl bg-surface-container-lowest border border-outline-variant hover:bg-surface-container text-on-surface-variant font-label-lg font-bold" onclick="setTabletState('asleep')">
+                Cancel
+              </button>
+</div>
+</div>
+<!-- ============================================== -->
+<!-- STATE 4: SPEAKING (Digital Daniel Conversing) -->
+<!-- ============================================== -->
+<div class="tablet-view hidden flex-1 flex flex-col justify-between items-center text-center max-w-3xl mx-auto py-2" id="view-speaking">
+<div class="flex flex-col items-center w-full">
+<!-- Speaking Daniel Headshot with Active Audio Waves -->
+<div class="relative mb-4">
+<div class="w-36 h-36 sm:w-40 sm:h-40 rounded-full p-1.5 bg-gradient-to-tr from-primary-container to-secondary-container shadow-md">
+<img class="w-full h-full object-cover rounded-full" data-alt="A friendly portrait of Daniel actively speaking with an articulate warm smile, clean high-key home light with soft natural linen textures." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBIQRMx3bhl4m8LvYzxFgKj5BlAL-w5cOptjYpbvYmYfDvVLafIx1UUCDxJAKPgQcCkGbaVM5Ea1k02bBSOFmth2eI5bmsybQ4fPQsXJ2S1sFmCiFOGPDSI06auphKwObMYlKsxxNcU3D_IXYmtTCpJNMzFvuG5h4CQhWLB-VDjnEMZpaY_R6KzkytDfLqJy6XYyEvSg2vM8Q2dcdx3ewRg7c8ioO9VRmq79Z38Ck6C8XEQiMLQhOwU">
+</div>
+<div class="absolute -bottom-2 left-1/2 -translate-x-1/2 whitespace-nowrap bg-surface-container-lowest border-2 border-primary-container px-4 py-1.5 rounded-full shadow-md flex items-center gap-1.5">
+<span class="material-symbols-outlined text-primary text-[20px] fill-icon">smart_toy</span>
+<span class="text-label-md font-bold text-primary">Digital Daniel · AI</span>
+</div>
+</div>
+<!-- Speaking Audio Badge -->
+<div class="inline-flex items-center gap-2 px-5 py-1.5 rounded-full bg-primary-fixed text-on-primary-fixed mb-4">
+<span class="material-symbols-outlined text-primary text-[22px] fill-icon">volume_up</span>
+<span class="text-label-md font-bold text-primary">Speaking aloud to you now</span>
+</div>
+<!-- High Contrast Subtitle / Speech Bubble -->
+<div class="w-full bg-surface-container-lowest p-6 sm:p-7 rounded-2xl border-2 border-primary-container shadow-sm text-left max-w-2xl">
+<span class="text-label-sm font-bold text-primary uppercase tracking-wider block mb-2">Daniel is saying:</span>
+<p class="text-headline-md font-headline-md font-bold text-on-surface leading-relaxed">
+                  "Those yellow English roses you planted in June were always your favorite! Did you snip a bloom for the kitchen counter today?"
+                </p>
+</div>
+</div>
+<!-- Interruption & Response Controls -->
+<div class="w-full max-w-xl grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
+<button class="min-h-[72px] rounded-2xl bg-tertiary hover:bg-[#1f523c] text-on-tertiary flex items-center justify-center gap-2 px-6 text-label-lg font-bold shadow-md active:scale-[0.98]" onclick="setTabletState('listening')">
+<span class="material-symbols-outlined text-[28px] fill-icon">mic</span>
+<span>Reply to Daniel</span>
+</button>
+<button class="min-h-[72px] rounded-2xl bg-surface-container-lowest border-2 border-outline text-on-surface hover:bg-surface-container flex items-center justify-center gap-2 px-6 text-label-lg font-bold" onclick="setTabletState('asleep')">
+<span class="material-symbols-outlined text-[26px]">stop_circle</span>
+<span>Pause &amp; Quiet</span>
+</button>
+</div>
+</div>
+<!-- ============================================== -->
+<!-- STATE 5: REAL FAMILY MESSAGE PLAYING (Authentic Deep Ocean Blue) -->
+<!-- ============================================== -->
+<div class="tablet-view hidden flex-1 flex flex-col justify-between items-center text-center max-w-3xl mx-auto py-2" id="view-family_message">
+<!-- Provenance Separation: AI steps back, authentic voice takes center -->
+<div class="w-full flex flex-col items-center">
+<!-- Contrast Comparison Header -->
+<div class="flex items-center justify-center gap-6 mb-4">
+<!-- Dimmed AI Avatar (stepped aside) -->
+<div class="flex flex-col items-center opacity-45 grayscale scale-90">
+<div class="w-16 h-16 rounded-full overflow-hidden border-2 border-outline">
+<img class="w-full h-full object-cover" data-alt="Small grayscale portrait of the AI companion avatar dimmed in background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCHSVeEwRAs5gf1AIKIlVsAgo0UAQFsrUveIlDylr65ZUrIe3NssVi4JdMIvvP7kPEcNdSi--q4zV9y2904nLv_7IH-MA5-sD85-u6uLVhQTB5Nm56mRZVlSygNp7RJwwoPUz1KrOG-8rrVlJywXlDeOf-bezxhmk-GYNqVindkm0-0WIwDgPtI15XMg_Kn1WFylmlrrG6brd7mUgAUGFvrdzJSbGKaCmLQI8XkxnktgXX9R5JS38vm">
+</div>
+<span class="text-label-sm font-bold mt-1 text-on-surface-variant">AI Stepped Aside</span>
+</div>
+<span class="material-symbols-outlined text-secondary text-[28px]">arrow_forward</span>
+<!-- Real Daniel Authentic Avatar (Deep Ocean Blue Aura) -->
+<div class="flex flex-col items-center">
+<div class="w-24 h-24 sm:w-28 sm:h-28 rounded-full p-1 bg-[#1D4E89] shadow-lg ring-4 ring-[#93bdff]">
+<img class="w-full h-full object-cover rounded-full" data-alt="A vivid, authentic casual photo of the real son Daniel outside near his car holding a coffee cup, grinning warmly into the camera lens with genuine emotion and natural daylight." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAdtL-uuP1IVzexEjtgZ4DSviuxURoJxgYgNnx0PyQ0l3iO1X_FOdfcnV2-PSpUr5Gu16VaLF0iiyV0qkvMPFoHUQo73Q3kxaG7q5nywc0vcegybVmjIeFhtAkLBu057s0Ji5RkTX5b2tOT9RBjLZWjaBYhuhFHxC19TIZWJrleVkCeHQ_Rg74PuKe4LpDAWQg08xKFuXO1q8iBmVQXEz1mRFOIiSePuAiEn2_8R5r6XoPCoUJ3Xaac">
+</div>
+<span class="text-label-md font-bold mt-1.5 text-[#1D4E89] flex items-center gap-1">
+<span class="material-symbols-outlined text-[18px] fill-icon">verified</span>
+<span>The Real Daniel</span>
+</span>
+</div>
+</div>
+<!-- Authentic Ocean Blue Card Container (#1D4E89) -->
+<div class="w-full bg-[#1D4E89] text-white p-6 sm:p-8 rounded-3xl shadow-xl text-left border-4 border-[#93bdff]/40 max-w-2xl">
+<div class="flex items-center justify-between border-b border-white/20 pb-3 mb-4">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-amber-300 text-[26px] fill-icon">campaign</span>
+<span class="font-bold text-headline-sm tracking-wide text-white">Authentic Voice Note</span>
+</div>
+<span class="px-3 py-1 rounded-full bg-white/20 text-label-sm font-bold">Recorded Today at 9:15 AM</span>
+</div>
+<p class="text-headline-sm font-headline-sm font-semibold text-white/95 leading-relaxed">
+                  "Hey Mom! Just wanted to check in before my meeting. I love hearing about the roses. Call me whenever you're ready!"
+                </p>
+<!-- Audio Scrubber / Waveform Bar (54px Minimum Height) -->
+<div class="mt-6 bg-[#0f2c4f] rounded-2xl p-4 flex items-center gap-4 border border-white/20">
+<button class="w-14 h-14 rounded-full bg-white text-[#1D4E89] flex items-center justify-center hover:bg-slate-100 transition-colors shrink-0" type="button">
+<span class="material-symbols-outlined text-[34px] fill-icon">pause</span>
+</button>
+<div class="flex-1 flex flex-col gap-1.5">
+<div class="h-3 w-full bg-white/20 rounded-full overflow-hidden flex">
+<div class="h-full bg-amber-400 w-3/5 rounded-full"></div>
+</div>
+<div class="flex justify-between text-label-sm font-mono text-white/80">
+<span>0:18</span>
+<span>0:32</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Massive Action Triggers -->
+<div class="w-full max-w-xl grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
+<button class="min-h-[74px] rounded-2xl bg-[#1D4E89] hover:bg-[#153a66] text-white flex items-center justify-center gap-3 px-6 text-headline-sm font-headline-sm font-bold shadow-md active:scale-[0.98]" onclick="setTabletState('calling')">
+<span class="material-symbols-outlined text-[32px] fill-icon">phone</span>
+<span>Call Daniel Back</span>
+</button>
+<button class="min-h-[74px] rounded-2xl bg-surface-container-lowest border-2 border-outline hover:bg-surface-container text-on-surface flex items-center justify-center gap-3 px-6 text-label-lg font-bold" onclick="setTabletState('confirm_send')">
+<span class="material-symbols-outlined text-[28px] fill-icon">record_voice_over</span>
+<span>Send Voice Note</span>
+</button>
+</div>
+</div>
+<!-- ============================================== -->
+<!-- STATE 6: FAMILY IS CALLING (Full Call Takeover) -->
+<!-- ============================================== -->
+<div class="tablet-view hidden flex-1 flex flex-col justify-between items-center text-center max-w-2xl mx-auto py-2" id="view-calling">
+<div class="flex flex-col items-center w-full my-auto">
+<!-- Ringing Avatar with Vibrant Green Glow Ripple -->
+<div class="relative mb-6">
+<div class="w-40 h-40 sm:w-48 sm:h-48 rounded-full p-2 bg-tertiary-fixed ring-8 ring-tertiary animate-pulse shadow-2xl">
+<img class="w-full h-full object-cover rounded-full" data-alt="Vibrant happy portrait of Daniel looking right at the camera smiling broadly, bright sunny outdoor background, crisp and highly authentic personal snapshot." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBzJ1MK7QYUCgsolo5rcWXGo9NkLlfnJV_3rfPd6go8VMqYdwcLnFJh5bzDnxZQpAuFcjK1lsAtGzRsfLRuw7-U5hCZV_mASEwGzr-Mhxd5RN7_-h9WI2qCCf6-Ve310v6h9hL3K_gG4A9YWgh-AKR6JmfBlgfg1f80NvnMkR5Zkf2GcFKmb9OC05xbW47nRoquel7zdbVh0_s0uji1RZzPpZhFdUD-mhcAOU1qekXkVcrTkAZQBBbD">
+</div>
+<!-- Call Icon Badge -->
+<div class="absolute bottom-1 right-2 w-14 h-14 rounded-full bg-tertiary text-on-tertiary flex items-center justify-center shadow-lg border-4 border-surface-bright">
+<span class="material-symbols-outlined text-[32px] fill-icon animate-bounce">ring_volume</span>
+</div>
+</div>
+<!-- Big Bold Caller Title -->
+<div class="inline-flex items-center gap-2 px-5 py-1.5 rounded-full bg-secondary-fixed text-on-secondary-fixed mb-3">
+<span class="material-symbols-outlined text-[20px] fill-icon">verified_user</span>
+<span class="text-label-md font-bold">Real Household Caller Verified</span>
+</div>
+<h2 class="text-display-lg font-display-lg text-on-surface tracking-tight">
+                The real Daniel is calling!
+              </h2>
+<p class="text-body-xl font-body-xl text-on-surface-variant max-w-md mt-2">
+                "I'll step aside. Enjoy your chat, Mom." — <span class="text-primary font-bold">Digital Daniel</span>
+</p>
+</div>
+<!-- Huge High-Contrast Pick Up & Decline Buttons (80px height) -->
+<div class="w-full grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
+<button class="min-h-[82px] rounded-2xl bg-tertiary hover:bg-[#1a553c] text-on-tertiary flex items-center justify-center gap-3 px-8 text-headline-sm font-headline-sm font-bold shadow-xl active:scale-[0.98]" onclick="alert('Call Connected! Talking with Daniel.')">
+<span class="material-symbols-outlined text-[38px] fill-icon">call</span>
+<span>Answer Call</span>
+</button>
+<button class="min-h-[82px] rounded-2xl bg-surface-container-lowest border-2 border-error hover:bg-error-container text-error flex items-center justify-center gap-3 px-8 text-headline-sm font-headline-sm font-bold shadow-sm active:scale-[0.98]" onclick="setTabletState('asleep')">
+<span class="material-symbols-outlined text-[36px] fill-icon">call_end</span>
+<span>Not Right Now</span>
+</button>
+</div>
+</div>
+<!-- ============================================== -->
+<!-- STATE 7: SAFETY ALERT (Calm Reassuring Red Accent) -->
+<!-- ============================================== -->
+<div class="tablet-view hidden flex-1 flex flex-col justify-between items-center text-center max-w-2xl mx-auto py-2" id="view-safety_alert">
+<div class="w-full flex flex-col items-center">
+<!-- Reassurance Card (Bordered in warm red, zero panic styling) -->
+<div class="w-full bg-surface-container-lowest border-4 border-error/70 rounded-3xl p-6 sm:p-8 shadow-xl text-left">
+<!-- Safe Kicker Header -->
+<div class="flex items-center justify-between border-b border-outline-variant pb-4 mb-5">
+<div class="flex items-center gap-3">
+<div class="w-12 h-12 rounded-2xl bg-error-container text-error flex items-center justify-center">
+<span class="material-symbols-outlined text-[32px] fill-icon">health_and_safety</span>
+</div>
+<div>
+<span class="text-label-sm font-bold uppercase tracking-wider text-error">Haven Safety System</span>
+<h3 class="text-headline-md font-headline-md font-bold text-on-surface">Daniel has been alerted.</h3>
+</div>
+</div>
+<span class="px-3 py-1 bg-surface-container rounded-full text-label-sm font-bold text-on-surface-variant">Active Assistance</span>
+</div>
+<!-- Soothing Reassurance Copy -->
+<div class="bg-surface-container-low p-5 rounded-2xl border border-outline-variant mb-5">
+<p class="text-headline-sm font-headline-sm text-on-surface leading-snug font-semibold">
+                    "Take a slow, deep breath and sit down comfortably, Mom. Daniel received your message that you feel dizzy."
+                  </p>
+<p class="text-body-lg font-body-lg text-on-surface-variant mt-3">
+                    His phone is ringing right now, and his sister Sarah was notified as well. You are safe.
+                  </p>
+</div>
+<!-- Emergency Dispatch Quick Button -->
+<a class="w-full min-h-[72px] rounded-2xl bg-error hover:bg-[#921414] text-on-error flex items-center justify-center gap-3 px-6 text-headline-sm font-headline-sm font-bold shadow-md active:scale-[0.98]" href="tel:911">
+<span class="material-symbols-outlined text-[32px] fill-icon">e911_emergency</span>
+<span>If you are hurt, call 911 now</span>
+</a>
+</div>
+</div>
+<!-- Bottom Return / False Alarm Reassurance -->
+<div class="w-full max-w-md mt-6">
+<button class="w-full min-h-[68px] rounded-2xl bg-surface-container-lowest border-2 border-outline hover:bg-surface-container text-on-surface flex items-center justify-center gap-2 px-6 text-headline-sm font-headline-sm font-bold shadow-sm" onclick="setTabletState('asleep')">
+<span class="material-symbols-outlined text-[28px] text-tertiary">task_alt</span>
+<span>I'm Feeling Better Now</span>
+</button>
+</div>
+</div>
+<!-- ============================================== -->
+<!-- STATE 8: CONFIRM BEFORE SENDING -->
+<!-- ============================================== -->
+<div class="tablet-view hidden flex-1 flex flex-col justify-between items-center text-center max-w-2xl mx-auto py-2" id="view-confirm_send">
+<div class="w-full flex flex-col items-center my-auto">
+<!-- Reassurance Modal Card -->
+<div class="w-full bg-surface-container-lowest border-2 border-outline-variant rounded-3xl p-6 sm:p-8 shadow-xl text-left">
+<div class="flex items-center gap-3 mb-4">
+<div class="w-12 h-12 rounded-full bg-secondary-fixed text-on-secondary-fixed flex items-center justify-center">
+<span class="material-symbols-outlined text-[28px]">mark_chat_read</span>
+</div>
+<div>
+<span class="text-label-sm font-bold uppercase tracking-wider text-on-surface-variant">Review Before Sending</span>
+<h3 class="text-headline-md font-headline-md font-bold text-on-surface">Send this message to Daniel?</h3>
+</div>
+</div>
+<!-- Exact Message Body in Clear 24px Font -->
+<div class="p-6 rounded-2xl bg-surface-container-low border-2 border-outline-variant mb-6">
+<span class="text-label-sm font-bold text-on-surface-variant block mb-2">Message:</span>
+<p class="text-headline-md font-headline-md font-bold text-on-surface italic">
+                    "The yellow roses in the garden have bloomed today."
+                  </p>
+</div>
+<!-- High Accessibility Decision Buttons -->
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+<button class="min-h-[76px] rounded-2xl bg-tertiary hover:bg-[#1a553c] text-on-tertiary flex items-center justify-center gap-2 px-6 text-headline-sm font-headline-sm font-bold shadow-md active:scale-[0.98]" onclick="simulateSendSuccess()">
+<span class="material-symbols-outlined text-[30px] fill-icon">send</span>
+<span>Yes, Send It</span>
+</button>
+<button class="min-h-[76px] rounded-2xl bg-surface-container-lowest border-2 border-outline text-on-surface hover:bg-surface-container flex items-center justify-center gap-2 px-6 text-headline-sm font-headline-sm font-bold shadow-sm" onclick="setTabletState('asleep')">
+<span class="material-symbols-outlined text-[28px]">close</span>
+<span>Cancel</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Quick Voice Edit Option -->
+<div class="w-full max-w-sm mt-4 text-center">
+<button class="text-label-lg font-bold text-secondary hover:underline inline-flex items-center gap-1.5 py-2" onclick="setTabletState('listening')">
+<span class="material-symbols-outlined text-[22px]">mic</span>
+<span>Speak again to change words</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Tablet Bottom Decorative Bezel Strip -->
+<div class="w-full bg-[#1b1916] py-2 px-6 flex items-center justify-center text-xs text-[#8a7267]">
+<span>Haven Standalone Elder Tablet · Model H-15 Ambient Display</span>
+</div>
+</div>
+</div>
+<!-- Judge / Accessibility Explainer Banner below tablet container -->
+<div class="w-full max-w-4xl mt-8 grid grid-cols-1 md:grid-cols-3 gap-4 text-on-surface">
+<div class="p-4 bg-surface-container-lowest rounded-2xl border border-outline-variant shadow-sm flex items-start gap-3">
+<span class="material-symbols-outlined text-primary text-[28px]">elderly</span>
+<div>
+<h4 class="font-bold text-label-lg">Senior Ergonomics</h4>
+<p class="text-label-sm text-on-surface-variant mt-0.5">Minimum 64px–82px physical touch targets, 20px–36px crystal clear typography, no cluttered multi-step workflows.</p>
+</div>
+</div>
+<div class="p-4 bg-surface-container-lowest rounded-2xl border border-outline-variant shadow-sm flex items-start gap-3">
+<span class="material-symbols-outlined text-[#1D4E89] text-[28px] fill-icon">verified</span>
+<div>
+<h4 class="font-bold text-label-lg">Strict Audio Provenance</h4>
+<p class="text-label-sm text-on-surface-variant mt-0.5">Unmistakable deep blue styling for authentic family vs. terracotta badge for Digital Daniel AI, preventing confusion.</p>
+</div>
+</div>
+<div class="p-4 bg-surface-container-lowest rounded-2xl border border-outline-variant shadow-sm flex items-start gap-3">
+<span class="material-symbols-outlined text-error text-[28px]">healing</span>
+<div>
+<h4 class="font-bold text-label-lg">Reassuring Safety</h4>
+<p class="text-label-sm text-on-surface-variant mt-0.5">Warm, non-hysterical emergency status with explicit family notification confirmation and high-visibility 911 trigger.</p>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer (Shared Components Standard) -->
+<footer class="w-full bg-surface-container-low border-t border-outline-variant mt-auto">
+<div class="w-full max-w-7xl mx-auto px-6 py-8 flex flex-col md:flex-row items-center justify-between gap-4">
+<div class="flex items-center gap-2">
+<span class="text-headline-sm font-headline-sm font-bold text-primary">Haven</span>
+<span class="text-on-surface-variant text-label-sm">· Alexa+ Hackathon Submission. Private household demo.</span>
+</div>
+<div class="flex flex-wrap items-center gap-6 text-label-sm font-label-sm">
+<a class="text-on-surface-variant hover:text-on-surface transition-colors" href="#">AI Transparency Statement</a>
+<a class="text-on-surface-variant hover:text-on-surface transition-colors" href="#">Guardian Privacy</a>
+<a class="text-on-surface-variant hover:text-on-surface transition-colors" href="#">Audio Provenance Protocol</a>
+<a class="text-on-surface-variant hover:text-on-surface transition-colors" href="#">Support</a>
+</div>
+<p class="text-label-sm text-on-surface-variant font-label-sm">© 2025 Haven. Alexa+ Hackathon Submission. Private household demo.</p>
+</div>
+</footer>
+<!-- State Controller Script -->
+<script>
+    const stateConfig = {
+      asleep: {
+        title: "Asleep (Standby)",
+        dotColor: "bg-tertiary",
+        pillClasses: "bg-surface-container text-on-surface border-outline-variant"
+      },
+      listening: {
+        title: "Listening…",
+        dotColor: "bg-tertiary animate-ping",
+        pillClasses: "bg-tertiary-fixed text-on-tertiary-fixed border-tertiary"
+      },
+      thinking: {
+        title: "Thinking…",
+        dotColor: "bg-primary animate-pulse",
+        pillClasses: "bg-primary-fixed text-on-primary-fixed border-primary-container"
+      },
+      speaking: {
+        title: "Digital Daniel Speaking",
+        dotColor: "bg-primary",
+        pillClasses: "bg-primary-fixed text-on-primary-fixed border-primary"
+      },
+      family_message: {
+        title: "Real Daniel Voice Note",
+        dotColor: "bg-[#1D4E89]",
+        pillClasses: "bg-[#d5e3ff] text-[#001c3b] border-[#1D4E89]"
+      },
+      calling: {
+        title: "Incoming Family Call",
+        dotColor: "bg-tertiary animate-ping",
+        pillClasses: "bg-tertiary-fixed text-on-tertiary-fixed border-tertiary font-bold"
+      },
+      safety_alert: {
+        title: "Haven Safety Active",
+        dotColor: "bg-error animate-pulse",
+        pillClasses: "bg-error-container text-on-error-container border-error"
+      },
+      confirm_send: {
+        title: "Confirmation Ready",
+        dotColor: "bg-secondary",
+        pillClasses: "bg-secondary-fixed text-on-secondary-fixed border-secondary"
+      }
+    };
+
+    function setTabletState(stateKey) {
+      // 1. Hide all view panels
+      document.querySelectorAll('.tablet-view').forEach(view => {
+        view.classList.add('hidden');
+      });
+
+      // 2. Show selected view panel
+      const targetView = document.getElementById(`view-${stateKey}`);
+      if (targetView) {
+        targetView.classList.remove('hidden');
+      }
+
+      // 3. Update Status Bar Pill
+      const pillContainer = document.getElementById('status-pill-container');
+      const pillDot = document.getElementById('status-indicator-dot');
+      const pillText = document.getElementById('status-pill-text');
+
+      const config = stateConfig[stateKey] || stateConfig.asleep;
+      pillText.textContent = config.title;
+      pillDot.className = `w-3 h-3 rounded-full ${config.dotColor}`;
+      pillContainer.className = `inline-flex items-center gap-2 px-3 py-1 rounded-full text-label-md border ${config.pillClasses}`;
+
+      // 4. Update Button Selector Tabs at top
+      document.querySelectorAll('.state-tab-btn').forEach(btn => {
+        if (btn.getAttribute('data-state') === stateKey) {
+          btn.className = "state-tab-btn px-3 py-1.5 rounded-lg text-label-sm font-label-sm transition-all border border-outline-variant bg-surface-container-lowest text-primary font-bold shadow-sm";
+        } else {
+          btn.className = "state-tab-btn px-3 py-1.5 rounded-lg text-label-sm font-label-sm transition-all border border-transparent text-on-surface-variant hover:bg-surface-container-high";
+        }
+      });
+    }
+
+    function resetToDefault() {
+      setTabletState('asleep');
+    }
+
+    function simulateSendSuccess() {
+      alert("Message sent to Daniel! He will hear it on his family app.");
+      setTabletState('asleep');
+    }
+
+    // Default Initialization to Asleep state
+    document.addEventListener('DOMContentLoaded', () => {
+      setTabletState('asleep');
+    });
+  </script>
+</body></html>

@@ -5,7 +5,7 @@ import { normalize } from "./safety.js";
 // to be human or the real child, no medicine advice, no claim that emergency services were called.
 // Words the real family recorded (attribution "real_family_member") are relayed untouched.
 
-export type GuardOptions = { childName: string; calledBy: string; attribution?: "real_family_member" };
+export type GuardOptions = { childName: string; calledBy: string; emergency?: string; attribution?: "real_family_member" };
 export type GuardResult = { text: string; rewritten: boolean; reason?: string };
 
 type Reason = "human_claim" | "emergency_claim" | "medication_advice" | "commitment";
@@ -171,7 +171,7 @@ function makesCommitment(s: string, childName: string) {
 function lines(o: GuardOptions): Record<Reason, string> {
   return {
     human_claim: `I'm Digital ${o.childName}, an AI version of ${o.childName}. The real ${o.childName} reads a summary every evening.`,
-    emergency_claim: `I can't call emergency services myself, ${o.calledBy}. If you are in danger, please call 112 now.`,
+    emergency_claim: `I can't call emergency services myself, ${o.calledBy}. If you are in danger, please call ${o.emergency ?? "112"} now.`,
     medication_advice: `I can't advise on medicines, ${o.calledBy}. Please check with your doctor; I'll let ${o.childName} know.`,
     commitment: `That one's for the real ${o.childName}, ${o.calledBy}. I can't promise that, but I'll ask ${o.childName} tonight.`,
   };

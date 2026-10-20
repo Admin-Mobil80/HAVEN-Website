@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { api } from "../lib/api";
 import { emit } from "../lib/bus";
 import { useNames } from "../lib/names";
+import { Icon } from "../components/Icon";
 
 type Voices = { available: boolean; libraryError?: string; current: { name: string; source: string } | null; library: { voiceId: string; publicOwnerId: string; name: string; accent?: string; gender?: string; language?: string; previewUrl?: string }[] };
 
@@ -36,14 +37,14 @@ export function Likeness() {
   return (
     <section className="panel likeness" aria-label="Your face and voice">
       <header className="panel__head">
-        <h2>Your face and voice</h2>
-        <span className="muted">optional · always labelled AI</span>
+        <h2><Icon name="record_voice_over" />Your face and voice</h2>
+        <span className="pill pill--brand"><Icon name="smart_toy" fill />optional · always labelled AI</span>
       </header>
       <div className="setup__grid">
         <PhotoUpload user={n.user} on={Boolean(photoOn)} busy={busy} run={run} />
         <fieldset>
-          <legend>Voice</legend>
-          <p>Now: <strong>{voices?.current ? `${voices.current.name}` : "default voice (Amazon Polly)"}</strong></p>
+          <legend><Icon name="record_voice_over" />Voice</legend>
+          <p className="now">Now: <span className="pill pill--brand">{voices?.current ? `${voices.current.name}` : "default voice (Amazon Polly)"}</span></p>
           {voices && !voices.available ? (
             <p className="muted">Custom voices are not set up on this server yet.</p>
           ) : (
@@ -121,9 +122,9 @@ function Recorder({ user, relation, calledBy, busy, run }: { user: string; relat
       <blockquote className="script">{script.map((l, i) => <p key={i}>{l}</p>)}</blockquote>
       <div className="row row--wrap">
         {rec ? (
-          <button className="btn btn--rec is-on" onClick={() => (rec.stop(), setRec(null))}>■ Stop ({secs}s)</button>
+          <button className="btn btn--rec is-on" onClick={() => (rec.stop(), setRec(null))}><Icon name="stop_circle" fill />Stop ({secs}s)</button>
         ) : (
-          <button className="btn btn--rec" disabled={!!busy} onClick={() => void start().catch(() => alert("Microphone not available"))}>🎙 {blob ? "Record again" : "Start recording"}</button>
+          <button className="btn btn--rec" disabled={!!busy} onClick={() => void start().catch(() => alert("Microphone not available"))}><Icon name="mic" fill />{blob ? "Record again" : "Start recording"}</button>
         )}
         {blob && <audio controls src={URL.createObjectURL(blob)} />}
       </div>
@@ -166,9 +167,9 @@ function PhotoUpload({ user, on, busy, run }: { user: string; on: boolean; busy:
 
   return (
     <fieldset>
-      <legend>Face</legend>
-      <p>Now: <strong>{on ? "your photo-real avatar" : "the illustrated avatar"}</strong></p>
-      <p className="muted">Use one clear, front-facing photo: good light, plain background, both eyes visible, mouth closed, neutral expression. It becomes a live, photo-real face that always shows an AI label.</p>
+      <legend><Icon name="photo_camera" />Face</legend>
+      <p className="now">Now: <span className="pill pill--brand">{on ? "photo-real avatar" : "illustrated avatar"}</span></p>
+      <p className="muted">Use one clear, front-facing photo: good light, plain background, both eyes visible, a soft, natural smile. It becomes a live, photo-real face that always shows an AI label.</p>
       <input type="file" accept="image/jpeg,image/png,image/webp" onChange={(e) => e.target.files?.[0] && void pick(e.target.files[0])} />
       {preview && <img className="photo-preview" src={preview} alt="Your photo, cropped" />}
       <label className="check">

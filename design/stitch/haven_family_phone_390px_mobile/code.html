@@ -1,0 +1,527 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Haven for Family - Screen 6</title>
+<!-- Material Symbols Outlined -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<!-- Google Fonts: Plus Jakarta Sans -->
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<!-- Tailwind CSS with Forms & Container Queries -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "tertiary-container": "#448064",
+            "on-background": "#1d1b18",
+            "on-secondary": "#ffffff",
+            "background": "#fef8f3",
+            "on-primary-fixed": "#341100",
+            "tertiary": "#2a674c",
+            "error": "#ba1a1a",
+            "on-surface-variant": "#574238",
+            "primary": "#9a4100",
+            "surface-container-high": "#ede7e2",
+            "surface-dim": "#dfd9d4",
+            "on-secondary-fixed": "#001c3b",
+            "tertiary-fixed-dim": "#95d4b3",
+            "on-tertiary-fixed-variant": "#0e5138",
+            "on-tertiary": "#ffffff",
+            "secondary-fixed-dim": "#a7c8ff",
+            "on-surface": "#1d1b18",
+            "secondary-fixed": "#d5e3ff",
+            "primary-fixed": "#ffdbcb",
+            "secondary": "#325f9b",
+            "on-secondary-fixed-variant": "#124782",
+            "surface-container-low": "#f9f3ed",
+            "secondary-container": "#93bdff",
+            "surface-bright": "#fef8f3",
+            "primary-fixed-dim": "#ffb690",
+            "surface-container": "#f3ede8",
+            "surface-container-highest": "#e7e1dc",
+            "on-primary-fixed-variant": "#783100",
+            "on-secondary-container": "#194b86",
+            "surface": "#fef8f3",
+            "surface-container-lowest": "#ffffff",
+            "inverse-primary": "#ffb690",
+            "surface-tint": "#9e4300",
+            "outline-variant": "#ddc1b3",
+            "on-tertiary-container": "#f5fff7",
+            "surface-variant": "#e7e1dc",
+            "error-container": "#ffdad6",
+            "primary-container": "#bd5611",
+            "inverse-surface": "#32302d",
+            "outline": "#8a7267",
+            "on-tertiary-fixed": "#002114",
+            "inverse-on-surface": "#f6f0ea",
+            "tertiary-fixed": "#b1f0ce",
+            "on-error": "#ffffff",
+            "on-primary": "#ffffff",
+            "on-error-container": "#93000a",
+            "on-primary-container": "#fffbff"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "space-lg": "2rem",
+            "space-md": "1.25rem",
+            "space-xs": "0.5rem",
+            "space-xl": "3rem",
+            "margin": "1.25rem",
+            "margin-desktop": "3.5rem",
+            "gutter": "1.5rem",
+            "gutter-desktop": "2.5rem",
+            "margin-tablet": "2rem",
+            "space-sm": "0.75rem",
+            "gutter-tablet": "2rem"
+          },
+          "fontFamily": {
+            "display-lg": ["Plus Jakarta Sans"],
+            "body-lg": ["Plus Jakarta Sans"],
+            "headline-lg-mobile": ["Plus Jakarta Sans"],
+            "headline-sm": ["Plus Jakarta Sans"],
+            "headline-md": ["Plus Jakarta Sans"],
+            "headline-lg": ["Plus Jakarta Sans"],
+            "body-xl": ["Plus Jakarta Sans"],
+            "label-md": ["Plus Jakarta Sans"],
+            "display-lg-mobile": ["Plus Jakarta Sans"],
+            "label-sm": ["Plus Jakarta Sans"],
+            "label-lg": ["Plus Jakarta Sans"],
+            "body-md": ["Plus Jakarta Sans"]
+          },
+          "fontSize": {
+            "display-lg": ["40px", {"lineHeight": "52px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+            "body-lg": ["19px", {"lineHeight": "32px", "letterSpacing": "0.01em", "fontWeight": "400"}],
+            "headline-lg-mobile": ["26px", {"lineHeight": "36px", "letterSpacing": "0em", "fontWeight": "600"}],
+            "headline-sm": ["20px", {"lineHeight": "30px", "letterSpacing": "0.01em", "fontWeight": "600"}],
+            "headline-md": ["24px", {"lineHeight": "34px", "letterSpacing": "0em", "fontWeight": "600"}],
+            "headline-lg": ["32px", {"lineHeight": "44px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+            "body-xl": ["22px", {"lineHeight": "36px", "letterSpacing": "0.01em", "fontWeight": "400"}],
+            "label-md": ["16px", {"lineHeight": "24px", "letterSpacing": "0.03em", "fontWeight": "600"}],
+            "display-lg-mobile": ["32px", {"lineHeight": "42px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+            "label-sm": ["14px", {"lineHeight": "20px", "letterSpacing": "0.04em", "fontWeight": "700"}],
+            "label-lg": ["18px", {"lineHeight": "26px", "letterSpacing": "0.02em", "fontWeight": "600"}],
+            "body-md": ["17px", {"lineHeight": "28px", "letterSpacing": "0.01em", "fontWeight": "400"}]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 500, 'GRAD' 0, 'opsz' 24;
+      display: inline-block;
+      vertical-align: middle;
+      line-height: 1;
+    }
+    .material-symbols-fill {
+      font-variation-settings: 'FILL' 1, 'wght' 600, 'GRAD' 0, 'opsz' 24;
+    }
+    /* Subtle pulsing effect for urgent safety indicator */
+    @keyframes pulse-ring {
+      0% { transform: scale(0.95); opacity: 0.8; }
+      50% { transform: scale(1.2); opacity: 0.3; }
+      100% { transform: scale(0.95); opacity: 0.8; }
+    }
+    .pulse-urgent {
+      animation: pulse-ring 2s infinite ease-in-out;
+    }
+  </style>
+</head>
+<body class="bg-surface text-on-surface antialiased flex justify-center items-start min-h-screen py-0 sm:py-8 font-body-md text-body-md selection:bg-secondary-fixed selection:text-on-secondary-fixed">
+<!-- 390px Native Mobile Shell Container -->
+<main class="w-full max-w-[390px] min-h-screen bg-surface flex flex-col shadow-2xl relative overflow-hidden sm:rounded-[40px] sm:border-[8px] sm:border-surface-dim">
+<!-- iOS / Native Status Bar Header -->
+<header class="w-full bg-surface-container-lowest px-6 pt-3 pb-2 flex justify-between items-center text-on-surface select-none z-30">
+<span class="font-label-sm text-label-sm font-bold tracking-tight">8:45 PM</span>
+<!-- Dynamic Island notch hint on mobile -->
+<div class="w-24 h-4 bg-on-surface/90 rounded-full mx-auto hidden sm:block"></div>
+<div class="flex items-center gap-1.5 text-on-surface">
+<span class="material-symbols-outlined text-[16px]">signal_cellular_4_bar</span>
+<span class="font-label-sm text-label-sm font-bold">5G</span>
+<span class="material-symbols-outlined text-[18px]">battery_full</span>
+</div>
+</header>
+<!-- Top App Bar & Household Status -->
+<section class="bg-surface-container-lowest px-4 pt-2 pb-3.5 shadow-sm z-20">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<div class="w-9 h-9 rounded-full bg-primary-fixed flex items-center justify-center text-primary font-bold">
+<span class="material-symbols-outlined material-symbols-fill text-primary text-[20px]">roofing</span>
+</div>
+<div>
+<div class="flex items-center gap-1.5">
+<h1 class="font-headline-sm text-headline-sm font-bold tracking-tight text-on-surface">Haven</h1>
+<span class="text-[11px] font-label-sm font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-secondary-fixed text-on-secondary-fixed">Family</span>
+</div>
+<div class="flex items-center gap-1.5 mt-0.5">
+<span class="inline-block w-2 h-2 rounded-full bg-tertiary"></span>
+<p class="font-label-sm text-label-sm text-on-surface-variant font-medium">Margaret's Hub · Online</p>
+</div>
+</div>
+</div>
+<button aria-label="Notification center" class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-on-surface hover:bg-surface-container-high transition-colors focus-visible:outline focus-visible:outline-3 focus-visible:outline-secondary">
+<span class="material-symbols-outlined text-[22px]">notifications</span>
+</button>
+</div>
+<!-- Quick Evaluator Switcher Tabs: Urgent Alert vs. Acknowledged -->
+<div class="mt-3 p-1 bg-surface-container rounded-xl flex items-center gap-1">
+<button class="flex-1 py-2 px-2.5 rounded-lg font-label-sm text-label-sm text-center font-bold transition-all bg-surface-container-lowest text-error shadow-sm flex items-center justify-center gap-1.5" id="btn-urgent" onclick="setAlertVariant('urgent')">
+<span class="inline-block w-2 h-2 rounded-full bg-error animate-ping"></span>
+<span>🚨 Urgent Alert</span>
+</button>
+<button class="flex-1 py-2 px-2.5 rounded-lg font-label-sm text-label-sm text-center font-bold text-on-surface-variant hover:text-on-surface transition-all flex items-center justify-center gap-1.5" id="btn-acknowledged" onclick="setAlertVariant('acknowledged')">
+<span class="material-symbols-outlined text-[16px] text-tertiary">check_circle</span>
+<span>✓ Acknowledged</span>
+</button>
+</div>
+</section>
+<!-- Scrollable Screen Content -->
+<div class="flex-1 overflow-y-auto px-4 py-4 space-y-4 pb-24">
+<!-- ============================================== -->
+<!-- VARIANT 1: URGENT ALERT CARD (Default Active) -->
+<!-- ============================================== -->
+<section class="bg-surface-container-lowest rounded-2xl border-2 border-error p-4 shadow-md relative overflow-hidden transition-all duration-300" id="card-urgent">
+<!-- Visual Red Emergency Header Accent -->
+<div class="flex items-center justify-between pb-2 mb-2 border-b border-error-container">
+<div class="flex items-center gap-2">
+<span class="relative flex h-3.5 w-3.5">
+<span class="pulse-urgent absolute inline-flex h-full w-full rounded-full bg-error opacity-75"></span>
+<span class="relative inline-flex rounded-full h-3.5 w-3.5 bg-error"></span>
+</span>
+<span class="font-label-sm text-label-sm font-bold uppercase tracking-wider text-error">Urgent · Call Now</span>
+</div>
+<span class="font-label-sm text-label-sm text-error font-semibold">8:42 PM</span>
+</div>
+<!-- Headline & Context -->
+<h2 class="font-headline-sm text-headline-sm font-bold text-on-surface leading-tight mt-1">
+          Mom may need you right now (dizziness)
+        </h2>
+<!-- Ethical AI & Safety Disclaimer -->
+<div class="mt-2.5 flex items-start gap-1.5 bg-surface-container-low p-2 rounded-lg border border-outline-variant/60">
+<span class="material-symbols-outlined text-primary text-[18px] shrink-0 mt-0.5">info</span>
+<p class="text-[13px] leading-relaxed text-on-surface-variant font-body-md">
+            Detected 8:42 PM by Haven's safety rules. Haven is an AI and can be wrong.
+          </p>
+</div>
+<!-- Action Buttons -->
+<div class="mt-3.5 space-y-2">
+<!-- Primary Call Button: Minimum 56px height for accessibility -->
+<a class="w-full min-h-[56px] py-3.5 px-4 bg-tertiary hover:bg-tertiary-container active:scale-[0.98] text-on-tertiary rounded-xl font-label-lg text-label-lg font-bold flex items-center justify-center gap-2 shadow-sm transition-transform focus-visible:outline focus-visible:outline-3 focus-visible:outline-secondary" href="tel:2065550144">
+<span class="material-symbols-outlined material-symbols-fill text-[24px]">call</span>
+<span>Call Mom (206-555-0144)</span>
+</a>
+<!-- Secondary Dismiss / Safe Button -->
+<button class="w-full min-h-[48px] py-2.5 px-4 bg-surface-container-lowest border-2 border-surface-dim hover:bg-surface-container-low text-on-surface rounded-xl font-label-md text-label-md font-semibold flex items-center justify-center gap-2 transition-colors" onclick="setAlertVariant('acknowledged')">
+<span class="material-symbols-outlined text-[20px] text-tertiary">check</span>
+<span>She's safe, close alert</span>
+</button>
+</div>
+<!-- Event Timeline Section -->
+<div class="mt-4 pt-3.5 border-t border-outline-variant/50">
+<div class="flex items-center justify-between mb-2.5">
+<h3 class="font-label-md text-label-md font-bold text-on-surface flex items-center gap-1.5">
+<span class="material-symbols-outlined text-primary text-[18px]">history</span>
+              Incident Timeline
+            </h3>
+<span class="font-label-sm text-label-sm text-on-surface-variant font-medium">Auto-synced</span>
+</div>
+<ol class="relative border-l-2 border-surface-container-highest ml-2.5 space-y-3.5 pl-4 py-1">
+<!-- Item 1: Margaret spoke to Daniel -->
+<li class="relative">
+<div class="absolute -left-[23px] top-1.5 w-3.5 h-3.5 rounded-full bg-primary border-2 border-surface-container-lowest"></div>
+<span class="font-label-sm text-label-sm font-bold text-primary block">8:40 PM</span>
+<p class="font-body-md text-on-surface text-[14px] leading-snug mt-0.5">
+                Margaret told <span class="font-semibold text-primary">Digital Daniel · AI</span>:
+                <em class="block text-on-surface-variant mt-0.5 bg-surface-container p-2 rounded-lg border-l-2 border-primary not-italic">"I feel a bit dizzy standing by the kettle..."</em>
+</p>
+</li>
+<!-- Item 2: Safety Rule Triggered -->
+<li class="relative">
+<div class="absolute -left-[23px] top-1.5 w-3.5 h-3.5 rounded-full bg-error border-2 border-surface-container-lowest"></div>
+<span class="font-label-sm text-label-sm font-bold text-error block">8:41 PM</span>
+<p class="font-body-md text-on-surface text-[14px] leading-snug mt-0.5">
+                Haven Safety Rule triggered: Fall/Dizziness protocol. Tablet entered reassuring safety screen and notified son.
+              </p>
+</li>
+<!-- Item 3: SMS alert sent -->
+<li class="relative">
+<div class="absolute -left-[23px] top-1.5 w-3.5 h-3.5 rounded-full bg-secondary border-2 border-surface-container-lowest"></div>
+<span class="font-label-sm text-label-sm font-bold text-secondary block">8:42 PM</span>
+<p class="font-body-md text-on-surface text-[14px] leading-snug mt-0.5">
+                High-priority SMS alert sent to Daniel.
+              </p>
+</li>
+<!-- Item 4: Safety rest state -->
+<li class="relative">
+<div class="absolute -left-[23px] top-1.5 w-3.5 h-3.5 rounded-full bg-tertiary border-2 border-surface-container-lowest"></div>
+<span class="font-label-sm text-label-sm font-bold text-tertiary block">8:43 PM</span>
+<p class="font-body-md text-on-surface text-[14px] leading-snug mt-0.5">
+                Mom seated safely in kitchen armchair; tablet standing by.
+              </p>
+</li>
+</ol>
+</div>
+</section>
+<!-- ============================================== -->
+<!-- VARIANT 2: ACKNOWLEDGED CARD (Hidden by default) -->
+<!-- ============================================== -->
+<section class="hidden bg-surface-container-lowest rounded-2xl border-2 border-secondary p-4 shadow-sm relative overflow-hidden transition-all duration-300" id="card-acknowledged">
+<div class="flex items-center justify-between pb-2 mb-2 border-b border-surface-container">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary text-[20px]">check_circle</span>
+<span class="font-label-sm text-label-sm font-bold uppercase tracking-wider text-secondary">Alert Acknowledged</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">8:46 PM</span>
+</div>
+<h2 class="font-headline-sm text-headline-sm font-bold text-on-surface">
+          You're in touch with Mom
+        </h2>
+<p class="font-body-md text-[14px] text-on-surface-variant mt-1">
+          Last confirmed with Margaret at 8:46 PM. Heart rate &amp; motion stable. Kitchen tablet standing by in ambient companion mode.
+        </p>
+<div class="mt-3 bg-secondary-fixed/50 p-2.5 rounded-xl flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary text-[20px]">favorite</span>
+<span class="font-label-sm text-label-sm font-semibold text-on-secondary-fixed">Status: Safe &amp; resting</span>
+</div>
+<button class="text-xs font-bold text-secondary underline hover:text-on-secondary-fixed" onclick="setAlertVariant('urgent')">Re-open Urgent</button>
+</div>
+</section>
+<!-- ============================================== -->
+<!-- CORE FAMILY APP FEATURES (MATCHING DANIEL'S PHONE) -->
+<!-- ============================================== -->
+<!-- Hackathon Core Metric Tile -->
+<section class="bg-surface-container-lowest rounded-2xl border border-surface-dim p-4 shadow-sm">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm font-bold text-on-surface-variant uppercase tracking-wider">Family Connection Metric</span>
+<span class="bg-tertiary-fixed text-on-tertiary-fixed-variant px-2 py-0.5 rounded-full text-[12px] font-bold font-label-sm">+200% vs last month</span>
+</div>
+<div class="mt-2 flex items-baseline gap-2">
+<span class="font-display-lg text-display-lg font-bold text-primary tracking-tight">3 / 4</span>
+<span class="font-label-lg text-label-lg font-bold text-on-surface">real calls with Mom this week</span>
+</div>
+<p class="font-body-md text-[13px] text-on-surface-variant mt-1 pt-2 border-t border-surface-container">
+          Before Haven: 1/week · <span class="font-bold text-on-surface">2 prompted by Haven</span>
+</p>
+</section>
+<!-- Today's Digest Card · 9:00 PM -->
+<section class="bg-surface-container-lowest rounded-2xl border border-surface-dim p-4 shadow-sm">
+<div class="flex items-center justify-between pb-2 border-b border-surface-container">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[20px]">auto_stories</span>
+<h3 class="font-headline-sm text-[18px] font-bold text-on-surface">Today's Digest</h3>
+</div>
+<span class="font-label-sm text-label-sm font-medium text-on-surface-variant">9:00 PM</span>
+</div>
+<!-- AI Digest Summary -->
+<div class="mt-3 bg-surface-container-low p-3 rounded-xl border border-outline-variant/40">
+<div class="flex items-center gap-1.5 mb-1 text-primary">
+<span class="material-symbols-outlined text-[16px]">arrow_back_ios_new</span>
+<span class="font-label-sm text-label-sm font-bold">Companion Observation</span>
+</div>
+<p class="font-body-md text-[14px] text-on-surface leading-relaxed">
+            Mom spent 45 minutes on the patio pruning yellow roses. She mentioned missing your Sunday lemon cookies.
+          </p>
+</div>
+<!-- Audio Player Snippet -->
+<div class="mt-3 bg-secondary-fixed/30 rounded-xl p-3 border border-secondary/20 flex items-center justify-between gap-3">
+<div class="flex items-center gap-2.5">
+<button class="w-11 h-11 rounded-full bg-secondary text-on-secondary flex items-center justify-center shrink-0 hover:bg-secondary/90 transition-transform active:scale-95 shadow-sm" id="audio-play-btn" onclick="toggleAudioMock()">
+<span class="material-symbols-outlined material-symbols-fill text-[24px]" id="audio-icon">play_arrow</span>
+</button>
+<div>
+<p class="font-label-md text-label-md font-bold text-on-surface">Mom's voice note</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">0:12 duration · Audio Provenance Verified</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-secondary text-[24px]">graphic_eq</span>
+</div>
+<!-- When You Call, Ask About: -->
+<div class="mt-3.5">
+<h4 class="font-label-md text-label-md font-bold text-on-surface mb-2 flex items-center gap-1.5">
+<span class="material-symbols-outlined text-primary text-[18px]">lightbulb</span>
+            When you call, ask about:
+          </h4>
+<ul class="space-y-1.5 font-body-md text-[14px] text-on-surface">
+<li class="flex items-start gap-2 bg-surface-container-lowest p-2 rounded-lg border border-surface-dim">
+<span class="material-symbols-outlined text-primary text-[18px] shrink-0 mt-0.5">check_circle</span>
+<span>Her yellow heirloom rose cutting</span>
+</li>
+<li class="flex items-start gap-2 bg-surface-container-lowest p-2 rounded-lg border border-surface-dim">
+<span class="material-symbols-outlined text-primary text-[18px] shrink-0 mt-0.5">check_circle</span>
+<span>The Glenn Miller record she played</span>
+</li>
+<li class="flex items-start gap-2 bg-surface-container-lowest p-2 rounded-lg border border-surface-dim">
+<span class="material-symbols-outlined text-primary text-[18px] shrink-0 mt-0.5">check_circle</span>
+<span>If she needs more flour for Sunday baking</span>
+</li>
+</ul>
+</div>
+</section>
+<!-- Mom Asked You Card -->
+<section class="bg-surface-container-lowest rounded-2xl border-2 border-secondary/30 p-4 shadow-sm relative">
+<div class="flex items-center gap-2 mb-2">
+<span class="w-7 h-7 rounded-full bg-secondary-fixed text-secondary flex items-center justify-center font-bold text-xs">M</span>
+<h3 class="font-headline-sm text-[18px] font-bold text-on-surface">Mom asked you</h3>
+</div>
+<div class="bg-surface-container p-3 rounded-xl border-l-4 border-secondary">
+<p class="font-headline-sm text-headline-sm font-semibold text-on-surface italic">
+            "Will you come home next month?"
+          </p>
+</div>
+<div class="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2">
+<!-- Voice Reply Button -->
+<button class="min-h-[50px] py-2.5 px-3 bg-secondary hover:bg-secondary/90 text-on-secondary rounded-xl font-label-md text-label-md font-bold flex items-center justify-center gap-1.5 transition-transform active:scale-[0.98]">
+<span class="material-symbols-outlined text-[20px]">mic</span>
+<span>Record Voice Reply</span>
+</button>
+<!-- Quick Text Reply -->
+<button class="min-h-[50px] py-2.5 px-3 bg-surface-container border-2 border-surface-dim hover:bg-surface-container-high text-on-surface rounded-xl font-label-md text-label-md font-bold flex items-center justify-center gap-1.5 transition-transform active:scale-[0.98]">
+<span class="material-symbols-outlined text-[20px]">chat</span>
+<span>Quick Text Reply</span>
+</button>
+</div>
+<p class="text-[12px] text-on-surface-variant text-center mt-2 font-body-md">
+          Voice replies play in your authentic voice on Margaret's Echo tablet.
+        </p>
+</section>
+<!-- Quick Family Actions: Stacked Buttons -->
+<section class="space-y-2 pt-1">
+<div class="grid grid-cols-2 gap-2">
+<button class="min-h-[52px] py-3 px-3 bg-surface-container-lowest border-2 border-surface-dim hover:bg-surface-container-low text-on-surface rounded-xl font-label-md text-label-md font-bold flex items-center justify-center gap-1.5 shadow-sm active:scale-[0.98]">
+<span class="material-symbols-outlined text-primary text-[20px]">schedule_send</span>
+<span>I'll call tonight</span>
+</button>
+<a class="min-h-[52px] py-3 px-3 bg-tertiary hover:bg-tertiary-container text-on-tertiary rounded-xl font-label-md text-label-md font-bold flex items-center justify-center gap-1.5 shadow-sm active:scale-[0.98] text-center" href="tel:2065550144">
+<span class="material-symbols-outlined material-symbols-fill text-[20px]">call</span>
+<span>Call Mom</span>
+</a>
+</div>
+</section>
+<!-- WhatsApp & Audio Logs Collapsible -->
+<section class="bg-surface-container-lowest rounded-2xl border border-surface-dim p-4 shadow-sm">
+<button class="w-full flex items-center justify-between text-left focus:outline-none" onclick="toggleLogs()">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary text-[22px]">forum</span>
+<h3 class="font-label-md text-label-md font-bold text-on-surface">WhatsApp &amp; Audio Logs (4)</h3>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant transition-transform" id="logs-chevron">expand_more</span>
+</button>
+<div class="mt-3 pt-3 border-t border-surface-container space-y-2.5" id="logs-content">
+<!-- Log 1 -->
+<div class="flex items-center justify-between text-xs bg-surface-container-low p-2 rounded-lg">
+<div>
+<p class="font-bold text-on-surface">"Love you Mom, talk soon" (Voice note)</p>
+<p class="text-on-surface-variant">Today 2:15 PM · Sent via Family Hub</p>
+</div>
+<span class="px-2 py-0.5 rounded font-bold bg-tertiary-fixed text-on-tertiary-fixed-variant text-[11px]">Played on tablet</span>
+</div>
+<!-- Log 2 -->
+<div class="flex items-center justify-between text-xs bg-surface-container-low p-2 rounded-lg">
+<div>
+<p class="font-bold text-on-surface">"Sent photo of grandchildren"</p>
+<p class="text-on-surface-variant">Yesterday 6:30 PM · WhatsApp Bridge</p>
+</div>
+<span class="px-2 py-0.5 rounded font-bold bg-secondary-fixed text-on-secondary-fixed text-[11px]">Delivered</span>
+</div>
+<!-- Log 3 -->
+<div class="flex items-center justify-between text-xs bg-surface-container-low p-2 rounded-lg">
+<div>
+<p class="font-bold text-on-surface">Outgoing Call (14 mins)</p>
+<p class="text-on-surface-variant">Sunday 10:15 AM · Phone</p>
+</div>
+<span class="px-2 py-0.5 rounded font-bold bg-surface-container-highest text-on-surface text-[11px]">Completed</span>
+</div>
+</div>
+</section>
+<!-- Subtle Hackathon Project Footer Note -->
+<footer class="pt-2 text-center text-xs text-on-surface-variant space-y-1">
+<p class="font-medium">© 2025 Haven · Private household demo</p>
+<div class="flex items-center justify-center gap-3 text-[11px]">
+<a class="underline hover:text-primary" href="#">AI Transparency</a>
+<span>·</span>
+<a class="underline hover:text-primary" href="#">Guardian Privacy</a>
+<span>·</span>
+<a class="underline hover:text-primary" href="#">Audio Provenance</a>
+</div>
+</footer>
+</div>
+<!-- Native App Bottom Sticky Navigation Bar -->
+<nav class="absolute bottom-0 left-0 right-0 bg-surface-container-lowest/95 backdrop-blur-md border-t border-surface-dim px-6 py-2.5 flex items-center justify-between z-30">
+<button class="flex flex-col items-center gap-1 text-primary focus:outline-none">
+<span class="material-symbols-outlined material-symbols-fill text-[24px]">home</span>
+<span class="font-label-sm text-[11px] font-bold">Mom's Hub</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-on-surface-variant hover:text-on-surface focus:outline-none">
+<span class="material-symbols-outlined text-[24px]">mic</span>
+<span class="font-label-sm text-[11px] font-medium">Voice Notes</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-on-surface-variant hover:text-on-surface focus:outline-none">
+<span class="material-symbols-outlined text-[24px]">timeline</span>
+<span class="font-label-sm text-[11px] font-medium">Activity</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-on-surface-variant hover:text-on-surface focus:outline-none">
+<span class="material-symbols-outlined text-[24px]">settings</span>
+<span class="font-label-sm text-[11px] font-medium">Settings</span>
+</button>
+</nav>
+</main>
+<!-- Interactive Logic for Tab Switching & Audio Mock -->
+<script>
+    function setAlertVariant(variant) {
+      const urgentCard = document.getElementById('card-urgent');
+      const ackCard = document.getElementById('card-acknowledged');
+      const btnUrgent = document.getElementById('btn-urgent');
+      const btnAck = document.getElementById('btn-acknowledged');
+
+      if (variant === 'urgent') {
+        urgentCard.classList.remove('hidden');
+        ackCard.classList.add('hidden');
+
+        btnUrgent.className = 'flex-1 py-2 px-2.5 rounded-lg font-label-sm text-label-sm text-center font-bold transition-all bg-surface-container-lowest text-error shadow-sm flex items-center justify-center gap-1.5';
+        btnAck.className = 'flex-1 py-2 px-2.5 rounded-lg font-label-sm text-label-sm text-center font-bold text-on-surface-variant hover:text-on-surface transition-all flex items-center justify-center gap-1.5';
+      } else {
+        urgentCard.classList.add('hidden');
+        ackCard.classList.remove('hidden');
+
+        btnAck.className = 'flex-1 py-2 px-2.5 rounded-lg font-label-sm text-label-sm text-center font-bold transition-all bg-surface-container-lowest text-secondary shadow-sm flex items-center justify-center gap-1.5';
+        btnUrgent.className = 'flex-1 py-2 px-2.5 rounded-lg font-label-sm text-label-sm text-center font-bold text-on-surface-variant hover:text-on-surface transition-all flex items-center justify-center gap-1.5';
+      }
+    }
+
+    let isAudioPlaying = false;
+    function toggleAudioMock() {
+      isAudioPlaying = !isAudioPlaying;
+      const icon = document.getElementById('audio-icon');
+      if (isAudioPlaying) {
+        icon.innerText = 'pause';
+      } else {
+        icon.innerText = 'play_arrow';
+      }
+    }
+
+    let logsOpen = true;
+    function toggleLogs() {
+      const content = document.getElementById('logs-content');
+      const chevron = document.getElementById('logs-chevron');
+      logsOpen = !logsOpen;
+      if (logsOpen) {
+        content.classList.remove('hidden');
+        chevron.innerText = 'expand_more';
+      } else {
+        content.classList.add('hidden');
+        chevron.innerText = 'chevron_right';
+      }
+    }
+  </script>
+</body></html>

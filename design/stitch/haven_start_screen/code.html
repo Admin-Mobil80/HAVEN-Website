@@ -1,0 +1,403 @@
+<!DOCTYPE html><html class="h-full" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Haven — Warm Ambient Companion for Older Adults</title>
+<!-- Google Fonts: Plus Jakarta Sans -->
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<!-- Material Symbols Outlined -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<!-- Tailwind CSS CDN -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Theme Configuration -->
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "on-primary": "#ffffff",
+            "primary": "#9a4100",
+            "surface-container-highest": "#e7e1dc",
+            "secondary-fixed": "#d5e3ff",
+            "on-tertiary-fixed": "#002114",
+            "primary-fixed": "#ffdbcb",
+            "primary-container": "#bd5611",
+            "secondary": "#325f9b",
+            "tertiary": "#2a674c",
+            "tertiary-fixed": "#b1f0ce",
+            "tertiary-fixed-dim": "#95d4b3",
+            "on-primary-container": "#fffbff",
+            "inverse-on-surface": "#f6f0ea",
+            "surface": "#fef8f3",
+            "on-primary-fixed": "#341100",
+            "surface-tint": "#9e4300",
+            "surface-container": "#f3ede8",
+            "surface-variant": "#e7e1dc",
+            "on-surface": "#1d1b18",
+            "surface-container-lowest": "#ffffff",
+            "on-tertiary": "#ffffff",
+            "secondary-fixed-dim": "#a7c8ff",
+            "surface-dim": "#dfd9d4",
+            "on-error-container": "#93000a",
+            "primary-fixed-dim": "#ffb690",
+            "error-container": "#ffdad6",
+            "on-tertiary-fixed-variant": "#0e5138",
+            "surface-container-high": "#ede7e2",
+            "outline-variant": "#ddc1b3",
+            "on-secondary-fixed": "#001c3b",
+            "error": "#ba1a1a",
+            "outline": "#8a7267",
+            "on-primary-fixed-variant": "#783100",
+            "inverse-primary": "#ffb690",
+            "secondary-container": "#93bdff",
+            "tertiary-container": "#448064",
+            "inverse-surface": "#32302d",
+            "on-background": "#1d1b18",
+            "surface-container-low": "#f9f3ed",
+            "on-tertiary-container": "#f5fff7",
+            "on-error": "#ffffff",
+            "on-secondary-fixed-variant": "#124782",
+            "surface-bright": "#fef8f3",
+            "on-secondary": "#ffffff",
+            "background": "#fef8f3",
+            "on-surface-variant": "#574238",
+            "on-secondary-container": "#194b86"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "margin-tablet": "2rem",
+            "space-sm": "0.75rem",
+            "space-lg": "2rem",
+            "space-md": "1.25rem",
+            "gutter": "1.5rem",
+            "space-xs": "0.5rem",
+            "margin-desktop": "3.5rem",
+            "gutter-desktop": "2.5rem",
+            "space-xl": "3rem",
+            "margin": "1.25rem",
+            "gutter-tablet": "2rem"
+          },
+          "fontFamily": {
+            "body-lg": ["Plus Jakarta Sans"],
+            "label-md": ["Plus Jakarta Sans"],
+            "label-sm": ["Plus Jakarta Sans"],
+            "headline-sm": ["Plus Jakarta Sans"],
+            "display-lg-mobile": ["Plus Jakarta Sans"],
+            "body-md": ["Plus Jakarta Sans"],
+            "headline-md": ["Plus Jakarta Sans"],
+            "headline-lg": ["Plus Jakarta Sans"],
+            "headline-lg-mobile": ["Plus Jakarta Sans"],
+            "label-lg": ["Plus Jakarta Sans"],
+            "body-xl": ["Plus Jakarta Sans"],
+            "display-lg": ["Plus Jakarta Sans"]
+          },
+          "fontSize": {
+            "body-lg": ["19px", { "lineHeight": "32px", "letterSpacing": "0.01em", "fontWeight": "400" }],
+            "label-md": ["16px", { "lineHeight": "24px", "letterSpacing": "0.03em", "fontWeight": "600" }],
+            "label-sm": ["14px", { "lineHeight": "20px", "letterSpacing": "0.04em", "fontWeight": "700" }],
+            "headline-sm": ["20px", { "lineHeight": "30px", "letterSpacing": "0.01em", "fontWeight": "600" }],
+            "display-lg-mobile": ["32px", { "lineHeight": "42px", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+            "body-md": ["17px", { "lineHeight": "28px", "letterSpacing": "0.01em", "fontWeight": "400" }],
+            "headline-md": ["24px", { "lineHeight": "34px", "letterSpacing": "0em", "fontWeight": "600" }],
+            "headline-lg": ["32px", { "lineHeight": "44px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+            "headline-lg-mobile": ["26px", { "lineHeight": "36px", "letterSpacing": "0em", "fontWeight": "600" }],
+            "label-lg": ["18px", { "lineHeight": "26px", "letterSpacing": "0.02em", "fontWeight": "600" }],
+            "body-xl": ["22px", { "lineHeight": "36px", "letterSpacing": "0.01em", "fontWeight": "400" }],
+            "display-lg": ["40px", { "lineHeight": "52px", "letterSpacing": "-0.02em", "fontWeight": "700" }]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    /* Material Symbols base config */
+    .material-symbols-outlined {
+      font-family: 'Material Symbols Outlined';
+      font-weight: normal;
+      font-style: normal;
+      font-size: 24px;
+      line-height: 1;
+      letter-spacing: normal;
+      text-transform: none;
+      display: inline-block;
+      white-space: nowrap;
+      word-wrap: normal;
+      direction: ltr;
+      -webkit-font-feature-settings: 'liga';
+      -webkit-font-smoothing: antialiased;
+    }
+    
+    /* Tactile subtle borders and shadow tokens as specified */
+    .tactile-card {
+      border: 1.5px solid #EAE5DD;
+      box-shadow: 0 2px 4px rgba(35, 33, 30, 0.04), 0 1px 2px rgba(35, 33, 30, 0.06);
+    }
+    .tactile-card:hover {
+      box-shadow: 0 8px 24px rgba(78, 59, 42, 0.08), 0 2px 6px rgba(78, 59, 42, 0.04);
+    }
+    
+    /* Custom accessibility focus outlines */
+    *:focus-visible {
+      outline: 3px solid #325f9b !important;
+      outline-offset: 2px !important;
+    }
+  </style>
+</head>
+<body class="bg-background text-on-surface antialiased min-h-full flex flex-col font-body-md text-body-md selection:bg-primary-fixed selection:text-on-primary-fixed">
+<!-- TOP APP BAR (Shared Component Anchor) -->
+<header class="bg-surface-container-lowest dark:bg-inverse-surface border-b border-outline-variant dark:border-outline shadow-sm dark:shadow-none sticky top-0 z-40 transition-colors">
+<div class="w-full max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+<!-- Logo + Meaningful Tagline -->
+<div class="flex items-center gap-5">
+<a class="flex items-center gap-2.5 group" href="#">
+<!-- Warm hearth / house with heart motif -->
+<div class="w-11 h-11 rounded-xl bg-primary-fixed flex items-center justify-center text-primary shadow-xs group-hover:scale-105 transition-transform">
+<span class="material-symbols-outlined text-[26px]" style="font-variation-settings: 'FILL' 1;">cottage</span>
+</div>
+<span class="text-headline-md font-headline-md font-bold text-primary dark:text-inverse-primary tracking-tight">Haven</span>
+</a>
+<div class="hidden xl:block h-7 w-[1.5px] bg-outline-variant"></div>
+<p class="hidden xl:block text-label-sm font-label-sm text-on-surface-variant max-w-md leading-snug">
+          Most AI companions want more of your loved one's time. <span class="text-on-surface font-semibold">Haven wants more of your calls.</span>
+</p>
+</div>
+<!-- Navigation & Trailing Actions -->
+<div class="flex items-center gap-6">
+<!-- Top Nav Links (Interactive Demo is active) -->
+<nav aria-label="Main Navigation" class="hidden md:flex items-center gap-6 pt-2">
+<a aria-current="page" class="border-b-2 border-primary dark:border-inverse-primary text-primary dark:text-inverse-primary font-bold pb-2 transition-all font-label-md text-label-md flex items-center gap-1.5" href="#">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">play_circle</span>
+            Interactive Demo
+          </a>
+<a class="text-on-surface-variant dark:text-inverse-on-surface hover:text-on-surface pb-2 transition-all font-label-md text-label-md" href="#">
+            Setup &amp; Customization
+          </a>
+<a class="text-on-surface-variant dark:text-inverse-on-surface hover:text-on-surface pb-2 transition-all font-label-md text-label-md" href="#">
+            Family View
+          </a>
+<a class="text-on-surface-variant dark:text-inverse-on-surface hover:text-on-surface pb-2 transition-all font-label-md text-label-md" href="#">
+            Household Logs
+          </a>
+</nav>
+<!-- Utility Trailing Controls -->
+<div class="flex items-center gap-3">
+<button aria-label="Audio controls" class="p-2.5 rounded-xl text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors" title="Audio volume settings" type="button">
+<span class="material-symbols-outlined">volume_up</span>
+</button>
+<button aria-label="Accessibility options" class="p-2.5 rounded-xl text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors" title="Accessibility preferences" type="button">
+<span class="material-symbols-outlined">accessibility_new</span>
+</button>
+<!-- Ghost / Secondary trailing action -->
+<button class="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-label-sm font-label-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors border border-outline-variant active:scale-[0.98]" type="button">
+<span class="material-symbols-outlined text-[18px]">restart_alt</span>
+            Reset Demo
+          </button>
+</div>
+</div>
+</div>
+</header>
+<!-- Reassurance Notice Banner -->
+<aside aria-label="Reassurance banner" class="bg-surface-container-low border-b border-outline-variant py-2.5 px-6">
+<div class="max-w-7xl mx-auto flex items-center justify-between text-label-sm font-label-sm text-on-surface-variant">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[18px]" style="font-variation-settings: 'FILL' 1;">verified_user</span>
+<span>A private demo household for this browser tab. Haven's companion is an AI and always says so.</span>
+</div>
+<div class="hidden sm:flex items-center gap-3 text-label-sm">
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-tertiary-fixed text-on-tertiary-fixed font-semibold text-[12px]">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary animate-pulse"></span>
+          Alexa+ MCP Live
+        </span>
+<span class="text-outline">|</span>
+<span class="text-on-surface-variant font-medium">Session ID: #DEMO-SEA-884</span>
+</div>
+</div>
+</aside>
+<!-- MAIN CANVAS -->
+<main class="flex-grow w-full max-w-7xl mx-auto px-6 py-10 md:py-14 flex flex-col justify-center">
+<!-- Hero / Welcome Station -->
+<section aria-labelledby="welcome-heading" class="max-w-4xl mx-auto text-center mb-12 md:mb-14">
+<div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-surface-container-high text-primary mb-4 border border-outline-variant shadow-xs">
+<span class="material-symbols-outlined text-[18px]" style="font-variation-settings: 'FILL' 1;">favorite</span>
+<span class="text-label-sm font-label-sm tracking-wide">Ambient Family Continuity</span>
+</div>
+<h1 class="text-display-lg font-display-lg text-on-surface tracking-tight mb-5" id="welcome-heading">
+        Welcome to Haven
+      </h1>
+<p class="text-body-xl font-body-xl text-on-surface-variant max-w-3xl mx-auto leading-relaxed">
+        Haven keeps a lonely older person company when their family can't be there. The older person talks to <strong class="text-on-surface font-semibold">"Digital Daniel"</strong>, a clearly labelled AI companion modeled with consent. Each evening family receives a prompt with conversation starters and urgent safety alerts, making families call more often, not less.
+      </p>
+</section>
+<!-- Side-by-Side Dual Choice Bento Cards -->
+<section aria-label="Experience Pathways" class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto w-full mb-16">
+<!-- CARD 1: Start Demo (Primary Pathway) -->
+<article class="bg-surface-container-lowest rounded-2xl tactile-card p-7 md:p-8 flex flex-col justify-between transition-all duration-300 relative group overflow-hidden">
+<!-- Top terracotta subtle companion accent line -->
+<div class="absolute top-0 left-0 right-0 h-1.5 bg-primary"></div>
+<div>
+<!-- Landscape Portrait of Digital Daniel with explicit AI provenance tag -->
+<div class="relative w-full h-56 rounded-xl overflow-hidden mb-6 bg-surface-container border border-outline-variant">
+<img class="w-full h-full object-cover group-hover:scale-102 transition-transform duration-500" data-alt="A warm, approachable portrait of a 35-year-old friendly man with gentle crinkles around his smiling eyes, sitting in a sun-drenched comfortable Pacific Northwest living room with wooden bookshelves and soft indoor plants. The photography is natural, tender, and bathed in golden morning light, highlighting high-legibility warmth and sincere domestic comfort." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAhGfpfD6hOKEUj4tsdKuvkKh5fjIM5uHuYXyqIMAr5cIO8L0j_jv7_FRQ9TF5tRZ4cBQv7n1n3OUv1yc7snsRn67rC4XJdLHo6bDY2dVJfjxPl7SBF8SwObpQ-8WSMyaCwa6jV7n5JwqYlSkXZ-38BhDXU3RoX3oFlSmBcekMY--9opWOzNLZGK4AFesuC1pXWFCLEzjdwRBKolNC8PlPBfxgpoJk478oswcgeTs8s_dxrSHojEsYN">
+<!-- Provenance Badge: Non-negotiable 'Digital Daniel · AI' -->
+<div class="absolute bottom-3 left-3 bg-surface-container-lowest/95 backdrop-blur-none px-3.5 py-1.5 rounded-lg border border-outline-variant shadow-md flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-primary animate-ping"></span>
+<span class="text-label-sm font-label-sm font-bold text-primary tracking-wide">Digital Daniel · AI</span>
+</div>
+<!-- Context Badge -->
+<div class="absolute top-3 right-3 bg-inverse-surface/85 text-inverse-on-surface px-2.5 py-1 rounded-md text-[13px] font-semibold flex items-center gap-1">
+<span class="material-symbols-outlined text-[15px]">location_on</span>
+              Seattle Hub
+            </div>
+</div>
+<!-- Card Content -->
+<div class="flex items-center gap-2 mb-2">
+<span class="text-label-sm font-label-sm text-primary uppercase tracking-wider font-bold">Preset Experience</span>
+</div>
+<h2 class="text-headline-md font-headline-md font-bold text-on-surface mb-3 tracking-tight">
+            Start demo
+          </h2>
+<p class="text-body-md font-body-md text-on-surface-variant leading-relaxed mb-6">
+            Meet Digital Daniel, keeping his mother Margaret company in Seattle. A fictional family with a stock AI face and voice. Ready in one click.
+          </p>
+<!-- Micro Spec Tags -->
+<div class="flex flex-wrap gap-2 mb-8">
+<span class="inline-flex items-center gap-1 px-3 py-1 rounded-lg bg-surface-container text-on-surface-variant text-label-sm">
+<span class="material-symbols-outlined text-[16px] text-primary">record_voice_over</span>
+              Synthetic Voice
+            </span>
+<span class="inline-flex items-center gap-1 px-3 py-1 rounded-lg bg-surface-container text-on-surface-variant text-label-sm">
+<span class="material-symbols-outlined text-[16px] text-tertiary">check_circle</span>
+              Preloaded Memories
+            </span>
+</div>
+</div>
+<!-- Primary Action Trigger -->
+<a class="w-full min-h-[56px] px-6 py-4 rounded-2xl bg-primary text-on-primary text-label-lg font-label-lg font-bold flex items-center justify-center gap-2 shadow-sm hover:bg-primary-container active:scale-[0.98] transition-all text-center focus-visible:outline focus-visible:outline-3 focus-visible:outline-secondary" href="#interactive-demo">
+<span>Launch interactive demo</span>
+<span class="material-symbols-outlined text-[22px]">arrow_forward</span>
+</a>
+</article>
+<!-- CARD 2: Create Your Own (Customization Pathway) -->
+<article class="bg-surface-container-lowest rounded-2xl tactile-card p-7 md:p-8 flex flex-col justify-between transition-all duration-300 relative group overflow-hidden">
+<!-- Top oceanic subtle family accent line -->
+<div class="absolute top-0 left-0 right-0 h-1.5 bg-secondary"></div>
+<div>
+<!-- Illustrated / Tactile Container representing customization -->
+<div class="w-full h-56 rounded-xl bg-surface-container-low border border-outline-variant mb-6 flex flex-col items-center justify-center p-6 text-center relative">
+<div class="w-20 h-20 rounded-2xl bg-secondary-fixed text-on-secondary-fixed flex items-center justify-center shadow-xs mb-3 group-hover:scale-105 transition-transform">
+<span class="material-symbols-outlined text-[42px]" style="font-variation-settings: 'FILL' 1;">add_circle</span>
+</div>
+<span class="text-label-md font-label-md font-bold text-secondary">Personal Household Setup</span>
+<p class="text-label-sm font-label-sm text-on-surface-variant mt-1">Configure consent, tone &amp; voice cloning</p>
+<div class="absolute top-3 left-3 bg-surface-container-lowest px-2.5 py-1 rounded-md border border-outline-variant text-label-sm font-semibold text-on-surface-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px] text-secondary">schedule</span>
+              ~2 min
+            </div>
+</div>
+<!-- Card Content -->
+<div class="flex items-center gap-2 mb-2">
+<span class="text-label-sm font-label-sm text-secondary uppercase tracking-wider font-bold">Custom Household</span>
+</div>
+<h2 class="text-headline-md font-headline-md font-bold text-on-surface mb-3 tracking-tight">
+            Create your own
+          </h2>
+<p class="text-body-md font-body-md text-on-surface-variant leading-relaxed mb-6">
+            Enter your name and who Haven is for, then add your own photo and voice. About two minutes to tailor for your real parent or relative.
+          </p>
+<!-- Micro Spec Tags -->
+<div class="flex flex-wrap gap-2 mb-8">
+<span class="inline-flex items-center gap-1 px-3 py-1 rounded-lg bg-surface-container text-on-surface-variant text-label-sm">
+<span class="material-symbols-outlined text-[16px] text-secondary">mic</span>
+              Voice Consent Required
+            </span>
+<span class="inline-flex items-center gap-1 px-3 py-1 rounded-lg bg-surface-container text-on-surface-variant text-label-sm">
+<span class="material-symbols-outlined text-[16px] text-secondary">notifications_active</span>
+              SMS Call Reminders
+            </span>
+</div>
+</div>
+<!-- Secondary Action Trigger -->
+<a class="w-full min-h-[56px] px-6 py-4 rounded-2xl bg-surface-container-lowest border-2 border-outline-variant text-on-surface text-label-lg font-label-lg font-bold flex items-center justify-center gap-2 hover:bg-surface-container-high hover:border-outline active:scale-[0.98] transition-all text-center focus-visible:outline focus-visible:outline-3 focus-visible:outline-secondary" href="#custom-setup">
+<span>Start custom setup</span>
+<span class="material-symbols-outlined text-[22px]">arrow_forward</span>
+</a>
+</article>
+</section>
+<!-- Bottom Highlights / Trust Pillars -->
+<section aria-labelledby="trust-pillars-heading" class="max-w-5xl mx-auto w-full pt-6 border-t border-outline-variant">
+<h3 class="sr-only" id="trust-pillars-heading">Key Trust Foundations</h3>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<!-- Pillar 1 -->
+<div class="p-5 rounded-xl bg-surface-container-low border border-outline-variant flex items-start gap-4">
+<div class="w-12 h-12 rounded-xl bg-primary-fixed text-primary flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-[26px]" style="font-variation-settings: 'FILL' 1;">badge</span>
+</div>
+<div>
+<h4 class="text-label-md font-label-md font-bold text-on-surface mb-1">Always Labelled AI</h4>
+<p class="text-body-md font-body-md text-on-surface-variant leading-relaxed">
+              Clear badges wherever Digital Daniel appears. Never deceives or replaces the authentic human identity.
+            </p>
+</div>
+</div>
+<!-- Pillar 2 -->
+<div class="p-5 rounded-xl bg-surface-container-low border border-outline-variant flex items-start gap-4">
+<div class="w-12 h-12 rounded-xl bg-secondary-fixed text-on-secondary-fixed flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-[26px]" style="font-variation-settings: 'FILL' 1;">phone_in_talk</span>
+</div>
+<div>
+<h4 class="text-label-md font-label-md font-bold text-on-surface mb-1">Prompts Real Calls</h4>
+<p class="text-body-md font-body-md text-on-surface-variant leading-relaxed">
+              Delivers daily conversation starters and care updates directly to family members, sparking genuine contact.
+            </p>
+</div>
+</div>
+<!-- Pillar 3 -->
+<div class="p-5 rounded-xl bg-surface-container-low border border-outline-variant flex items-start gap-4">
+<div class="w-12 h-12 rounded-xl bg-tertiary-fixed text-on-tertiary-fixed flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-[26px]" style="font-variation-settings: 'FILL' 1;">hub</span>
+</div>
+<div>
+<h4 class="text-label-md font-label-md font-bold text-on-surface mb-1">Built for Alexa+ Hackathon</h4>
+<p class="text-body-md font-body-md text-on-surface-variant leading-relaxed">
+              Real MCP architecture, large-format tablet interface for elders, and companion mobile view for family.
+            </p>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- FOOTER (Shared Component Anchor) -->
+<footer class="bg-surface-container-low dark:bg-inverse-surface border-t border-outline-variant dark:border-outline mt-auto transition-colors">
+<div class="w-full max-w-7xl mx-auto px-6 py-8 flex flex-col md:flex-row items-center justify-between gap-4">
+<div class="flex flex-col sm:flex-row items-center gap-3 text-center sm:text-left">
+<span class="text-headline-sm font-headline-sm font-bold text-primary dark:text-inverse-primary tracking-tight">Haven</span>
+<span class="hidden sm:inline text-outline">·</span>
+<span class="text-label-sm font-label-sm text-on-surface-variant dark:text-inverse-on-surface">
+          © 2025 Haven. Alexa+ Hackathon Submission. Private household demo.
+        </span>
+</div>
+<nav aria-label="Legal and transparency links" class="flex flex-wrap items-center justify-center gap-6">
+<a class="text-label-sm font-label-sm text-on-surface-variant dark:text-inverse-on-surface hover:text-on-surface hover:text-primary dark:hover:text-inverse-primary transition-colors" href="#">
+          AI Transparency Statement
+        </a>
+<a class="text-label-sm font-label-sm text-on-surface-variant dark:text-inverse-on-surface hover:text-on-surface hover:text-primary dark:hover:text-inverse-primary transition-colors" href="#">
+          Guardian Privacy
+        </a>
+<a class="text-label-sm font-label-sm text-on-surface-variant dark:text-inverse-on-surface hover:text-on-surface hover:text-primary dark:hover:text-inverse-primary transition-colors" href="#">
+          Audio Provenance Protocol
+        </a>
+<a class="text-label-sm font-label-sm text-on-surface-variant dark:text-inverse-on-surface hover:text-on-surface hover:text-primary dark:hover:text-inverse-primary transition-colors" href="#">
+          Support
+        </a>
+</nav>
+</div>
+</footer>
+</body></html>

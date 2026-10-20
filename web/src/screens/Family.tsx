@@ -3,6 +3,7 @@ import { api, poll } from "../lib/api";
 import { emit, log, on } from "../lib/bus";
 import type { FamilyState } from "../lib/types";
 import { useNames } from "../lib/names";
+import { Icon } from "../components/Icon";
 
 // The family member's phone. What they need before they call, and one tap to act. In judge mode it also
 // mirrors what WhatsApp delivered, since judges cannot receive messages from the test number.
@@ -48,41 +49,24 @@ export function Family({ framed }: { framed?: boolean }) {
   return (
     <section className={`panel family${framed ? " family--framed" : ""}`} aria-label={`${n.user}'s phone`}>
       <header className="panel__head">
-        <h2>{n.user}'s phone</h2>
-        <span className="muted">Haven for family</span>
+        <h2><Icon name="cottage" fill />Haven</h2>
+        <span className="pill pill--real">{n.user} · family</span>
       </header>
-
       <div className="family__body">
-        <div className="metric" aria-label="Real calls this week">
-          <div className="metric__num">
-            {stats.realCallsThisWeek}
-            <span>/ {stats.goal}</span>
-          </div>
-          <div className="metric__label">
-            real calls with {amma} this week
-            <br />
-            <span className="muted">
-              before Haven: {stats.baseline}/week · {stats.promptedByHaven} prompted by Haven{stats.demoSeeded ? ` · ${stats.demoSeeded} demo data` : ""}
-            </span>
-          </div>
-        </div>
-
         {incident && (
           <div className={`card card--alert${incident.state === "acknowledged" ? " is-acked" : ""}`} role="alert">
-            <p className="card__kicker">{incident.state === "acknowledged" ? "Alert · you're on it" : "Urgent · call now"}</p>
+            <p className="card__kicker"><Icon name="shield_with_heart" fill />{incident.state === "acknowledged" ? "Alert · you're on it" : "Urgent · call now"}</p>
             <p className="card__title">{amma} may need you right now ({incident.reason.replace(/_/g, " ")}).</p>
-            <p className="muted">
-              Detected {new Date(incident.openedAt).toLocaleTimeString()} by Haven's safety rules. Haven is an AI and can be wrong.
-            </p>
+            <p className="muted">Detected {new Date(incident.openedAt).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })} by Haven's safety rules. Haven is an AI and can be wrong.</p>
             <div className="row row--wrap">
               {incident.state === "open" && (
                 <button className="btn btn--yes" disabled={!!busy} onClick={() => act("Calling now", async () => { await api(`/api/incidents/${incident.id}/ack`, { body: {} }); await api("/api/calls", { body: {} }); }, `Marked as seen. Call ${amma} on +${s.elder.phone}.`)}>
-                  Calling now
+                  <Icon name="call" fill />Calling now
                 </button>
               )}
-              <a className="btn" href={`tel:+${s.elder.phone}`}>Call {amma}</a>
+              <a className="btn" href={`tel:+${s.elder.phone}`}><Icon name="call" />Call {amma}</a>
               <button className="btn btn--ghost" disabled={!!busy} onClick={() => act("Close alert", () => api(`/api/incidents/${incident.id}/close`, { body: {} }), `Closed. Haven tells ${amma} you've got it.`)}>
-                She's safe, close
+                <Icon name="check" />{n.elderP.Subj === "They" ? "They're" : `${n.elderP.Subj}'s`} safe, close
               </button>
             </div>
             <ol className="timeline">
@@ -95,48 +79,62 @@ export function Family({ framed }: { framed?: boolean }) {
           </div>
         )}
 
+        <div className="metric" aria-label="Real calls this week">
+          <p className="kicker">Real calls this week</p>
+          <div className="metric__num">
+            {stats.realCallsThisWeek}
+            <span> / {stats.goal}</span>
+          </div>
+          <p className="metric__label">
+            real calls with {amma} this week
+            <span className="muted">
+              before Haven: {stats.baseline}/week · {stats.promptedByHaven} prompted by Haven{stats.demoSeeded ? ` · ${stats.demoSeeded} demo data` : ""}
+            </span>
+          </p>
+        </div>
+
         <div className="card">
-          <p className="card__kicker">Today's update{digest ? ` · ${new Date(digest.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}` : ""}</p>
+          <p className="card__kicker"><Icon name="wb_twilight" />Today's update{digest ? ` · ${new Date(digest.createdAt).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}` : ""}</p>
           {digest ? (
             <>
-              <p className="card__title">{digest.summary}</p>
+              <p className="quote">{digest.summary}</p>
               {digest.audioUrl && <audio className="player" controls preload="none" src={digest.audioUrl} />}
               {digest.starters.length > 0 && (
                 <>
-                  <p className="muted">When you call, ask about:</p>
+                  <p className="kicker"><Icon name="lightbulb" />When you call, ask about</p>
                   <ul className="starters">{digest.starters.map((x) => <li key={x}>{x}</li>)}</ul>
                 </>
               )}
             </>
           ) : (
-            <p className="muted">Haven sends the update every evening at 9 pm.</p>
+            <p className="muted">Haven sends this update every evening at 9 pm.</p>
           )}
-          <button className="btn btn--ghost" disabled={!!busy} onClick={() => act("Send digest now", () => api("/api/digest/run", { body: {} }), "Today's update is ready.")}>
+          <button className="btn btn--dashed btn--sm" disabled={!!busy} onClick={() => act("Send digest now", () => api("/api/digest/run", { body: {} }), "Today's update is ready.")}>
             {busy === "Send digest now" ? "Writing…" : "Send today's update now"}
           </button>
         </div>
 
         {open.length > 0 && (
-          <div className="card">
-            <p className="card__kicker">{amma} asked you</p>
+          <div className="card card--asked">
+            <p className="card__kicker"><Icon name="mark_chat_unread" />{amma} asked you</p>
             {open.map((d) => (
               <Question key={d.id} id={d.id} question={d.question} onDone={() => act("Reply sent", async () => undefined, `Haven will play your reply to ${amma} in your own voice.`)} />
             ))}
           </div>
         )}
 
-        <div className="row row--wrap">
+        <div className="family__ctas">
           <button className="btn" disabled={!!busy} onClick={() => act("I'll call tonight", () => api("/api/call-promise", { body: {} }), `Haven will tell ${amma} you'll call tonight.`)}>
             I'll call tonight
           </button>
           <button className="btn btn--yes" disabled={!!busy} onClick={() => act(`Call ${amma}`, () => api("/api/calls", { body: {} }), `Calling ${amma}… ${n.companion} steps aside.`)}>
-            📞 Call {amma}
+            <Icon name="call" fill />Call {amma}
           </button>
         </div>
         {note && <p className="note" role="status">{note}</p>}
 
         <details className="mirror">
-          <summary>WhatsApp messages ({s.outbox.length})</summary>
+          <summary><Icon name="chat" fill />WhatsApp messages ({s.outbox.length})<Icon name="expand_more" /></summary>
           <p className="muted">What Haven sent to the family. In the demo household these are simulated.</p>
           <ul>
             {mirror.map((o) => (
@@ -188,9 +186,9 @@ function Question({ id, question, onDone }: { id: string; question: string; onDo
       <p className="question__q">"{question}"</p>
       <div className="row row--wrap">
         {rec ? (
-          <button className="btn btn--rec is-on" onClick={() => (rec.stop(), setRec(null))}>■ Stop and send</button>
+          <button className="btn btn--rec is-on btn--block" onClick={() => (rec.stop(), setRec(null))}><Icon name="stop_circle" fill />Stop and send</button>
         ) : (
-          <button className="btn btn--rec" onClick={start}>🎙 Reply in your voice</button>
+          <button className="btn btn--real btn--block" onClick={start}><Icon name="mic" fill />Reply in your own voice</button>
         )}
         <form
           className="typebox"
@@ -203,7 +201,7 @@ function Question({ id, question, onDone }: { id: string; question: string; onDo
           }}
         >
           <input value={text} onChange={(e) => setText(e.target.value)} placeholder="or type a reply" aria-label="Type a reply" maxLength={500} />
-          <button className="btn" type="submit" disabled={!text.trim()}>Send</button>
+          <button className="btn" type="submit" disabled={!text.trim()} aria-label="Send reply"><Icon name="send" /></button>
         </form>
       </div>
       {err && <p className="error">{err}</p>}

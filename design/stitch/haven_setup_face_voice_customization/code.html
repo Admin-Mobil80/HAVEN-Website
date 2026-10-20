@@ -1,0 +1,724 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Haven — Setup: Face, Voice &amp; Customization</title>
+<!-- Material Symbols Outlined font -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<!-- Google Fonts: Plus Jakarta Sans -->
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300..800;1,300..800&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<!-- Tailwind CSS CDN with forms and container queries -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Theme Configuration Verbatim -->
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "background": "#fef8f3",
+            "on-background": "#1d1b18",
+            "error": "#ba1a1a",
+            "secondary": "#325f9b",
+            "primary-container": "#bd5611",
+            "on-error": "#ffffff",
+            "tertiary-container": "#448064",
+            "surface-container": "#f3ede8",
+            "on-primary": "#ffffff",
+            "on-surface": "#1d1b18",
+            "surface-bright": "#fef8f3",
+            "primary": "#9a4100",
+            "surface-tint": "#9e4300",
+            "on-tertiary-container": "#f5fff7",
+            "on-tertiary": "#ffffff",
+            "outline-variant": "#ddc1b3",
+            "outline": "#8a7267",
+            "on-surface-variant": "#574238",
+            "on-tertiary-fixed": "#002114",
+            "surface-container-low": "#f9f3ed",
+            "secondary-fixed": "#d5e3ff",
+            "on-primary-fixed": "#341100",
+            "on-primary-fixed-variant": "#783100",
+            "error-container": "#ffdad6",
+            "surface-variant": "#e7e1dc",
+            "on-secondary-fixed-variant": "#124782",
+            "tertiary": "#2a674c",
+            "surface": "#fef8f3",
+            "secondary-container": "#93bdff",
+            "surface-container-high": "#ede7e2",
+            "inverse-surface": "#32302d",
+            "tertiary-fixed": "#b1f0ce",
+            "secondary-fixed-dim": "#a7c8ff",
+            "inverse-primary": "#ffb690",
+            "on-error-container": "#93000a",
+            "surface-dim": "#dfd9d4",
+            "primary-fixed": "#ffdbcb",
+            "primary-fixed-dim": "#ffb690",
+            "on-tertiary-fixed-variant": "#0e5138",
+            "surface-container-highest": "#e7e1dc",
+            "inverse-on-surface": "#f6f0ea",
+            "on-secondary-container": "#194b86",
+            "on-secondary": "#ffffff",
+            "on-secondary-fixed": "#001c3b",
+            "tertiary-fixed-dim": "#95d4b3",
+            "on-primary-container": "#fffbff",
+            "surface-container-lowest": "#ffffff"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "margin": "1.25rem",
+            "gutter-desktop": "2.5rem",
+            "space-lg": "2rem",
+            "space-md": "1.25rem",
+            "space-sm": "0.75rem",
+            "gutter-tablet": "2rem",
+            "space-xl": "3rem",
+            "gutter": "1.5rem",
+            "margin-tablet": "2rem",
+            "margin-desktop": "3.5rem",
+            "space-xs": "0.5rem"
+          },
+          "fontFamily": {
+            "headline-md": ["Plus Jakarta Sans"],
+            "headline-sm": ["Plus Jakarta Sans"],
+            "display-lg-mobile": ["Plus Jakarta Sans"],
+            "body-lg": ["Plus Jakarta Sans"],
+            "body-xl": ["Plus Jakarta Sans"],
+            "display-lg": ["Plus Jakarta Sans"],
+            "label-lg": ["Plus Jakarta Sans"],
+            "body-md": ["Plus Jakarta Sans"],
+            "headline-lg": ["Plus Jakarta Sans"],
+            "headline-lg-mobile": ["Plus Jakarta Sans"],
+            "label-md": ["Plus Jakarta Sans"],
+            "label-sm": ["Plus Jakarta Sans"]
+          },
+          "fontSize": {
+            "headline-md": ["24px", { "lineHeight": "34px", "letterSpacing": "0em", "fontWeight": "600" }],
+            "headline-sm": ["20px", { "lineHeight": "30px", "letterSpacing": "0.01em", "fontWeight": "600" }],
+            "display-lg-mobile": ["32px", { "lineHeight": "42px", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+            "body-lg": ["19px", { "lineHeight": "32px", "letterSpacing": "0.01em", "fontWeight": "400" }],
+            "body-xl": ["22px", { "lineHeight": "36px", "letterSpacing": "0.01em", "fontWeight": "400" }],
+            "display-lg": ["40px", { "lineHeight": "52px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+            "label-lg": ["18px", { "lineHeight": "26px", "letterSpacing": "0.02em", "fontWeight": "600" }],
+            "body-md": ["17px", { "lineHeight": "28px", "letterSpacing": "0.01em", "fontWeight": "400" }],
+            "headline-lg": ["32px", { "lineHeight": "44px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+            "headline-lg-mobile": ["26px", { "lineHeight": "36px", "letterSpacing": "0em", "fontWeight": "600" }],
+            "label-md": ["16px", { "lineHeight": "24px", "letterSpacing": "0.03em", "fontWeight": "600" }],
+            "label-sm": ["14px", { "lineHeight": "20px", "letterSpacing": "0.04em", "fontWeight": "700" }]
+          }
+        }
+      }
+    };
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      display: inline-block;
+      vertical-align: middle;
+      line-height: 1;
+    }
+    .custom-focus:focus-visible {
+      outline: 3px solid #325f9b !important;
+      outline-offset: 2px !important;
+    }
+  </style>
+</head>
+<body class="bg-background text-on-surface antialiased min-h-screen flex flex-col font-body-md selection:bg-primary-fixed selection:text-on-primary-fixed">
+<!-- Top Navigation Bar (Shared Component strictly mapped) -->
+<header class="bg-surface-container-lowest border-b border-outline-variant shadow-sm sticky top-0 z-50">
+<div class="w-full max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+<!-- Brand & Tagline Anchor -->
+<div class="flex items-center gap-4">
+<a class="text-headline-md font-headline-md font-bold text-primary tracking-tight flex items-center gap-2 custom-focus rounded" href="#">
+<span class="material-symbols-outlined text-primary text-3xl" data-icon="nature_people">nature_people</span>
+<span>Haven</span>
+</a>
+<div class="hidden lg:block h-6 w-px bg-outline-variant"></div>
+<p class="hidden lg:block text-label-sm font-label-sm text-on-surface-variant max-w-md leading-tight">
+          Most AI companions want more of your loved one's time. Haven wants more of your calls.
+        </p>
+</div>
+<!-- Navigation Tabs -->
+<nav aria-label="Main Navigation" class="hidden md:flex items-center gap-8">
+<a class="text-on-surface-variant hover:text-on-surface pb-2 transition-all font-label-md text-label-md hover:bg-surface-container-low px-2 rounded-t custom-focus" href="#">
+          Interactive Demo
+        </a>
+<!-- Active link: Setup & Customization -->
+<a aria-current="page" class="border-b-2 border-primary text-primary font-bold pb-2 transition-all font-label-md text-label-md px-2 custom-focus" href="#">
+          Setup &amp; Customization
+        </a>
+<a class="text-on-surface-variant hover:text-on-surface pb-2 transition-all font-label-md text-label-md hover:bg-surface-container-low px-2 rounded-t custom-focus" href="#">
+          Family View
+        </a>
+<a class="text-on-surface-variant hover:text-on-surface pb-2 transition-all font-label-md text-label-md hover:bg-surface-container-low px-2 rounded-t custom-focus" href="#">
+          Household Logs
+        </a>
+</nav>
+<!-- Trailing Action Cluster -->
+<div class="flex items-center gap-3">
+<!-- Accessibility / Sound Icon buttons -->
+<button aria-label="Audio Controls" class="p-2 text-on-surface-variant hover:bg-surface-container-low rounded-lg transition-colors custom-focus" title="Sound Volume" type="button">
+<span class="material-symbols-outlined" data-icon="volume_up">volume_up</span>
+</button>
+<button aria-label="Accessibility Options" class="p-2 text-on-surface-variant hover:bg-surface-container-low rounded-lg transition-colors custom-focus" title="Accessibility Preferences" type="button">
+<span class="material-symbols-outlined" data-icon="accessibility_new">accessibility_new</span>
+</button>
+<div class="h-6 w-px bg-outline-variant mx-1"></div>
+<button class="px-3.5 py-2 text-label-sm font-label-sm rounded-lg border border-outline-variant text-on-surface hover:bg-surface-container-low transition-colors custom-focus" type="button">
+          Reset Demo
+        </button>
+<button class="px-4 py-2 text-label-sm font-label-sm rounded-lg bg-error text-on-error hover:opacity-90 font-semibold transition-opacity flex items-center gap-1.5 shadow-sm custom-focus" type="button">
+<span class="material-symbols-outlined text-lg" data-icon="emergency">emergency</span>
+<span>Emergency Call</span>
+</button>
+</div>
+</div>
+</header>
+<!-- Ethical Notice Banner below Header -->
+<div class="bg-surface-container border-b border-outline-variant py-2.5 px-6">
+<div class="max-w-7xl mx-auto flex items-center justify-between text-label-sm font-label-sm text-on-surface-variant">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-base" data-icon="verified_user">verified_user</span>
+<span>A private demo household for this browser tab. Haven's companion is an AI and always says so.</span>
+</div>
+<div class="hidden sm:flex items-center gap-3 text-xs font-semibold tracking-wide">
+<span class="inline-flex items-center gap-1 bg-surface-container-highest px-2 py-0.5 rounded text-on-surface">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span>
+          Audio Provenance: ACTIVE
+        </span>
+<span class="text-outline">•</span>
+<span>Echo Show Hub H-15 Ready</span>
+</div>
+</div>
+</div>
+<!-- Main Content Canvas (Constrained 1200px / 1440px desktop viewport target) -->
+<main class="w-full max-w-7xl mx-auto px-6 py-8 flex-1 space-y-8">
+<!-- Header, Breadcrumb & Multi-step Indicator -->
+<section class="space-y-4">
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+<div>
+<a class="inline-flex items-center gap-1 text-label-sm font-label-sm text-secondary hover:underline custom-focus mb-2" href="#">
+<span class="material-symbols-outlined text-sm" data-icon="arrow_back">arrow_back</span>
+<span>Back to basic setup (About you &amp; Mom)</span>
+</a>
+<h1 class="text-headline-lg font-headline-lg text-on-surface tracking-tight">
+            Personalize Digital Daniel
+          </h1>
+<p class="text-body-lg font-body-lg text-on-surface-variant mt-1">
+            Train your labelled AI companion with your photo, voice sample, and safety boundaries.
+          </p>
+</div>
+<!-- Multi-Step Progress Indicator -->
+<div class="bg-surface-container-lowest p-3 rounded-xl border border-outline-variant shadow-sm flex items-center gap-3">
+<!-- Step 1: Completed -->
+<div class="flex items-center gap-2">
+<span class="w-7 h-7 rounded-full bg-tertiary text-on-tertiary flex items-center justify-center text-sm font-bold">
+<span class="material-symbols-outlined text-base" data-icon="check">check</span>
+</span>
+<span class="text-label-sm font-label-sm text-on-surface">1. Basic Info</span>
+</div>
+<div class="w-8 h-0.5 bg-tertiary"></div>
+<!-- Step 2: Active -->
+<div class="flex items-center gap-2">
+<span class="w-7 h-7 rounded-full bg-primary text-on-primary flex items-center justify-center text-sm font-bold ring-2 ring-primary ring-offset-2">
+              2
+            </span>
+<span class="text-label-sm font-label-sm font-bold text-primary">Face &amp; Voice</span>
+</div>
+<div class="w-8 h-0.5 bg-outline-variant"></div>
+<!-- Step 3: Active / Boundary Rules -->
+<div class="flex items-center gap-2">
+<span class="w-7 h-7 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center text-sm font-bold">
+              3
+            </span>
+<span class="text-label-sm font-label-sm font-bold text-on-surface">Household Rules &amp; Consent</span>
+</div>
+</div>
+</div>
+</section>
+<!-- PANEL 1: "Your face and voice" -->
+<section class="bg-surface-container-lowest rounded-2xl border border-outline-variant p-8 shadow-sm">
+<div class="flex flex-col sm:flex-row sm:items-baseline justify-between pb-6 border-b border-outline-variant gap-2">
+<div>
+<h2 class="text-headline-md font-headline-md text-on-surface flex items-center gap-2.5">
+<span class="material-symbols-outlined text-primary text-2xl" data-icon="perm_contact_calendar">perm_contact_calendar</span>
+<span>Your face and voice</span>
+</h2>
+<p class="text-label-sm font-label-sm text-on-surface-variant mt-1">
+            optional · always labelled AI
+          </p>
+</div>
+<div class="inline-flex items-center gap-1.5 bg-surface-container px-3 py-1.5 rounded-full border border-outline-variant text-label-sm font-label-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-tertiary text-base" data-icon="lock">lock</span>
+<span>Encrypted with Margaret's household key</span>
+</div>
+</div>
+<!-- Two balanced columns (Face & Voice) -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-6">
+<!-- LEFT COLUMN: Face -->
+<div class="flex flex-col justify-between space-y-6 bg-surface-container-low p-6 rounded-xl border border-outline-variant">
+<div class="space-y-4">
+<div class="flex items-center justify-between">
+<h3 class="text-headline-sm font-headline-sm text-on-surface flex items-center gap-2">
+<span class="w-6 h-6 rounded-full bg-secondary-fixed text-on-secondary-fixed flex items-center justify-center text-xs font-bold">1</span>
+<span>Your photo-real avatar</span>
+</h3>
+<span class="bg-surface-container px-3 py-1 rounded-full text-label-sm font-label-sm border border-outline-variant text-primary font-medium flex items-center gap-1">
+<span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+                Active: Daniel stock photo
+              </span>
+</div>
+<!-- Tips Card -->
+<div class="bg-surface-container-lowest p-3.5 rounded-lg border border-outline-variant text-label-sm font-label-sm text-on-surface-variant flex items-start gap-2.5">
+<span class="material-symbols-outlined text-primary text-lg mt-0.5" data-icon="tips_and_updates">tips_and_updates</span>
+<div>
+<strong class="text-on-surface font-semibold">Photo guidance:</strong> Soft natural morning lighting, uncluttered warm background, and a calm, familiar smile Mom will recognize.
+              </div>
+</div>
+<!-- Square crop preview with badge -->
+<div class="flex flex-col sm:flex-row items-center gap-6 pt-2">
+<div class="relative w-44 h-44 rounded-xl overflow-hidden border-2 border-primary-container shadow-md bg-surface-container-high flex-shrink-0">
+<img class="w-full h-full object-cover" data-alt="A warm and gentle portrait of Daniel, a smiling 40-year-old man sitting in his cozy sunlit home library surrounded by wooden bookshelves and warm afternoon linen light. The aesthetic is domestic, peaceful, and comforting, captured in soft golden tones perfectly matching the warm linen sanctuary design system." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA_YiYJ7KU7mR-6Bf0zPYi16cPVD8RibrkQfFIaRuPXYGEzTjA4AEgPOx5nUeaJt783soiklcSxux_qVZ-En_-q3j8x34fT-8LC8GEkmUwlr9M30JajCv7jxdQKTUC7FlV6lK21cs5czUQI-O0igc5D6Y0-CvgzaUgIkmhPdGZ0DWh68xo-N320IatHHFvxA_RNhpa37OYE7Cd4njqDRqKodl1fyydNL3D5lYvBP_PDzw3Ehcc5kn8g">
+<!-- Prominent AI badge preview at bottom -->
+<div class="absolute bottom-0 inset-x-0 bg-inverse-surface/90 text-inverse-on-surface py-1.5 px-2 text-center flex items-center justify-center gap-1.5 backdrop-blur-none">
+<span class="material-symbols-outlined text-xs text-primary-fixed" data-icon="smart_toy">smart_toy</span>
+<span class="text-xs font-bold tracking-wide">Digital Daniel · AI</span>
+</div>
+</div>
+<!-- Upload Area -->
+<div class="w-full space-y-3">
+<div class="border-2 border-dashed border-outline-variant hover:border-outline rounded-xl p-4 text-center bg-surface-container-lowest transition-colors cursor-pointer group">
+<span class="material-symbols-outlined text-3xl text-outline group-hover:text-primary transition-colors" data-icon="add_photo_alternate">add_photo_alternate</span>
+<p class="text-label-md font-label-md text-on-surface mt-1 font-semibold">Drag &amp; drop new photo</p>
+<p class="text-xs text-on-surface-variant">PNG or JPG up to 15MB</p>
+</div>
+<div class="flex gap-2">
+<button class="flex-1 py-2.5 px-3 rounded-lg bg-surface-container-lowest border border-outline-variant text-label-sm font-label-sm text-on-surface hover:bg-surface-container transition-colors custom-focus" type="button">
+                    Upload new photo
+                  </button>
+<button class="py-2.5 px-3 rounded-lg border border-outline-variant text-label-sm font-label-sm text-on-surface-variant hover:bg-surface-container transition-colors custom-focus" type="button">
+                    Change photo
+                  </button>
+</div>
+</div>
+</div>
+<!-- Explicit Consent Checkbox -->
+<div class="pt-2">
+<label class="flex items-start gap-3 bg-surface-container-lowest p-3.5 rounded-lg border border-outline-variant cursor-pointer">
+<input checked="" class="mt-1 w-5 h-5 rounded text-primary focus:ring-secondary border-outline" type="checkbox">
+<span class="text-body-md font-body-md text-on-surface leading-snug">
+                  This is a photo of me (Daniel), and I agree Haven may turn it into a labelled AI avatar for Margaret's household tablet.
+                </span>
+</label>
+</div>
+</div>
+<!-- Actions -->
+<div class="pt-4 border-t border-outline-variant flex flex-col sm:flex-row items-center gap-3">
+<button class="w-full sm:w-auto flex-1 min-h-[52px] px-6 rounded-xl bg-primary hover:bg-primary-container text-on-primary font-label-md text-label-md font-bold transition-all shadow-sm custom-focus active:scale-[0.98]" type="button">
+              Create my avatar
+            </button>
+<button class="w-full sm:w-auto px-4 min-h-[52px] rounded-xl border border-outline-variant text-on-surface hover:bg-surface-container-lowest font-label-md text-label-md transition-colors custom-focus" type="button">
+              Use warm illustration instead
+            </button>
+</div>
+</div>
+<!-- RIGHT COLUMN: Voice -->
+<div class="flex flex-col justify-between space-y-6 bg-surface-container-low p-6 rounded-xl border border-outline-variant">
+<div class="space-y-4">
+<div class="flex items-center justify-between">
+<h3 class="text-headline-sm font-headline-sm text-on-surface flex items-center gap-2">
+<span class="w-6 h-6 rounded-full bg-secondary-fixed text-on-secondary-fixed flex items-center justify-center text-xs font-bold">2</span>
+<span>Your authentic voice</span>
+</h3>
+<span class="bg-surface-container px-3 py-1 rounded-full text-label-sm font-label-sm border border-outline-variant text-secondary font-medium flex items-center gap-1">
+<span class="w-2 h-2 rounded-full bg-secondary"></span>
+                Now: Chris (warm stock voice)
+              </span>
+</div>
+<!-- Audio Recorder Card -->
+<div class="bg-surface-container-lowest p-5 rounded-xl border border-outline-variant space-y-4">
+<!-- Script Box -->
+<div class="bg-surface-container p-3.5 rounded-lg border-l-4 border-primary">
+<p class="text-xs font-bold text-primary uppercase tracking-wider mb-1">Read aloud into your microphone:</p>
+<p class="text-body-md font-body-md text-on-surface italic font-medium">
+                  "Hey Mom, it’s Daniel. Hope you’re having a gentle morning. I’m thinking of you and I’ll give you a real call later today."
+                </p>
+</div>
+<!-- Audio Waveform Visualizer & Timer -->
+<div class="space-y-2">
+<div class="h-14 bg-surface-container-highest rounded-lg flex items-center justify-center gap-1 px-4 overflow-hidden border border-outline-variant">
+<!-- Simulated warm terracotta wave -->
+<div class="w-1.5 bg-primary rounded-full h-3"></div>
+<div class="w-1.5 bg-primary rounded-full h-6 animate-pulse"></div>
+<div class="w-1.5 bg-primary-container rounded-full h-10"></div>
+<div class="w-1.5 bg-primary rounded-full h-8"></div>
+<div class="w-1.5 bg-primary-container rounded-full h-11 animate-pulse"></div>
+<div class="w-1.5 bg-primary rounded-full h-7"></div>
+<div class="w-1.5 bg-primary rounded-full h-5"></div>
+<div class="w-1.5 bg-primary-container rounded-full h-9"></div>
+<div class="w-1.5 bg-primary rounded-full h-12"></div>
+<div class="w-1.5 bg-primary rounded-full h-6"></div>
+<div class="w-1.5 bg-primary-container rounded-full h-10"></div>
+<div class="w-1.5 bg-primary rounded-full h-4"></div>
+<div class="w-1.5 bg-primary rounded-full h-7"></div>
+<div class="w-1.5 bg-primary-container rounded-full h-11"></div>
+<div class="w-1.5 bg-primary rounded-full h-5"></div>
+</div>
+<!-- Recorder Controls & Scrubber -->
+<div class="flex items-center justify-between gap-3 pt-1">
+<div class="flex items-center gap-2">
+<button class="px-3.5 py-2 rounded-lg bg-error text-on-error font-label-sm font-label-sm flex items-center gap-1.5 shadow-sm hover:opacity-95 custom-focus" type="button">
+<span class="w-3 h-3 bg-white rounded-sm"></span>
+<span>Stop (34s)</span>
+</button>
+<button class="px-3 py-2 rounded-lg border border-outline-variant text-on-surface hover:bg-surface-container text-label-sm font-label-sm transition-colors custom-focus" title="Re-record sample" type="button">
+<span class="material-symbols-outlined text-sm" data-icon="replay">replay</span>
+<span class="ml-1">Re-record</span>
+</button>
+</div>
+<div class="flex items-center gap-2 flex-1 max-w-[180px]">
+<span class="material-symbols-outlined text-primary text-xl cursor-pointer" data-icon="play_circle">play_circle</span>
+<div class="w-full bg-outline-variant h-2 rounded-full overflow-hidden">
+<div class="bg-primary h-full w-2/3"></div>
+</div>
+<span class="text-xs text-on-surface-variant font-mono">0:24</span>
+</div>
+</div>
+</div>
+<!-- Voice Consent Checkbox -->
+<label class="flex items-start gap-3 pt-2 cursor-pointer">
+<input checked="" class="mt-1 w-5 h-5 rounded text-primary focus:ring-secondary border-outline" type="checkbox">
+<span class="text-label-sm font-label-sm text-on-surface">
+                  I confirm this is my own voice and authorize Haven to synthesize responses solely for Margaret's Echo tablet.
+                </span>
+</label>
+<button class="w-full py-2.5 rounded-lg bg-secondary text-on-secondary font-label-sm font-label-sm hover:bg-secondary-fixed-variant transition-colors custom-focus" type="button">
+                Use my voice sample
+              </button>
+</div>
+<!-- Collapsible Pre-set Voice Accordion -->
+<div class="border border-outline-variant rounded-xl bg-surface-container-lowest overflow-hidden">
+<div class="px-4 py-3 bg-surface-container-low flex items-center justify-between border-b border-outline-variant">
+<span class="text-label-sm font-label-sm font-bold text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-base" data-icon="record_voice_over">record_voice_over</span>
+<span>Or pick a pre-set voice</span>
+</span>
+<span class="text-xs text-on-surface-variant font-medium">3 available</span>
+</div>
+<div class="divide-y divide-outline-variant p-2 space-y-1">
+<!-- Voice 1 -->
+<div class="p-2.5 rounded-lg flex items-center justify-between hover:bg-surface-container-low transition-colors bg-surface-container">
+<div class="flex items-center gap-3">
+<button class="p-1.5 rounded-full bg-surface-container-lowest text-primary shadow-sm hover:scale-105 transition-transform" title="Preview Chris" type="button">
+<span class="material-symbols-outlined text-lg" data-icon="play_arrow">play_arrow</span>
+</button>
+<div>
+<p class="text-label-sm font-label-sm font-bold text-on-surface">Chris · US Warm Pacific</p>
+<p class="text-xs text-on-surface-variant">Calm cadence, mid-range pitch</p>
+</div>
+</div>
+<span class="px-2.5 py-1 text-xs font-bold rounded bg-primary text-on-primary">Active</span>
+</div>
+<!-- Voice 2 -->
+<div class="p-2.5 rounded-lg flex items-center justify-between hover:bg-surface-container-low transition-colors">
+<div class="flex items-center gap-3">
+<button class="p-1.5 rounded-full bg-surface-container-lowest text-on-surface shadow-sm hover:scale-105 transition-transform" title="Preview Ethan" type="button">
+<span class="material-symbols-outlined text-lg" data-icon="play_arrow">play_arrow</span>
+</button>
+<div>
+<p class="text-label-sm font-label-sm font-bold text-on-surface">Ethan · UK Gentle</p>
+<p class="text-xs text-on-surface-variant">Warm British inflection, unhurried</p>
+</div>
+</div>
+<button class="px-2.5 py-1 text-xs font-semibold rounded border border-outline-variant hover:bg-surface-container transition-colors" type="button">Use</button>
+</div>
+<!-- Voice 3 -->
+<div class="p-2.5 rounded-lg flex items-center justify-between hover:bg-surface-container-low transition-colors">
+<div class="flex items-center gap-3">
+<button class="p-1.5 rounded-full bg-surface-container-lowest text-on-surface shadow-sm hover:scale-105 transition-transform" title="Preview David" type="button">
+<span class="material-symbols-outlined text-lg" data-icon="play_arrow">play_arrow</span>
+</button>
+<div>
+<p class="text-label-sm font-label-sm font-bold text-on-surface">David · Midwest Reassuring</p>
+<p class="text-xs text-on-surface-variant">Deep resonance, grounding tone</p>
+</div>
+</div>
+<button class="px-2.5 py-1 text-xs font-semibold rounded border border-outline-variant hover:bg-surface-container transition-colors" type="button">Use</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- PANEL 2: "Teach Haven about Mom" -->
+<section class="bg-surface-container-lowest rounded-2xl border border-outline-variant p-8 shadow-sm space-y-6">
+<div class="flex flex-col sm:flex-row sm:items-baseline justify-between pb-6 border-b border-outline-variant gap-2">
+<div>
+<h2 class="text-headline-md font-headline-md text-on-surface flex items-center gap-2.5">
+<span class="material-symbols-outlined text-tertiary text-2xl" data-icon="psychology">psychology</span>
+<span>Teach Haven about Mom</span>
+</h2>
+<p class="text-label-sm font-label-sm text-on-surface-variant mt-1">
+            only Daniel can change this · strictly enforced boundaries
+          </p>
+</div>
+<div class="inline-flex items-center gap-1.5 bg-tertiary-container/15 px-3 py-1.5 rounded-full border border-tertiary/20 text-label-sm font-label-sm text-tertiary">
+<span class="material-symbols-outlined text-base" data-icon="verified">verified</span>
+<span>Companion Guardrails Active</span>
+</div>
+</div>
+<!-- 2x2 Responsive Bento Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+<!-- CARD 1: Mom (Elder Profile) -->
+<div class="bg-surface-container-low p-6 rounded-xl border border-outline-variant space-y-5 flex flex-col justify-between">
+<div class="space-y-4">
+<div class="flex items-center gap-2.5 pb-2 border-b border-outline-variant">
+<span class="material-symbols-outlined text-primary text-xl" data-icon="elderly">elderly</span>
+<h3 class="text-headline-sm font-headline-sm text-on-surface">Mom (Elder Profile)</h3>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div>
+<label class="block text-label-sm font-label-sm text-on-surface font-semibold mb-1">Legal Name</label>
+<input class="w-full h-12 rounded-lg bg-surface-container-lowest border border-outline-variant px-3 text-on-surface focus:border-on-surface focus:ring-0 custom-focus" readonly="" type="text" value="Margaret">
+</div>
+<div>
+<label class="block text-label-sm font-label-sm text-on-surface font-semibold mb-1">What you call her</label>
+<input class="w-full h-12 rounded-lg bg-surface-container-lowest border border-outline-variant px-3 text-on-surface focus:border-on-surface focus:ring-0 custom-focus" type="text" value="Mom">
+</div>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div>
+<label class="block text-label-sm font-label-sm text-on-surface font-semibold mb-1">Pronouns</label>
+<input class="w-full h-12 rounded-lg bg-surface-container-lowest border border-outline-variant px-3 text-on-surface focus:border-on-surface focus:ring-0 custom-focus" type="text" value="she/her">
+</div>
+<div>
+<label class="block text-label-sm font-label-sm text-on-surface font-semibold mb-1">City / Timezone</label>
+<input class="w-full h-12 rounded-lg bg-surface-container-lowest border border-outline-variant px-3 text-on-surface focus:border-on-surface focus:ring-0 custom-focus" type="text" value="Seattle (PT)">
+</div>
+</div>
+<div>
+<label class="block text-label-sm font-label-sm text-on-surface font-semibold mb-1">
+                Things Mom loves (one per line)
+              </label>
+<textarea class="w-full rounded-lg bg-surface-container-lowest border border-outline-variant p-3 text-body-md font-body-md text-on-surface focus:border-on-surface focus:ring-0 leading-relaxed custom-focus" rows="5">Yellow heirloom roses in her patio garden
+Glenn Miller &amp; big band swing music
+Baking lemon shortbread for the grandkids
+1950s classic Hollywood films (Cary Grant, Audrey Hepburn)</textarea>
+<p class="text-xs text-on-surface-variant mt-1">Haven uses these naturally in light conversational prompts.</p>
+</div>
+</div>
+</div>
+<!-- CARD 2: You & Conversation Style -->
+<div class="bg-surface-container-low p-6 rounded-xl border border-outline-variant space-y-5 flex flex-col justify-between">
+<div class="space-y-4">
+<div class="flex items-center gap-2.5 pb-2 border-b border-outline-variant">
+<span class="material-symbols-outlined text-secondary text-xl" data-icon="forum">forum</span>
+<h3 class="text-headline-sm font-headline-sm text-on-surface">You &amp; Conversation Style</h3>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div>
+<label class="block text-label-sm font-label-sm text-on-surface font-semibold mb-1">Your Name</label>
+<input class="w-full h-12 rounded-lg bg-surface-container-lowest border border-outline-variant px-3 text-on-surface focus:border-on-surface focus:ring-0 custom-focus" readonly="" type="text" value="Daniel">
+</div>
+<div>
+<label class="block text-label-sm font-label-sm text-on-surface font-semibold mb-1">Relationship / Pronoun</label>
+<input class="w-full h-12 rounded-lg bg-surface-container-lowest border border-outline-variant px-3 text-on-surface focus:border-on-surface focus:ring-0 custom-focus" readonly="" type="text" value="Son (he/him)">
+</div>
+</div>
+<div>
+<label class="block text-label-sm font-label-sm text-on-surface font-semibold mb-1">
+                Words and nicknames you use with her
+              </label>
+<input class="w-full h-12 rounded-lg bg-surface-container-lowest border border-outline-variant px-3 text-on-surface focus:border-on-surface focus:ring-0 custom-focus" type="text" value="&quot;Love you bunches&quot;, &quot;Kiddo&quot;, &quot;Take it easy&quot;">
+</div>
+<!-- Companion Tone Selector -->
+<div>
+<label class="block text-label-sm font-label-sm text-on-surface font-semibold mb-2">
+                Companion Tone Preference
+              </label>
+<div class="grid grid-cols-3 gap-2">
+<button class="py-2.5 px-2 rounded-lg bg-on-surface text-on-primary text-label-sm font-label-sm font-bold text-center border-2 border-on-surface shadow-sm" type="button">
+                  Warm &amp; gentle
+                </button>
+<button class="py-2.5 px-2 rounded-lg bg-surface-container-lowest text-on-surface text-label-sm font-label-sm font-semibold text-center border border-outline-variant hover:bg-surface-container transition-colors" type="button">
+                  Cheerful &amp; energetic
+                </button>
+<button class="py-2.5 px-2 rounded-lg bg-surface-container-lowest text-on-surface text-label-sm font-label-sm font-semibold text-center border border-outline-variant hover:bg-surface-container transition-colors" type="button">
+                  Quiet &amp; reflective
+                </button>
+</div>
+</div>
+<!-- Hard Negative Constraints -->
+<div>
+<label class="block text-label-sm font-label-sm text-error font-semibold mb-1 flex items-center gap-1">
+<span class="material-symbols-outlined text-base" data-icon="block">block</span>
+<span>Digital Daniel must NEVER...</span>
+</label>
+<textarea class="w-full rounded-lg bg-surface-container-lowest border border-outline-variant p-3 text-body-md font-body-md text-on-surface focus:border-error focus:ring-0 leading-relaxed custom-focus" rows="3">Never pretend to be physically in Seattle right now, never claim to have eaten dinner together yesterday, never give medical prescriptions or diagnose illness.</textarea>
+</div>
+</div>
+</div>
+<!-- CARD 3: Boundary Rules -->
+<div class="bg-surface-container-low p-6 rounded-xl border border-outline-variant space-y-5 flex flex-col justify-between">
+<div class="space-y-4">
+<div class="flex items-center justify-between pb-2 border-b border-outline-variant">
+<div class="flex items-center gap-2.5">
+<span class="material-symbols-outlined text-primary text-xl" data-icon="shield">shield</span>
+<h3 class="text-headline-sm font-headline-sm text-on-surface">Boundary Rules</h3>
+</div>
+<span class="text-xs bg-primary-fixed text-on-primary-fixed px-2 py-0.5 rounded font-bold">Pass-to-Daniel Triggers</span>
+</div>
+<!-- Explanation Callout -->
+<div class="bg-surface-container-lowest p-3 rounded-lg border border-outline-variant text-label-sm font-label-sm text-on-surface-variant flex items-start gap-2">
+<span class="material-symbols-outlined text-primary text-base mt-0.5" data-icon="handshake">handshake</span>
+<p>
+                When Mom mentions these topics, Digital Daniel gracefully steps aside and says:
+                <em class="text-on-surface font-semibold">"Let me check with the real Daniel and have him call you about that."</em>
+</p>
+</div>
+<!-- Checkbox Boundary Toggles -->
+<div class="space-y-2.5">
+<label class="flex items-center gap-3 p-2.5 rounded-lg bg-surface-container-lowest border border-outline-variant cursor-pointer hover:bg-surface-bright">
+<input checked="" class="w-5 h-5 rounded text-primary focus:ring-secondary border-outline" type="checkbox">
+<span class="material-symbols-outlined text-secondary text-lg" data-icon="calendar_month">calendar_month</span>
+<span class="text-label-sm font-label-sm text-on-surface font-semibold">Upcoming plans &amp; calendar visits</span>
+</label>
+<label class="flex items-center gap-3 p-2.5 rounded-lg bg-surface-container-lowest border border-outline-variant cursor-pointer hover:bg-surface-bright">
+<input checked="" class="w-5 h-5 rounded text-primary focus:ring-secondary border-outline" type="checkbox">
+<span class="material-symbols-outlined text-tertiary text-lg" data-icon="payments">payments</span>
+<span class="text-label-sm font-label-sm text-on-surface font-semibold">Money, finances, bills, or bank questions</span>
+</label>
+<label class="flex items-center gap-3 p-2.5 rounded-lg bg-surface-container-lowest border border-outline-variant cursor-pointer hover:bg-surface-bright">
+<input checked="" class="w-5 h-5 rounded text-primary focus:ring-secondary border-outline" type="checkbox">
+<span class="material-symbols-outlined text-error text-lg" data-icon="medical_services">medical_services</span>
+<span class="text-label-sm font-label-sm text-on-surface font-semibold">Health, symptoms, pain, medication, dizziness</span>
+</label>
+<label class="flex items-center gap-3 p-2.5 rounded-lg bg-surface-container-lowest border border-outline-variant cursor-pointer hover:bg-surface-bright">
+<input checked="" class="w-5 h-5 rounded text-primary focus:ring-secondary border-outline" type="checkbox">
+<span class="material-symbols-outlined text-secondary text-lg" data-icon="groups">groups</span>
+<span class="text-label-sm font-label-sm text-on-surface font-semibold">Family news or sensitive family relationships</span>
+</label>
+<label class="flex items-center gap-3 p-2.5 rounded-lg bg-surface-container-lowest border border-outline-variant cursor-pointer hover:bg-surface-bright">
+<input checked="" class="w-5 h-5 rounded text-primary focus:ring-secondary border-outline" type="checkbox">
+<span class="material-symbols-outlined text-primary text-lg" data-icon="assignment_turned_in">assignment_turned_in</span>
+<span class="text-label-sm font-label-sm text-on-surface font-semibold">Making promises or commitments on Daniel's behalf</span>
+</label>
+</div>
+<!-- Topics to Avoid -->
+<div>
+<label class="block text-label-sm font-label-sm text-on-surface font-semibold mb-1">
+                Topics to avoid altogether
+              </label>
+<input class="w-full h-12 rounded-lg bg-surface-container-lowest border border-outline-variant px-3 text-on-surface text-label-sm focus:border-on-surface focus:ring-0 custom-focus" type="text" value="Dad's passing (keep discussions gentle if brought up), politics, estate planning.">
+</div>
+</div>
+</div>
+<!-- CARD 4: Daily Habits, Goals & Consent -->
+<div class="bg-surface-container-low p-6 rounded-xl border border-outline-variant space-y-5 flex flex-col justify-between">
+<div class="space-y-4">
+<div class="flex items-center gap-2.5 pb-2 border-b border-outline-variant">
+<span class="material-symbols-outlined text-tertiary text-xl" data-icon="phone_callback">phone_callback</span>
+<h3 class="text-headline-sm font-headline-sm text-on-surface">Daily Habits &amp; Consent</h3>
+</div>
+<!-- Call frequency comparison -->
+<div class="grid grid-cols-2 gap-4">
+<div class="bg-surface-container-lowest p-3 rounded-lg border border-outline-variant">
+<label class="block text-xs font-semibold text-on-surface-variant mb-1">Current calls with Mom</label>
+<div class="flex items-center gap-2">
+<input class="w-16 h-10 rounded border border-outline-variant text-center font-bold text-on-surface focus:ring-0" max="14" min="0" type="number" value="1">
+<span class="text-label-sm font-label-sm text-on-surface-variant">call / week</span>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-3 rounded-lg border border-primary-container">
+<label class="block text-xs font-semibold text-primary mb-1">Your family goal</label>
+<div class="flex items-center gap-2">
+<input class="w-16 h-10 rounded border border-primary text-center font-bold text-primary focus:ring-0" max="14" min="1" type="number" value="4">
+<span class="text-label-sm font-label-sm text-primary font-semibold">calls / week</span>
+</div>
+</div>
+</div>
+<!-- Daily Digest delivery time -->
+<div>
+<label class="block text-label-sm font-label-sm text-on-surface font-semibold mb-1">
+                Daily Family Digest delivery
+              </label>
+<select class="w-full h-12 rounded-lg bg-surface-container-lowest border border-outline-variant px-3 text-on-surface focus:border-on-surface focus:ring-0 custom-focus">
+<option selected="">9:00 PM (Evening recap via SMS)</option>
+<option>8:00 AM (Morning briefing via SMS)</option>
+<option>Real-time digest upon companion session end</option>
+</select>
+</div>
+<!-- Consent Architecture Checkboxes -->
+<div class="pt-2 space-y-3">
+<label class="flex items-start gap-3 bg-surface-container-lowest p-3 rounded-lg border border-outline-variant cursor-pointer">
+<input checked="" class="mt-1 w-5 h-5 rounded text-primary focus:ring-secondary border-outline" type="checkbox">
+<span class="text-label-sm font-label-sm text-on-surface leading-snug">
+<span class="material-symbols-outlined text-xs text-tertiary align-baseline" data-icon="lock">lock</span>
+                  I consent to Haven generating AI companion conversations strictly adhering to ethical disclosure badges.
+                </span>
+</label>
+<label class="flex items-start gap-3 bg-surface-container-lowest p-3 rounded-lg border border-outline-variant cursor-pointer">
+<input checked="" class="mt-1 w-5 h-5 rounded text-primary focus:ring-secondary border-outline" type="checkbox">
+<span class="text-label-sm font-label-sm text-on-surface leading-snug">
+<span class="material-symbols-outlined text-xs text-tertiary align-baseline" data-icon="lock">lock</span>
+                  I consent to receiving a nightly privacy-first conversation digest and real-time safety alerts.
+                </span>
+</label>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Bottom Action Bar -->
+<section class="bg-surface-container-low rounded-xl border border-outline-variant p-6 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
+<div class="flex items-center gap-3">
+<span class="w-3 h-3 rounded-full bg-tertiary animate-pulse"></span>
+<span class="text-label-md font-label-md text-on-surface-variant">
+          All changes automatically sync to Margaret's tablet Hub (Model H-15 Ambient Display).
+        </span>
+</div>
+<div class="flex items-center gap-4 w-full md:w-auto">
+<button class="w-full md:w-auto min-h-[56px] px-6 rounded-xl border-2 border-outline-variant text-on-surface bg-surface-container-lowest hover:bg-surface-container font-label-lg text-label-lg font-semibold transition-colors custom-focus" type="button">
+          Discard changes
+        </button>
+<button class="w-full md:w-auto min-h-[56px] px-8 rounded-xl bg-primary hover:bg-primary-container text-on-primary font-label-lg text-label-lg font-bold transition-all shadow-md custom-focus active:scale-[0.98] flex items-center justify-center gap-2" type="button">
+<span>Save &amp; Activate Digital Daniel</span>
+<span class="material-symbols-outlined text-xl" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+</section>
+</main>
+<!-- Footer (Shared Component strictly mapped) -->
+<footer class="bg-surface-container-low border-t border-outline-variant mt-12">
+<div class="w-full max-w-7xl mx-auto px-6 py-8 flex flex-col md:flex-row items-center justify-between gap-4">
+<div class="flex flex-col sm:flex-row items-center gap-4 text-center sm:text-left">
+<span class="text-headline-sm font-headline-sm font-bold text-primary">Haven</span>
+<span class="text-body-md font-body-md text-on-surface-variant">
+          © 2025 Haven. Alexa+ Hackathon Submission. Private household demo.
+        </span>
+</div>
+<div class="flex flex-wrap items-center justify-center gap-6">
+<a class="text-label-sm font-label-sm text-on-surface-variant hover:text-on-surface hover:text-primary transition-colors custom-focus" href="#">
+          AI Transparency Statement
+        </a>
+<a class="text-label-sm font-label-sm text-on-surface-variant hover:text-on-surface hover:text-primary transition-colors custom-focus" href="#">
+          Guardian Privacy
+        </a>
+<a class="text-label-sm font-label-sm text-on-surface-variant hover:text-on-surface hover:text-primary transition-colors custom-focus" href="#">
+          Audio Provenance Protocol
+        </a>
+<a class="text-label-sm font-label-sm text-on-surface-variant hover:text-on-surface hover:text-primary transition-colors custom-focus" href="#">
+          Support
+        </a>
+</div>
+</div>
+</footer>
+</body></html>

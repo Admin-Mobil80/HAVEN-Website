@@ -3,6 +3,7 @@ import { z } from "zod";
 import { activeIncident, addEvent, openOrUpgrade } from "../../domain/incidents.js";
 import { CAPS, ESCALATION_REASONS, type Household, type Incident, type Member } from "../../domain/types.js";
 import { capPush } from "../../domain/util.js";
+import { emergencyNumber } from "../../domain/people.js";
 import type { ToolContext } from "../context.js";
 import { declaredOutput, guard, primaryMember, backupMember, safeSend, trace } from "../result.js";
 
@@ -23,7 +24,7 @@ export function alertBody(doc: Pick<Household, "elder">, incident: Pick<Incident
   const { elder } = doc;
   const words = incident.elderWords.trim();
   const said = words ? `${elder.name} (${elder.calledBy}) said: "${words}".` : `${elder.name} (${elder.calledBy}) may need help.`;
-  return `${incident.emergency ? "EMERGENCY" : "Urgent"} from Haven. ${said} Please call now${elder.phone ? ` on +${elder.phone}` : ""}. Haven has said to call 112 in danger.`;
+  return `${incident.emergency ? "EMERGENCY" : "Urgent"} from Haven. ${said} Please call now${elder.phone ? ` on +${elder.phone}` : ""}. Haven has said to call ${emergencyNumber(elder)} in danger.`;
 }
 
 export function registerEscalationTools(server: McpServer, ctx: ToolContext) {
@@ -111,16 +112,16 @@ export function registerEscalationTools(server: McpServer, ctx: ToolContext) {
           emergency: incident.emergency,
           action: opened.action,
           notified,
-          say: sayFor(incident, notified, opened.shouldAlert, opened.primary),
+          say: sayFor(incident, notified, opened.shouldAlert, opened.primary, emergencyNumber(opened.elder)),
         };
       }),
   );
 }
 
 // Never claims the family knows unless an alert for this situation actually reached someone.
-function sayFor(incident: Incident, notified: string[], alerted: boolean, primary = "your family") {
+function sayFor(incident: Incident, notified: string[], alerted: boolean, primary = "your family", emergency = "112") {
   if (incident.tier === "important") return `I'll make sure ${primary} knows about this today.`;
-  const danger = "If you are in danger, call 112 now.";
+  const danger = `If you are in danger, call ${emergency} now.`;
   if (notified.length > 0) return `${notified.join(" and ")} ${notified.length > 1 ? "have" : "has"} been told. ${danger}`;
   if (!alerted && incident.alertDeliveredAt) return `${primary} has already been told. ${danger}`;
   return `I'm trying to reach ${primary}. ${danger}`;

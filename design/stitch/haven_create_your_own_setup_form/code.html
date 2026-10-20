@@ -1,0 +1,529 @@
+<!DOCTYPE html><html class="h-full" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Haven — Create Your Own Companion Setup</title>
+<!-- Google Fonts: Plus Jakarta Sans -->
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<!-- Material Symbols Outlined -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<!-- Tailwind CSS v3 -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Theme Configuration -->
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "surface": "#fef8f3",
+            "error-container": "#ffdad6",
+            "on-tertiary-fixed": "#002114",
+            "on-secondary": "#ffffff",
+            "secondary": "#325f9b",
+            "on-tertiary-container": "#f5fff7",
+            "surface-container-lowest": "#ffffff",
+            "background": "#fef8f3",
+            "secondary-container": "#93bdff",
+            "surface-container-high": "#ede7e2",
+            "tertiary": "#2a674c",
+            "tertiary-fixed": "#b1f0ce",
+            "tertiary-fixed-dim": "#95d4b3",
+            "outline": "#8a7267",
+            "primary-fixed": "#ffdbcb",
+            "surface-dim": "#dfd9d4",
+            "on-secondary-fixed": "#001c3b",
+            "primary": "#9a4100",
+            "primary-fixed-dim": "#ffb690",
+            "surface-variant": "#e7e1dc",
+            "outline-variant": "#ddc1b3",
+            "inverse-on-surface": "#f6f0ea",
+            "surface-container-highest": "#e7e1dc",
+            "secondary-fixed": "#d5e3ff",
+            "tertiary-container": "#448064",
+            "on-primary-fixed": "#341100",
+            "surface-bright": "#fef8f3",
+            "on-primary-container": "#fffbff",
+            "inverse-surface": "#32302d",
+            "surface-container": "#f3ede8",
+            "on-surface-variant": "#574238",
+            "on-surface": "#1d1b18",
+            "error": "#ba1a1a",
+            "on-tertiary": "#ffffff",
+            "on-error": "#ffffff",
+            "on-secondary-fixed-variant": "#124782",
+            "on-error-container": "#93000a",
+            "on-secondary-container": "#194b86",
+            "inverse-primary": "#ffb690",
+            "on-background": "#1d1b18",
+            "on-primary": "#ffffff",
+            "on-tertiary-fixed-variant": "#0e5138",
+            "secondary-fixed-dim": "#a7c8ff",
+            "surface-container-low": "#f9f3ed",
+            "surface-tint": "#9e4300",
+            "primary-container": "#bd5611",
+            "on-primary-fixed-variant": "#783100"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "2xl": "1rem",
+            "3xl": "1.5rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "gutter": "1.5rem",
+            "space-lg": "2rem",
+            "margin-desktop": "3.5rem",
+            "space-xs": "0.5rem",
+            "space-md": "1.25rem",
+            "space-sm": "0.75rem",
+            "gutter-tablet": "2rem",
+            "space-xl": "3rem",
+            "gutter-desktop": "2.5rem",
+            "margin-tablet": "2rem",
+            "margin": "1.25rem"
+          },
+          "fontFamily": {
+            "display-lg-mobile": ["Plus Jakarta Sans"],
+            "body-xl": ["Plus Jakarta Sans"],
+            "headline-sm": ["Plus Jakarta Sans"],
+            "headline-lg": ["Plus Jakarta Sans"],
+            "display-lg": ["Plus Jakarta Sans"],
+            "label-md": ["Plus Jakarta Sans"],
+            "label-sm": ["Plus Jakarta Sans"],
+            "body-md": ["Plus Jakarta Sans"],
+            "headline-md": ["Plus Jakarta Sans"],
+            "label-lg": ["Plus Jakarta Sans"],
+            "headline-lg-mobile": ["Plus Jakarta Sans"],
+            "body-lg": ["Plus Jakarta Sans"]
+          },
+          "fontSize": {
+            "display-lg-mobile": ["32px", { "lineHeight": "42px", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+            "body-xl": ["22px", { "lineHeight": "36px", "letterSpacing": "0.01em", "fontWeight": "400" }],
+            "headline-sm": ["20px", { "lineHeight": "30px", "letterSpacing": "0.01em", "fontWeight": "600" }],
+            "headline-lg": ["32px", { "lineHeight": "44px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+            "display-lg": ["40px", { "lineHeight": "52px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+            "label-md": ["16px", { "lineHeight": "24px", "letterSpacing": "0.03em", "fontWeight": "600" }],
+            "label-sm": ["14px", { "lineHeight": "20px", "letterSpacing": "0.04em", "fontWeight": "700" }],
+            "body-md": ["17px", { "lineHeight": "28px", "letterSpacing": "0.01em", "fontWeight": "400" }],
+            "headline-md": ["24px", { "lineHeight": "34px", "letterSpacing": "0em", "fontWeight": "600" }],
+            "label-lg": ["18px", { "lineHeight": "26px", "letterSpacing": "0.02em", "fontWeight": "600" }],
+            "headline-lg-mobile": ["26px", { "lineHeight": "36px", "letterSpacing": "0em", "fontWeight": "600" }],
+            "body-lg": ["19px", { "lineHeight": "32px", "letterSpacing": "0.01em", "fontWeight": "400" }]
+          }
+        }
+      }
+    };
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      display: inline-block;
+      vertical-align: middle;
+      line-height: 1;
+    }
+    .material-symbols-outlined.fill {
+      font-variation-settings: 'FILL' 1;
+    }
+    input:focus, select:focus, textarea:focus {
+      outline: 3px solid #325f9b !important;
+      outline-offset: 2px !important;
+      border-color: #1d1b18 !important;
+    }
+    button:focus-visible, a:focus-visible {
+      outline: 3px solid #325f9b !important;
+      outline-offset: 2px !important;
+    }
+  </style>
+</head>
+<body class="bg-background text-on-background min-h-screen flex flex-col font-body-md antialiased selection:bg-primary-fixed selection:text-on-primary-fixed">
+<!-- ========================================== -->
+<!-- TopNavBar (Shared Component)               -->
+<!-- ========================================== -->
+<header class="bg-surface-container-lowest dark:bg-inverse-surface border-b border-outline-variant dark:border-outline shadow-sm dark:shadow-none sticky top-0 z-50">
+<div class="w-full max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+<!-- Brand & Tagline cluster -->
+<div class="flex items-center gap-6">
+<a class="flex flex-col group focus:outline-none" href="#">
+<span class="text-headline-md font-headline-md font-bold text-primary dark:text-inverse-primary tracking-tight flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[28px]">cottage</span>
+            Haven
+          </span>
+<span class="text-label-sm font-label-sm text-on-surface-variant hidden lg:block tracking-normal font-normal">
+            Most AI companions want more of your loved one's time. Haven wants more of your calls.
+          </span>
+</a>
+</div>
+<!-- Navigation links (Desktop) -->
+<nav aria-label="Main Navigation" class="hidden md:flex items-center gap-8">
+<!-- Interactive Demo -->
+<a class="text-on-surface-variant dark:text-inverse-on-surface hover:text-on-surface pb-2 transition-all font-label-md text-label-md" href="#">
+          Interactive Demo
+        </a>
+<!-- Setup & Customization (ACTIVE) -->
+<a aria-current="page" class="border-b-2 border-primary dark:border-inverse-primary text-primary dark:text-inverse-primary font-bold pb-2 transition-all font-label-md text-label-md" href="#">
+          Setup &amp; Customization
+        </a>
+<!-- Family View -->
+<a class="text-on-surface-variant dark:text-inverse-on-surface hover:text-on-surface pb-2 transition-all font-label-md text-label-md" href="#">
+          Family View
+        </a>
+<!-- Household Logs -->
+<a class="text-on-surface-variant dark:text-inverse-on-surface hover:text-on-surface pb-2 transition-all font-label-md text-label-md" href="#">
+          Household Logs
+        </a>
+</nav>
+<!-- Trailing Action Cluster -->
+<div class="flex items-center gap-3">
+<button class="p-2.5 rounded-full hover:bg-surface-container-low dark:hover:bg-surface-container-high transition-colors text-on-surface-variant focus-visible:outline focus-visible:outline-3 focus-visible:outline-secondary" title="Audio Provenance Volume" type="button">
+<span class="material-symbols-outlined">volume_up</span>
+</button>
+<button class="p-2.5 rounded-full hover:bg-surface-container-low dark:hover:bg-surface-container-high transition-colors text-on-surface-variant focus-visible:outline focus-visible:outline-3 focus-visible:outline-secondary" title="Accessibility Settings" type="button">
+<span class="material-symbols-outlined">accessibility_new</span>
+</button>
+<button class="hidden sm:inline-flex items-center gap-2 px-4 py-2 rounded-xl text-label-sm font-label-sm text-on-surface border border-outline-variant hover:bg-surface-container-low active:scale-[0.98] transition-transform duration-150 ease-out focus-visible:outline focus-visible:outline-3 focus-visible:outline-secondary" type="button">
+<span class="material-symbols-outlined text-[18px]">restart_alt</span>
+          Reset Demo
+        </button>
+<button class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-label-sm font-label-sm bg-error-container text-on-error-container hover:bg-error/20 font-bold active:scale-[0.98] transition-transform duration-150 ease-out focus-visible:outline focus-visible:outline-3 focus-visible:outline-secondary" type="button">
+<span class="material-symbols-outlined text-[18px]">call</span>
+          Emergency Call
+        </button>
+</div>
+</div>
+</header>
+<!-- Notice Sub-header Banner -->
+<div class="bg-surface-container-low border-b border-outline-variant/60 py-2.5 px-6">
+<div class="max-w-7xl mx-auto flex items-center justify-center gap-2 text-center text-label-sm font-label-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px] text-tertiary">verified_user</span>
+<span>A private demo household for this browser tab. Haven's companion is an AI and always says so.</span>
+</div>
+</div>
+<!-- ========================================== -->
+<!-- Main Form Workspace (Max 720px centered)   -->
+<!-- ========================================== -->
+<main class="flex-grow w-full max-w-[720px] mx-auto px-6 py-10 md:py-14">
+<!-- 1. Navigation Breadcrumb / Back Link -->
+<div class="mb-6">
+<a class="inline-flex items-center gap-2 text-label-md font-label-md text-on-surface-variant hover:text-on-surface transition-colors py-1 group" href="#">
+<span class="material-symbols-outlined text-[20px] group-hover:-translate-x-1 transition-transform">arrow_back</span>
+        Back to start
+      </a>
+</div>
+<!-- 2. Form Header -->
+<header class="mb-10">
+<div class="flex items-center gap-3.5 flex-wrap mb-3">
+<h1 class="text-headline-lg font-headline-lg text-on-surface tracking-tight">
+          Create your own
+        </h1>
+<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-secondary-fixed text-on-secondary-fixed font-label-sm text-label-sm font-semibold border border-secondary-container">
+<span class="material-symbols-outlined text-[16px]">schedule</span>
+          takes ~2 minutes
+        </span>
+</div>
+<p class="text-body-lg font-body-lg text-on-surface-variant leading-relaxed max-w-[660px]">
+        Set up a companion for someone you love. Haven creates a clearly labelled AI companion to keep them company and prompt you to call more often.
+      </p>
+</header>
+<!-- FORM START -->
+<form class="space-y-8" onsubmit="event.preventDefault();">
+<!-- ======================================== -->
+<!-- SECTION 1: ABOUT YOU                    -->
+<!-- ======================================== -->
+<section class="bg-surface-container-lowest border border-outline-variant rounded-2xl p-7 md:p-8 shadow-[0_2px_4px_rgba(35,33,30,0.04),0_1px_2px_rgba(35,33,30,0.06)] relative overflow-hidden">
+<!-- Subtle Top Accent Ribbon -->
+<div class="absolute top-0 left-0 right-0 h-1.5 bg-secondary"></div>
+<!-- Section Header -->
+<div class="flex items-center gap-3.5 pb-6 border-b border-outline-variant/60">
+<div class="w-12 h-12 rounded-xl bg-secondary-fixed text-on-secondary-fixed flex items-center justify-center shrink-0 border border-secondary-container">
+<span class="material-symbols-outlined text-[26px]">person</span>
+</div>
+<div>
+<h2 class="text-headline-sm font-headline-sm text-on-surface font-semibold">
+              About you
+            </h2>
+<p class="text-label-sm font-label-sm text-on-surface-variant font-normal">
+              The family member setting this up
+            </p>
+</div>
+</div>
+<div class="pt-6 space-y-6">
+<!-- Field: Your Name -->
+<div>
+<label class="block text-label-md font-label-md text-on-surface mb-2 font-semibold" for="your-name">
+              Your name <span class="text-primary">*</span>
+</label>
+<input class="w-full h-14 px-4 rounded-xl bg-surface-container-lowest border-2 border-outline-variant text-on-surface placeholder-on-surface-variant/60 font-body-md text-body-md transition-colors" id="your-name" name="your-name" placeholder="e.g. Daniel" required="" type="text" value="Daniel">
+</div>
+<!-- Field: You are their... -->
+<div>
+<label class="block text-label-md font-label-md text-on-surface mb-2 font-semibold" for="your-relation">
+              You are their… <span class="text-primary">*</span>
+</label>
+<div class="relative">
+<select class="w-full h-14 pl-4 pr-11 rounded-xl bg-surface-container-lowest border-2 border-outline-variant text-on-surface font-body-md text-body-md appearance-none transition-colors" id="your-relation" name="your-relation">
+<option selected="" value="son">Son</option>
+<option value="daughter">Daughter</option>
+<option value="grandson">Grandson</option>
+<option value="granddaughter">Granddaughter</option>
+<option value="nephew">Nephew</option>
+<option value="niece">Niece</option>
+<option value="friend">Friend</option>
+<option value="neighbour">Neighbour</option>
+<option value="other">Other</option>
+</select>
+<span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant text-[24px]">
+                expand_more
+              </span>
+</div>
+</div>
+<!-- Field: Your Pronouns -->
+<div>
+<span class="block text-label-md font-label-md text-on-surface mb-2.5 font-semibold">
+              Your pronouns
+            </span>
+<div aria-label="Your pronouns" class="flex flex-wrap gap-3" role="radiogroup">
+<!-- he/him (active) -->
+<button aria-checked="true" class="h-12 px-6 rounded-full bg-on-surface text-surface font-label-md text-label-md border-2 border-on-surface font-semibold inline-flex items-center gap-1.5 shadow-sm transition-all" role="radio" type="button">
+<span class="material-symbols-outlined text-[18px]">check</span>
+                he/him
+              </button>
+<!-- she/her -->
+<button aria-checked="false" class="h-12 px-6 rounded-full bg-surface-container-lowest text-on-surface font-label-md text-label-md border-2 border-outline-variant hover:border-outline hover:bg-surface-container-low transition-all font-medium" role="radio" type="button">
+                she/her
+              </button>
+<!-- they/them -->
+<button aria-checked="false" class="h-12 px-6 rounded-full bg-surface-container-lowest text-on-surface font-label-md text-label-md border-2 border-outline-variant hover:border-outline hover:bg-surface-container-low transition-all font-medium" role="radio" type="button">
+                they/them
+              </button>
+<!-- other -->
+<button aria-checked="false" class="h-12 px-6 rounded-full bg-surface-container-lowest text-on-surface font-label-md text-label-md border-2 border-outline-variant hover:border-outline hover:bg-surface-container-low transition-all font-medium" role="radio" type="button">
+                other
+              </button>
+</div>
+</div>
+<!-- Field: Your Phone Number -->
+<div>
+<label class="block text-label-md font-label-md text-on-surface mb-2 font-semibold" for="your-phone">
+              Your phone number
+            </label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant text-[22px]">
+                phone_iphone
+              </span>
+<input class="w-full h-14 pl-12 pr-4 rounded-xl bg-surface-container-lowest border-2 border-outline-variant text-on-surface placeholder-on-surface-variant/60 font-body-md text-body-md transition-colors" id="your-phone" name="your-phone" placeholder="(555) 000-0000" type="tel" value="(206) 555-0192">
+</div>
+<!-- Reassurance Note -->
+<div class="mt-2.5 flex items-start gap-2 text-label-sm font-label-sm text-tertiary">
+<span class="material-symbols-outlined text-[18px] shrink-0 mt-0.5">lock_clock</span>
+<span>We only send evening updates and safety alerts via SMS. Zero promotional texts or spam.</span>
+</div>
+</div>
+</div>
+</section>
+<!-- ======================================== -->
+<!-- SECTION 2: WHO HAVEN IS FOR             -->
+<!-- ======================================== -->
+<section class="bg-surface-container-lowest border border-outline-variant rounded-2xl p-7 md:p-8 shadow-[0_2px_4px_rgba(35,33,30,0.04),0_1px_2px_rgba(35,33,30,0.06)] relative overflow-hidden">
+<!-- Subtle Top Accent Ribbon: Terracotta -->
+<div class="absolute top-0 left-0 right-0 h-1.5 bg-primary"></div>
+<!-- Section Header -->
+<div class="flex items-center gap-3.5 pb-6 border-b border-outline-variant/60">
+<div class="w-12 h-12 rounded-xl bg-primary-fixed text-on-primary-fixed flex items-center justify-center shrink-0 border border-outline-variant">
+<span class="material-symbols-outlined text-[26px]">volunteer_activism</span>
+</div>
+<div>
+<h2 class="text-headline-sm font-headline-sm text-on-surface font-semibold">
+              Who Haven is for
+            </h2>
+<p class="text-label-sm font-label-sm text-on-surface-variant font-normal">
+              Your parent or relative receiving the companion
+            </p>
+</div>
+</div>
+<div class="pt-6 space-y-6">
+<!-- Field: Their Name -->
+<div>
+<label class="block text-label-md font-label-md text-on-surface mb-2 font-semibold" for="their-name">
+              Their name <span class="text-primary">*</span>
+</label>
+<input class="w-full h-14 px-4 rounded-xl bg-surface-container-lowest border-2 border-outline-variant text-on-surface placeholder-on-surface-variant/60 font-body-md text-body-md transition-colors" id="their-name" name="their-name" placeholder="e.g. Margaret" required="" type="text" value="Margaret">
+</div>
+<!-- Dual Column: Relation & What do you call them -->
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+<!-- They are your... -->
+<div>
+<label class="block text-label-md font-label-md text-on-surface mb-2 font-semibold" for="their-relation">
+                They are your… <span class="text-primary">*</span>
+</label>
+<div class="relative">
+<select class="w-full h-14 pl-4 pr-11 rounded-xl bg-surface-container-lowest border-2 border-outline-variant text-on-surface font-body-md text-body-md appearance-none transition-colors" id="their-relation" name="their-relation">
+<option selected="" value="mother">Mother</option>
+<option value="father">Father</option>
+<option value="grandmother">Grandmother</option>
+<option value="grandfather">Grandfather</option>
+<option value="aunt">Aunt</option>
+<option value="uncle">Uncle</option>
+<option value="friend">Friend</option>
+<option value="neighbour">Neighbour</option>
+<option value="other">Other</option>
+</select>
+<span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant text-[24px]">
+                  expand_more
+                </span>
+</div>
+</div>
+<!-- What do you call them? -->
+<div>
+<label class="block text-label-md font-label-md text-on-surface mb-2 font-semibold" for="pet-name">
+                What do you call them?
+              </label>
+<input class="w-full h-14 px-4 rounded-xl bg-surface-container-lowest border-2 border-outline-variant text-on-surface placeholder-on-surface-variant/60 font-body-md text-body-md transition-colors" id="pet-name" name="pet-name" placeholder="e.g. Mom, Grandma, Nana" type="text" value="Mom">
+</div>
+</div>
+<!-- Field: Their Pronouns -->
+<div>
+<span class="block text-label-md font-label-md text-on-surface mb-2.5 font-semibold">
+              Their pronouns
+            </span>
+<div aria-label="Their pronouns" class="flex flex-wrap gap-3" role="radiogroup">
+<!-- she/her (active) -->
+<button aria-checked="true" class="h-12 px-6 rounded-full bg-on-surface text-surface font-label-md text-label-md border-2 border-on-surface font-semibold inline-flex items-center gap-1.5 shadow-sm transition-all" role="radio" type="button">
+<span class="material-symbols-outlined text-[18px]">check</span>
+                she/her
+              </button>
+<!-- he/him -->
+<button aria-checked="false" class="h-12 px-6 rounded-full bg-surface-container-lowest text-on-surface font-label-md text-label-md border-2 border-outline-variant hover:border-outline hover:bg-surface-container-low transition-all font-medium" role="radio" type="button">
+                he/him
+              </button>
+<!-- they/them -->
+<button aria-checked="false" class="h-12 px-6 rounded-full bg-surface-container-lowest text-on-surface font-label-md text-label-md border-2 border-outline-variant hover:border-outline hover:bg-surface-container-low transition-all font-medium" role="radio" type="button">
+                they/them
+              </button>
+<!-- other -->
+<button aria-checked="false" class="h-12 px-6 rounded-full bg-surface-container-lowest text-on-surface font-label-md text-label-md border-2 border-outline-variant hover:border-outline hover:bg-surface-container-low transition-all font-medium" role="radio" type="button">
+                other
+              </button>
+</div>
+</div>
+<!-- Dual Column: City & Preferred Language -->
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+<!-- City / Location -->
+<div>
+<label class="block text-label-md font-label-md text-on-surface mb-2 font-semibold" for="city-location">
+                City / Location <span class="text-on-surface-variant font-normal text-label-sm">(optional)</span>
+</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant text-[22px]">
+                  location_on
+                </span>
+<input class="w-full h-14 pl-12 pr-4 rounded-xl bg-surface-container-lowest border-2 border-outline-variant text-on-surface placeholder-on-surface-variant/60 font-body-md text-body-md transition-colors" id="city-location" name="city-location" placeholder="e.g. Seattle, WA" type="text" value="Seattle">
+</div>
+</div>
+<!-- Preferred Language -->
+<div>
+<label class="block text-label-md font-label-md text-on-surface mb-2 font-semibold" for="preferred-language">
+                Preferred language
+              </label>
+<div class="relative">
+<select class="w-full h-14 pl-4 pr-11 rounded-xl bg-surface-container-lowest border-2 border-outline-variant text-on-surface font-body-md text-body-md appearance-none transition-colors" id="preferred-language" name="preferred-language">
+<option selected="" value="en-US">English (US)</option>
+<option value="en-GB">English (UK)</option>
+<option value="en-IN">English (India)</option>
+<option value="hi-IN">Hindi</option>
+<option value="es-ES">Spanish</option>
+</select>
+<span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant text-[24px]">
+                  expand_more
+                </span>
+</div>
+</div>
+</div>
+<!-- Field: Things they love to talk about -->
+<div>
+<div class="flex items-center justify-between mb-2">
+<label class="text-label-md font-label-md text-on-surface font-semibold" for="passions-topics">
+                Things they love to talk about
+              </label>
+<span class="text-label-sm font-label-sm text-on-surface-variant">4-5 lines recommended</span>
+</div>
+<textarea class="w-full p-4 rounded-xl bg-surface-container-lowest border-2 border-outline-variant text-on-surface placeholder-on-surface-variant/60 font-body-md text-body-md transition-colors leading-relaxed resize-y" id="passions-topics" name="passions-topics" placeholder="e.g. Her rose garden, big band music, family baking traditions, and favorite travels." rows="4">Her rose garden, big band music (Glenn Miller), baking lemon cookies for the grandkids, and classic Hollywood movies from the 1950s.</textarea>
+<!-- Helpful Guidance Note -->
+<div class="mt-3 p-3.5 rounded-xl bg-surface-container-low border border-outline-variant/60 flex items-start gap-2.5">
+<span class="text-lg leading-none shrink-0 mt-0.5">💡</span>
+<p class="text-label-sm font-label-sm text-on-surface-variant leading-normal">
+<span class="font-bold text-on-surface">Tip:</span> Digital Daniel uses these memories to spark comforting, genuine conversations when you can't be there.
+              </p>
+</div>
+</div>
+</div>
+</section>
+<!-- ======================================== -->
+<!-- FORM ACTIONS & BOTTOM SECTION           -->
+<!-- ======================================== -->
+<div class="pt-4 space-y-6">
+<!-- Prominent Primary Companion Trigger CTA -->
+<button class="w-full min-h-[64px] px-8 rounded-2xl bg-[#D96B27] hover:bg-[#C05819] text-white font-label-lg text-label-lg font-bold flex items-center justify-center gap-3 shadow-md hover:shadow-lg active:scale-[0.99] transition-all duration-150 ease-out focus-visible:outline focus-visible:outline-3 focus-visible:outline-secondary" type="submit">
+<span>Create Digital Daniel →</span>
+</button>
+<!-- Dynamic Context Note under CTA -->
+<p class="text-center text-label-sm font-label-sm text-on-surface-variant">
+          Next you can add your photo and voice sample. <strong class="text-on-surface">Digital Daniel</strong> is always clearly badged as an AI.
+        </p>
+<!-- Secondary Return Link -->
+<div class="text-center pt-1">
+<a class="inline-flex items-center gap-1.5 text-label-md font-label-md text-on-surface-variant hover:text-on-surface transition-colors font-medium" href="#">
+<span class="material-symbols-outlined text-[18px]">undo</span>
+            ← Back to demo start
+          </a>
+</div>
+<!-- Trust & Privacy Assurance Badges Grid -->
+<div class="mt-8 pt-8 border-t border-outline-variant grid grid-cols-1 sm:grid-cols-3 gap-4">
+<div class="flex items-center gap-2.5 justify-center sm:justify-start px-2 py-1 text-label-sm font-label-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-tertiary text-[20px]">shield</span>
+<span>100% Private to Household</span>
+</div>
+<div class="flex items-center gap-2.5 justify-center px-2 py-1 text-label-sm font-label-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-secondary text-[20px]">assignment_turned_in</span>
+<span>Explicit Consent Architecture</span>
+</div>
+<div class="flex items-center gap-2.5 justify-center sm:justify-end px-2 py-1 text-label-sm font-label-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-primary text-[20px]">verified</span>
+<span>Strict AI Watermark Badge</span>
+</div>
+</div>
+</div>
+</form>
+</main>
+<!-- ========================================== -->
+<!-- Footer (Shared Component)                  -->
+<!-- ========================================== -->
+<footer class="bg-surface-container-low dark:bg-inverse-surface border-t border-outline-variant dark:border-outline mt-auto">
+<div class="w-full max-w-7xl mx-auto px-6 py-8 flex flex-col md:flex-row items-center justify-between gap-4">
+<div class="flex flex-col sm:flex-row items-center gap-3 text-center sm:text-left">
+<span class="text-headline-sm font-headline-sm font-bold text-primary dark:text-inverse-primary">Haven</span>
+<span class="text-label-sm font-label-sm text-on-surface-variant dark:text-inverse-on-surface">
+          © 2025 Haven. Alexa+ Hackathon Submission. Private household demo.
+        </span>
+</div>
+<nav aria-label="Legal and Documentation" class="flex flex-wrap items-center justify-center gap-6 text-label-sm font-label-sm">
+<a class="text-on-surface-variant dark:text-inverse-on-surface hover:text-on-surface transition-colors hover:text-primary dark:hover:text-inverse-primary" href="#">
+          AI Transparency Statement
+        </a>
+<a class="text-on-surface-variant dark:text-inverse-on-surface hover:text-on-surface transition-colors hover:text-primary dark:hover:text-inverse-primary" href="#">
+          Guardian Privacy
+        </a>
+<a class="text-on-surface-variant dark:text-inverse-on-surface hover:text-on-surface transition-colors hover:text-primary dark:hover:text-inverse-primary" href="#">
+          Audio Provenance Protocol
+        </a>
+<a class="text-on-surface-variant dark:text-inverse-on-surface hover:text-on-surface transition-colors hover:text-primary dark:hover:text-inverse-primary" href="#">
+          Support
+        </a>
+</nav>
+</div>
+</footer>
+</body></html>

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { on, type LogItem } from "../lib/bus";
+import { Icon } from "./Icon";
 
 const LABEL: Record<LogItem["source"], string> = {
   "alexa-sim": "Alexa+ sim",
@@ -28,8 +29,10 @@ export function McpLog() {
   return (
     <section className="panel log" aria-label="MCP activity log">
       <header className="panel__head">
-        <h2>MCP activity</h2>
-        <span className="muted">spec 2025-11-25 · Streamable HTTP</span>
+        <div>
+          <h2><Icon name="terminal" />MCP activity</h2>
+          <span className="muted">spec 2025-11-25 · Streamable HTTP</span>
+        </div>
       </header>
       <div className="log__body" role="log" aria-live="polite">
         {items.length === 0 && <p className="muted">Start with "Alexa, talk to …" to see the MCP calls.</p>}
@@ -37,7 +40,7 @@ export function McpLog() {
           <div key={i} className={`log__row log__row--${it.source}${it.isError ? " log__row--error" : ""}`}>
             <button className="log__line" onClick={() => setOpen(open === i ? null : i)} aria-expanded={open === i}>
               <span className="log__time">{it.at.slice(11, 19)}</span>
-              <span className="log__src">{LABEL[it.source]}</span>
+              <span className="log__src">[{LABEL[it.source]}]</span>
               <span className="log__dir">{it.dir}</span>
               <span className="log__title">{it.title}</span>
             </button>

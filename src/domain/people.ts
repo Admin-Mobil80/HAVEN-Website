@@ -15,6 +15,9 @@ export function forms(p: Pronouns | undefined): Forms {
 
 const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
+// The number to tell them to call in danger: 911 for a US household, 112 (India's and Europe's) otherwise.
+export const emergencyNumber = (elder: { language?: string }) => (elder.language === "en-US" ? "911" : "112");
+
 // The member whose AI version the companion is (the person who set Haven up).
 export function owner(doc: Household): Member | undefined {
   return doc.members.find((m) => m.id === doc.persona.childMemberId) ?? doc.members.find((m) => m.role === "primary");

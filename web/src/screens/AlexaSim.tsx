@@ -4,6 +4,7 @@ import { emit, log, on } from "../lib/bus";
 import { callTool, connect } from "../lib/mcp";
 import { canListen, listen, speechLang } from "../lib/speech";
 import { useNames } from "../lib/names";
+import { Icon } from "../components/Icon";
 
 // "Simulated Alexa+ add-on": a real MCP client of Haven's server. It routes a few fixed intents
 // itself (as Alexa+ would) and hands the conversation to the tablet. Not an Alexa product and no
@@ -78,16 +79,25 @@ export function AlexaSim() {
   return (
     <section className="panel alexa" aria-label="Simulated Alexa+ add-on">
       <header className="panel__head">
-        <h2>Simulated Alexa+ add-on</h2>
-        <span className="muted">real MCP client</span>
+        <div>
+          <h2><span className="dot" aria-hidden />Simulated Alexa+ add-on</h2>
+          <span className="muted">real MCP client, not an Amazon product</span>
+        </div>
       </header>
-      <div className={`ring${busy ? " is-busy" : ""}`} aria-hidden />
-      <p className="alexa__last" aria-live="polite">{last || `Try: “${talkTo}”`}</p>
-      <div className="row row--wrap">
+      <div className="alexa__stage">
+        <div className={`ring${busy ? " is-busy" : ""}`} aria-hidden>
+          <Icon name="graphic_eq" />
+        </div>
+        <p className="alexa__state">{busy ? "Alexa+ working…" : "Alexa+ ready"}</p>
+        <p className="alexa__last" aria-live="polite">{last || <>Try: <em>"{talkTo}"</em></>}</p>
+      </div>
+      <div className="alexa__buttons">
         <button className="btn btn--primary" disabled={busy} onClick={() => (unlockAudio(), void handle(talkTo))}>
-          "{talkTo}"
+          <Icon name="play_arrow" />"{talkTo}"
         </button>
-        <button className="btn" disabled={busy} onClick={mic}>🎤 Speak</button>
+        <button className="btn btn--soft" disabled={busy} onClick={mic}>
+          <Icon name="mic" />Speak
+        </button>
       </div>
       <form
         className="typebox"

@@ -1,4 +1,4 @@
-import { existsSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import express, { type ErrorRequestHandler } from "express";
 import { mcpRouter } from "./http/mcpRoute.js";
@@ -142,6 +142,7 @@ function mountWeb(app: express.Express, webDir: string | undefined) {
     });
     return;
   }
+  const shell = readFileSync(index); // one small file, fixed for the life of this deployment
   app.use(
     express.static(webDir, {
       index: false,
@@ -155,8 +156,10 @@ function mountWeb(app: express.Express, webDir: string | undefined) {
   app.use((req, res, next) => {
     if (req.method !== "GET" && req.method !== "HEAD") return next();
     if (SPA_EXCLUDED.test(req.path) || path.extname(req.path) !== "") return next();
-    res.set("Cache-Control", "no-cache");
-    res.sendFile(index);
+    // no-store, and no ETag or Last-Modified: the Lambda zip pins every mtime to 1980, so a
+    // rebuilt shell of the same size would get the same validators and browsers would keep the old one.
+    res.set("Cache-Control", "no-store");
+    res.type("html").end(req.method === "HEAD" ? undefined : shell);
   });
 }
 

@@ -2,7 +2,7 @@ import { detectCommitment } from "../domain/commitment.js";
 import { guardReply } from "../domain/guards.js";
 import { asksIfReal, declines, isAffirmative } from "../domain/matchers.js";
 import { compilePersona } from "../domain/persona.js";
-import { people } from "../domain/people.js";
+import { emergencyNumber, people } from "../domain/people.js";
 import { classify } from "../domain/safety.js";
 import { CAPS, MOODS, type ActiveSession, type Household, type LogEntry, type SessionRecord, type VoiceChoice } from "../domain/types.js";
 import { capPush, HOUR, istDate, nextId } from "../domain/util.js";
@@ -224,7 +224,7 @@ async function textTurn(hh: string, raw: string, deps: TurnDeps, mcp: LocalMcp, 
     ruleEvent = `${safety.level}:${safety.reason ?? "other"}`;
     if (r.ok) incident = { id: String(r.data.incident_id), tier: String(r.data.tier), emergency: Boolean(r.data.emergency), state: String(r.data.state) };
     if (tier === "urgent") {
-      const say = typeof r.data.say === "string" ? r.data.say : `I'm letting ${child} know right now. If you are in danger, call 112.`;
+      const say = typeof r.data.say === "string" ? r.data.say : `I'm letting ${child} know right now. If you are in danger, call ${emergencyNumber(doc.elder)}.`;
       return { text: say, mode: "safety", ruleEvent, incident };
     }
   }
@@ -265,7 +265,7 @@ async function textTurn(hh: string, raw: string, deps: TurnDeps, mcp: LocalMcp, 
 
   // 6. The brain proposes; the guard and the server decide.
   const brain = await runBrain(hh, doc, text, deps, now);
-  let say = guardReply(brain.say, { childName: child, calledBy: doc.elder.calledBy }).text;
+  let say = guardReply(brain.say, { childName: child, calledBy: doc.elder.calledBy, emergency: emergencyNumber(doc.elder) }).text;
 
   // 7. Carry out the proposals over MCP.
   for (const m of brain.remember) await mcp.call("agent", "remember", { type: m.type, content: m.content, private: m.private ?? false });

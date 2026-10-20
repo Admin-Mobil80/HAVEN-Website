@@ -354,6 +354,10 @@ test("a built web app is served with an SPA fallback and immutable hashed assets
       const res = await web.request("GET", p);
       assert.equal(res.status, 200, p);
       assert.ok(res.text.includes("<title>Haven</title>"), p);
+      // A new deploy must reach returning visitors: no caching and no validators on the shell.
+      assert.equal(res.headers["cache-control"], "no-store", p);
+      assert.equal(res.headers.etag, undefined, p);
+      assert.equal(res.headers["last-modified"], undefined, p);
     }
     const asset = await web.request("GET", "/assets/app-abc123.js");
     assert.equal(asset.status, 200);
