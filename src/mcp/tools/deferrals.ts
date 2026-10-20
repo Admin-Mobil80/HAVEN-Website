@@ -9,7 +9,7 @@ export const DeferralOutput = z.object({
   deferral_id: z.string(),
   status: z.enum(["open", "answered", "relayed"]),
   deduped: z.boolean(),
-  say: z.string().describe("What to tell her instead of promising anything."),
+  say: z.string().describe("What to tell them instead of promising anything."),
 });
 
 export function deferralSay(doc: Household) {
@@ -28,12 +28,12 @@ export function registerDeferralTools(server: McpServer, ctx: ToolContext) {
     {
       title: "Ask the real family later",
       description:
-        "Use when the elder asks for something only her real family member can decide or promise: plans, visits or dates, money, health decisions, family matters, or any promise. " +
-        "Records the question for that person to answer later; nothing is sent now. Then tell her the returned 'say' line (or close to it) instead of promising anything. " +
+        "Use when the elder asks for something only their real family member can decide or promise: plans, visits or dates, money, health decisions, family matters, or any promise. " +
+        "Records the question for that person to answer later; nothing is sent now. Then tell them the returned 'say' line (or close to it) instead of promising anything. " +
         "The same question within 24 hours is not recorded twice. Only the family can answer or close a question; there is no tool for that.",
       inputSchema: {
         topic: z.enum(DEFER_TOPICS),
-        question: z.string().trim().min(1).max(200).describe("Her question in her own words, e.g. 'Will you come for Diwali?'"),
+        question: z.string().trim().min(1).max(200).describe("Their question in their own words, e.g. 'Will you come home next month?'"),
         context: z.string().max(300).default("").describe("One neutral line of context for the family, if useful."),
       },
       outputSchema: declaredOutput(DeferralOutput),

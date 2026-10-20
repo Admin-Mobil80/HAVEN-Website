@@ -27,17 +27,17 @@ export function registerWellbeingTools(server: McpServer, ctx: ToolContext) {
   server.registerTool(
     "log_wellbeing",
     {
-      title: "Log how she is",
+      title: "Log how they are",
       description:
-        "Record a short, neutral note of how the elder seems today, based only on what she said: mood, energy, sleep, appetite and topics. " +
-        "The server decides whether her family should see it soon; it is never an emergency (use start_escalation for that). " +
-        "Do not diagnose, name conditions, or comment on medicines. Set private if she asked to keep it from her family.",
+        "Record a short, neutral note of how the elder seems today, based only on what they said: mood, energy, sleep, appetite and topics. " +
+        "The server decides whether their family should see it soon; it is never an emergency (use start_escalation for that). " +
+        "Do not diagnose, name conditions, or comment on medicines. Set private if they asked to keep it from their family.",
       inputSchema: {
         mood: z.enum(MOODS),
         energy: z.enum(["low", "normal", "high"]).optional(),
         sleep: z.enum(["poor", "ok", "good"]).optional(),
         appetite: z.enum(["poor", "ok", "good"]).optional(),
-        mentions: z.array(z.string().trim().min(1).max(40)).max(4).default([]).describe("Up to 4 topics she talked about, e.g. 'garden'."),
+        mentions: z.array(z.string().trim().min(1).max(40)).max(4).default([]).describe("Up to 4 topics they talked about, e.g. 'garden'."),
         note: z.string().max(200).optional().describe("One short neutral sentence."),
         private: z.boolean().default(false),
       },

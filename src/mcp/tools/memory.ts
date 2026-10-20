@@ -9,7 +9,7 @@ const MemoryOut = z.object({
   id: z.string(),
   type: z.enum(MEMORY_TYPES),
   content: z.string(),
-  private: z.boolean().describe("True if she asked to keep it from her family. Fine to use with her; never repeat it to anyone else."),
+  private: z.boolean().describe("True if they asked to keep it from their family. Fine to use with them; never repeat it to anyone else."),
   at: z.string(),
 });
 export const RecallOutput = z.object({ memories: z.array(MemoryOut), matched: z.number().int() });
@@ -90,9 +90,9 @@ export function registerMemoryTools(server: McpServer, ctx: ToolContext) {
       title: "Recall memories",
       description:
         "Look up things the elder has shared before (people, events, preferences, stories, routines) so you can bring them up naturally. " +
-        "Use a short keyword query, a type, or neither for the most recent. Memories marked private may be used with her but must never be passed on to family.",
+        "Use a short keyword query, a type, or neither for the most recent. Memories marked private may be used with them but must never be passed on to family.",
       inputSchema: {
-        query: z.string().max(80).optional().describe("A few keywords, e.g. 'Lalitha' or 'Diwali sweets'."),
+        query: z.string().max(80).optional().describe("A few keywords, e.g. 'Linda' or 'rose garden'."),
         about: z.enum(MEMORY_TYPES).optional(),
         limit: z.number().int().min(1).max(5).default(5),
       },
@@ -118,11 +118,11 @@ export function registerMemoryTools(server: McpServer, ctx: ToolContext) {
       title: "Remember something",
       description:
         "Save one short fact the elder shared so you can recall it later (a person, event, preference, story or routine). " +
-        "Set private when she asks to keep it from her family (for example 'don't tell Priya'); the server also detects this. " +
-        "Do not save health details, money matters, or anything she did not say herself. Saving is silent: do not announce it.",
+        "Set private when they ask to keep it from their family (for example 'don't tell Daniel'); the server also detects this. " +
+        "Do not save health details, money matters, or anything they did not say themselves. Saving is silent: do not announce it.",
       inputSchema: {
         type: z.enum(MEMORY_TYPES),
-        content: z.string().trim().min(1).max(200).describe("One short sentence in the third person, e.g. 'Lalitha visited on Sunday'."),
+        content: z.string().trim().min(1).max(200).describe("One short sentence in the third person, e.g. 'Linda visited on Sunday'."),
         private: z.boolean().optional(),
       },
       outputSchema: declaredOutput(RememberOutput),

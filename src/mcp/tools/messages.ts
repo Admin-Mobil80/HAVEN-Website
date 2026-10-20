@@ -30,11 +30,11 @@ export const ReplyOutput = z.object({
 
 const ERROR_TEXT: Record<string, [string, boolean]> = {
   confirmation_not_found: ["That confirmation does not exist. Start again without confirmation_id.", false],
-  confirmation_expired: ["The confirmation expired after 5 minutes. Start again and ask her again.", false],
+  confirmation_expired: ["The confirmation expired after 5 minutes. Start again and ask them again.", false],
   confirmation_used: ["That confirmation was already used.", false],
-  confirmation_superseded: ["A newer preview replaced this one. Use the latest confirmation_id, or start again and ask her again.", false],
+  confirmation_superseded: ["A newer preview replaced this one. Use the latest confirmation_id, or start again and ask them again.", false],
   args_mismatch: ["The message or kind changed since the preview. Start again with the new wording.", false],
-  elder_not_confirmed: ["She has not clearly said yes since the preview. Ask her, and retry only after a clear yes.", true],
+  elder_not_confirmed: ["They have not clearly said yes since the preview. Ask them, and retry only after a clear yes.", true],
 };
 
 const oldestFirst = (a: FamilyMessage, b: FamilyMessage) => a.createdAt.localeCompare(b.createdAt);
@@ -45,7 +45,7 @@ export function registerMessageTools(server: McpServer, ctx: ToolContext) {
     {
       title: "Play a family message",
       description:
-        "Get the next unplayed message that a real family member recorded or wrote for the elder: a voice note, a text, an answer to a question she asked earlier, or a promise to call. " +
+        "Get the next unplayed message that a real family member recorded or wrote for the elder: a voice note, a text, an answer to a question they asked earlier, or a promise to call. " +
         "Present it as coming from that real person, using their own words or recording, and never as something you said. Marks it played unless peek is true.",
       inputSchema: { peek: z.boolean().default(false).describe("Check what is waiting without marking it played.") },
       outputSchema: declaredOutput(PlayOutput),
@@ -95,11 +95,11 @@ export function registerMessageTools(server: McpServer, ctx: ToolContext) {
   server.registerTool(
     "record_reply",
     {
-      title: "Send her reply to family",
+      title: "Send their reply to family",
       description:
-        "Send the elder's own words to her primary family member, or ask that person to call her (kind call_request). Two steps, enforced by the server. " +
-        "Step 1: call without confirmation_id; you get a preview and a confirmation_id, and must then ask her in your own words whether to send it. " +
-        "Step 2: only after she clearly says yes in her next turn, call again with the same message and kind plus the confirmation_id. " +
+        "Send the elder's own words to their primary family member, or ask that person to call them (kind call_request). Two steps, enforced by the server. " +
+        "Step 1: call without confirmation_id; you get a preview and a confirmation_id, and must then ask them in your own words whether to send it. " +
+        "Step 2: only after they clearly say yes in their next turn, call again with the same message and kind plus the confirmation_id. " +
         "A yes from before the preview does not count, and the confirmation expires after 5 minutes. Never say it was sent unless step 2 succeeds.",
       inputSchema: {
         message: z.string().trim().min(1).max(280).describe("Her words, lightly tidied, in the first person."),

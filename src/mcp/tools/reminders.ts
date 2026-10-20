@@ -37,7 +37,7 @@ export function registerReminderTools(server: McpServer, ctx: ToolContext) {
     {
       title: "Get reminders",
       description:
-        "List reminders her family has set or confirmed (for example a physio appointment, or a promise to call tonight), in India time. " +
+        "List reminders their family has set or confirmed (for example a physio appointment, or a promise to call tonight), in India time. " +
         "'now' means due within two hours either way. Mention them in plain words; never add advice about medicines or doses.",
       inputSchema: { window: z.enum(WINDOWS).default("today") },
       outputSchema: declaredOutput(RemindersOutput),

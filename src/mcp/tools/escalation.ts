@@ -14,7 +14,7 @@ export const EscalationOutput = z.object({
   emergency: z.boolean(),
   action: z.enum(["opened", "upgraded", "appended"]),
   notified: z.array(z.string()).describe("Family members alerted by this call."),
-  say: z.string().describe("What to tell her now."),
+  say: z.string().describe("What to tell them now."),
 });
 
 const sourceFor = (client: string): Incident["source"] => (client === "rule" ? "rule" : client === "agent" ? "agent" : "alexa");
@@ -33,10 +33,10 @@ export function registerEscalationTools(server: McpServer, ctx: ToolContext) {
     {
       title: "Alert family",
       description:
-        "Use when the elder may need her family soon. urgent: she may be hurt, unwell, scared, confused, or asks for her family right now; set emergency for a fall, chest pain, trouble breathing, or a cry for help. " +
+        "Use when the elder may need their family soon. urgent: they may be hurt, unwell, scared, confused, or ask for their family right now; set emergency for a fall, chest pain, trouble breathing, or a cry for help. " +
         "important: something the family should see today, such as not eating, skipped tablets, or feeling very lonely. " +
-        "Urgent alerts reach her family at once; important ones go to their dashboard. Repeated calls attach to the same incident and never send duplicate alerts. " +
-        "Then tell her the returned 'say' line. You cannot call emergency services and must never say that you did. Only the family can close an incident.",
+        "Urgent alerts reach their family at once; important ones go to their dashboard. Repeated calls attach to the same incident and never send duplicate alerts. " +
+        "Then tell them the returned 'say' line. You cannot call emergency services and must never say that you did. Only the family can close an incident.",
       inputSchema: {
         tier: z.enum(["urgent", "important"]),
         reason: z.enum(ESCALATION_REASONS),
