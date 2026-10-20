@@ -5,7 +5,7 @@ import { newHousehold, type SetupInput } from "../store/seed.js";
 // one click. The face is an Anam stock avatar and the voice an ElevenLabs library voice, so no
 // real person's likeness is used. "Create your own" builds the same thing from the user's answers.
 export const DEMO_PRESET: SetupInput = {
-  userName: "David",
+  userName: "Daniel",
   userPronouns: "he",
   userRelation: "son",
   elderName: "Margaret",
@@ -18,8 +18,8 @@ export const DEMO_PRESET: SetupInput = {
   phrases: ["Mom", "love you, Mom"],
 };
 
-export const DEMO_AVATAR_ID = process.env.DEMO_AVATAR_ID || "6cc28442-cccd-42a8-b6e4-24b7210a09c5"; // Anam stock "Gabriel"
-export const DEMO_AVATAR_STILL = "/demo/digital-david.webp";
+export const DEMO_AVATAR_ID = process.env.DEMO_AVATAR_ID || "6615addc-3203-4e6f-b867-13135177107a"; // Anam stock "Daniel" (less widely used than the first-page avatars)
+export const DEMO_AVATAR_STILL = "/demo/digital-daniel.webp";
 export const DEMO_VOICE_ID = process.env.DEMO_VOICE_ID || "iP95p4xoKVk53GoZ742B"; // ElevenLabs premade "Chris" (American; uses no voice slot)
 
 export function demoPresetHousehold(id: string, now: Date): Household {

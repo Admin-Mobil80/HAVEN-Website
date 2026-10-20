@@ -33,9 +33,9 @@ export function SetupWizard({ onDone }: { onDone: (how: "demo" | "own") => void 
       <p>Haven keeps someone you love company when you can't be there, and tells you each evening what to talk about when you call. It speaks as a clearly labelled AI version of you.</p>
       <div className="choices">
         <button className="choice" onClick={startDemo} disabled={busy}>
-          <img src="/demo/digital-david.webp" alt="" />
+          <img src="/demo/digital-daniel.webp" alt="" />
           <strong>{busy ? "Starting…" : "Start demo"}</strong>
-          <span>Meet Digital David, keeping his mother Margaret company in Seattle. A fictional family with a stock AI face and voice. Ready in one click.</span>
+          <span>Meet Digital Daniel, keeping his mother Margaret company in Seattle. A fictional family with a stock AI face and voice. Ready in one click.</span>
         </button>
         <button className="choice" onClick={() => setOwn(true)} disabled={busy}>
           <span className="choice__icon" aria-hidden>＋</span>

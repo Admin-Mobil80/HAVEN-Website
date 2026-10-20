@@ -96,14 +96,14 @@ test("Start demo: a fictional household with a stock face and voice, and its sti
   const { h, repo, auth } = await app();
   try {
     const view = (await h.request("POST", "/api/setup/demo", { headers: auth })).json();
-    assert.equal(view.user.name, "David");
+    assert.equal(view.user.name, "Daniel");
     assert.equal(view.elder.calledBy, "Mom");
     const doc = (await repo.get("demo-lk"))!;
     assert.equal(doc.persona.voice?.source, "library");
     assert.ok(doc.persona.avatar?.avatarId && !doc.persona.avatar.photoKey);
     const elder = (await h.request("GET", "/api/state/elder", { headers: auth })).json();
     assert.equal(elder.photoAvatar, true);
-    assert.equal(elder.photoUrl, "/demo/digital-david.webp");
+    assert.equal(elder.photoUrl, "/demo/digital-daniel.webp");
   } finally {
     await h.close();
   }
