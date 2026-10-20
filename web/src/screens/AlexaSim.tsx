@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { speakBrowser, unlockAudio } from "../lib/audio";
 import { emit, log, on } from "../lib/bus";
 import { callTool, connect } from "../lib/mcp";
-import { canListen, listen } from "../lib/speech";
+import { canListen, listen, speechLang } from "../lib/speech";
 import { useNames } from "../lib/names";
 
 // "Simulated Alexa+ add-on": a real MCP client of Haven's server. It routes a few fixed intents
@@ -70,7 +70,7 @@ export function AlexaSim() {
     unlockAudio();
     if (!canListen) return handle(talkTo);
     setLast("Listening…");
-    const text = await listen({ lang: "en-IN" }).done.catch(() => "");
+    const text = await listen({ lang: speechLang(n.setup?.elder.language) }).done.catch(() => "");
     if (text) await handle(text);
     else setLast("");
   };

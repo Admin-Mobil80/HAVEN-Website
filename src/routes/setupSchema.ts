@@ -12,7 +12,7 @@ export const SetupBody = z.object({
   calledBy: z.string().trim().max(30).default(""),
   elderPronouns: z.enum(PRONOUNS),
   city: z.string().trim().max(40).optional(),
-  language: z.enum(["en-IN", "hi-IN"]).optional(),
+  language: z.enum(["en-US", "en-IN", "hi-IN"]).optional(),
   thingsTheyLove: z.array(z.string().trim().min(1).max(80)).max(8).optional(),
   phrases: z.array(z.string().trim().min(1).max(40)).max(8).optional(),
 });

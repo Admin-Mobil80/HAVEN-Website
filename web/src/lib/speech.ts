@@ -24,6 +24,9 @@ const Ctor = (window as unknown as { SpeechRecognition?: new () => Recognition; 
 
 export const canListen = Boolean(Ctor);
 
+// Recognition language for a household: its own setting, English (India) for older households.
+export const speechLang = (language?: string) => (language === "hi-IN" || language === "en-US" ? language : "en-IN");
+
 export type Listening = { done: Promise<string>; stop(): void };
 
 export function listen(opts: { lang?: string; onInterim?: (text: string) => void; silenceMs?: number; maxMs?: number } = {}): Listening {

@@ -33,9 +33,9 @@ export function SetupWizard({ onDone }: { onDone: (how: "demo" | "own") => void 
       <p>Haven keeps someone you love company when you can't be there, and tells you each evening what to talk about when you call. It speaks as a clearly labelled AI version of you.</p>
       <div className="choices">
         <button className="choice" onClick={startDemo} disabled={busy}>
-          <img src="/demo/digital-arjun.webp" alt="" />
+          <img src="/demo/digital-david.webp" alt="" />
           <strong>{busy ? "Starting…" : "Start demo"}</strong>
-          <span>Meet Digital Arjun, keeping his mother Kamala ("Amma") company in Chennai. A fictional family with a stock AI face and voice. Ready in one click.</span>
+          <span>Meet Digital David, keeping his mother Margaret company in Seattle. A fictional family with a stock AI face and voice. Ready in one click.</span>
         </button>
         <button className="choice" onClick={() => setOwn(true)} disabled={busy}>
           <span className="choice__icon" aria-hidden>＋</span>
@@ -58,6 +58,7 @@ function OwnSetup({ onDone, onBack }: { onDone: () => void; onBack: () => void }
     calledBy: "",
     elderPronouns: "she" as Pronouns,
     city: "",
+    language: "en-US",
     loves: "",
   });
   const [err, setErr] = useState("");
@@ -82,6 +83,7 @@ function OwnSetup({ onDone, onBack }: { onDone: () => void; onBack: () => void }
           calledBy: f.calledBy.trim(),
           elderPronouns: f.elderPronouns,
           city: f.city.trim() || undefined,
+          language: f.language,
           thingsTheyLove: f.loves.split(/[,\n]/).map((x) => x.trim()).filter(Boolean).slice(0, 8),
         },
       });
@@ -135,6 +137,14 @@ function OwnSetup({ onDone, onBack }: { onDone: () => void; onBack: () => void }
         <label>What do you call {E.obj}?<input value={f.calledBy} onChange={(e) => set({ calledBy: e.target.value })} placeholder="e.g. Amma, Appa, Nani, or their name" maxLength={30} /></label>
         {pronounPicker(f.elderPronouns, (p) => set({ elderPronouns: p }), "Their pronouns")}
         <label>City (optional)<input value={f.city} onChange={(e) => set({ city: e.target.value })} maxLength={40} /></label>
+        <label>
+          {E.Subj} {E.Subj === "They" ? "speak" : "speaks"}
+          <select value={f.language} onChange={(e) => set({ language: e.target.value })}>
+            <option value="en-US">English (US)</option>
+            <option value="en-IN">English (India)</option>
+            <option value="hi-IN">Hindi</option>
+          </select>
+        </label>
         <label>Things {them} loves to talk about (comma-separated)<textarea rows={2} value={f.loves} onChange={(e) => set({ loves: e.target.value })} placeholder="e.g. the garden, old songs, cooking" /></label>
       </fieldset>
 

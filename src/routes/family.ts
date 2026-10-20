@@ -52,7 +52,7 @@ export function setupView(doc: Household) {
     configured: doc.configured,
     voice: doc.persona.voice ? { name: doc.persona.voice.name, source: doc.persona.voice.source } : null,
     photoAvatar: Boolean(doc.persona.avatar),
-    elder: { name: doc.elder.name, calledBy: doc.elder.calledBy, city: doc.elder.city, relationToUser: doc.elder.relationToUser, pronouns: doc.elder.pronouns },
+    elder: { name: doc.elder.name, calledBy: doc.elder.calledBy, city: doc.elder.city, relationToUser: doc.elder.relationToUser, pronouns: doc.elder.pronouns, language: doc.elder.language },
     user: { name: child?.name ?? "", relation: child?.relation ?? "", pronouns: child?.pronouns ?? "they" },
     childName: child?.name ?? "",
     displayName: doc.persona.displayName,

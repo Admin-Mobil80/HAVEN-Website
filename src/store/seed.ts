@@ -11,7 +11,7 @@ export type SetupInput = {
   calledBy: string; // "Ummi"
   elderPronouns: Pronouns;
   city?: string;
-  language?: "en-IN" | "hi-IN";
+  language?: "en-US" | "en-IN" | "hi-IN";
   thingsTheyLove?: string[];
   phrases?: string[];
 };

@@ -18,7 +18,7 @@ export type Elder = {
   age?: number;
   city: string;
   phone: string; // shown in urgent alerts so family can tap to call
-  language: "en-IN" | "hi-IN";
+  language: "en-US" | "en-IN" | "hi-IN";
 };
 
 export type Member = {

@@ -4,7 +4,7 @@ import { api, poll } from "../lib/api";
 import { playBase64, playSrc, playTts, speakBrowser, unlockAudio } from "../lib/audio";
 import { emit, log, on } from "../lib/bus";
 import { callTool } from "../lib/mcp";
-import { canListen, listen, type Listening } from "../lib/speech";
+import { canListen, listen, speechLang, type Listening } from "../lib/speech";
 import type { ElderState, PlayedMessage, TurnResponse } from "../lib/types";
 import { forms, useNames } from "../lib/names";
 import { cuePhoto, isLive, speakPhoto, startPhotoAvatar, stopPhotoAvatar } from "../lib/anam";
@@ -239,7 +239,7 @@ export function Tablet({ chips: chipsProp, compact }: { chips?: string[]; compac
     setError("");
     void warmPhoto(); // the live face connects while they talk
     try {
-      listening.current = listen({ lang: elderRef.current?.elder.language === "hi-IN" ? "hi-IN" : "en-IN", onInterim: setHeard });
+      listening.current = listen({ lang: speechLang(elderRef.current?.elder.language), onInterim: setHeard });
       const text = await listening.current.done;
       listening.current = null;
       setState("idle");

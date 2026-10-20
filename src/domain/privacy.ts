@@ -27,7 +27,7 @@ export type ElderProjection = {
   photoKey?: string; // signed into photoUrl by the route
   stillUrl?: string; // a stock avatar's public still, used when there is no photoKey
   persona: { displayName: string; mode: "child" | "neutral"; isAI: true; badge: string; childName?: string; childPronouns?: string };
-  elder: { name: string; calledBy: string; pronouns: string; language: "en-IN" | "hi-IN" };
+  elder: { name: string; calledBy: string; pronouns: string; language: "en-US" | "en-IN" | "hi-IN" };
   pendingFamilyMessages: number;
   reminders: { id: string; text: string; due: string; source: Reminder["source"] }[];
   openIncident: { id: string; tier: Incident["tier"]; emergency: boolean; state: Incident["state"]; openedAt: string } | null;
