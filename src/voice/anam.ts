@@ -50,7 +50,13 @@ export class Anam {
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
           clientLabel: label.slice(0, 60),
-          personaConfig: { avatarId, avatarModel: "cara-4", enableAudioPassthrough: true, maxSessionLengthSeconds: 900 }, // billed per minute: hard stop at 15 min
+          personaConfig: {
+            avatarId,
+            avatarModel: "cara-4",
+            enableAudioPassthrough: true,
+            maxSessionLengthSeconds: 900, // billed per minute: hard stop at 15 min
+            directorNotes: { presetStyle: "warm", expressivity: 0.65 }, // a soft smile, not a neutral stare
+          },
           sessionOptions: { showAIAvatarDisclosure: true, sessionReplay: { enableSessionReplay: false } },
         }),
       },

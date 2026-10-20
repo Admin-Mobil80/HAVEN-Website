@@ -7,6 +7,7 @@ import { signMediaUrl } from "../http/media.js";
 import { householdWriteLimit, type HouseholdLimiter } from "../http/security.js";
 import { mediaKey } from "../store/s3Media.js";
 import { newHousehold } from "../store/seed.js";
+import { demoPresetHousehold } from "../domain/demoPreset.js";
 import { SetupBody as NewSetupBody } from "./setupSchema.js";
 import { DEFER_TOPICS as TOPICS, PRONOUNS } from "../domain/types.js";
 import type { Repo } from "../store/repo.js";
@@ -120,6 +121,17 @@ export function familyRouter(deps: FamilyRouteDeps): Router {
     if (!current) return void res.status(404).json({ error: "household_not_found" });
     if (!current.demo) return void res.status(403).json({ error: "not_a_demo_household" });
     const fresh = newHousehold(current.id, deps.now(), parsed.data, { demo: true });
+    fresh.version = current.version + 1;
+    await deps.repo.put(fresh, deps.demoTtlSeconds ? { ttlSeconds: deps.demoTtlSeconds } : undefined);
+    res.status(201).json(setupView(fresh));
+  });
+
+  // "Start demo": the ready-made fictional household (stock face and voice), demo households only.
+  router.post("/api/setup/demo", auth, write, async (_req, res) => {
+    const current = await deps.repo.get(hh(res));
+    if (!current) return void res.status(404).json({ error: "household_not_found" });
+    if (!current.demo) return void res.status(403).json({ error: "not_a_demo_household" });
+    const fresh = demoPresetHousehold(current.id, deps.now());
     fresh.version = current.version + 1;
     await deps.repo.put(fresh, deps.demoTtlSeconds ? { ttlSeconds: deps.demoTtlSeconds } : undefined);
     res.status(201).json(setupView(fresh));

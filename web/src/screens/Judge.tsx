@@ -66,7 +66,7 @@ export function Judge() {
       </p>
 
       {names.ready && !names.configured ? (
-        <SetupWizard onDone={() => setTab("demo")} />
+        <SetupWizard onDone={(how) => setTab(how === "own" ? "setup" : "demo")} />
       ) : tab === "setup" ? (
         <>
           <Likeness />

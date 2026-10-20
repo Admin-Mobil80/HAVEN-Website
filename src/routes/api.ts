@@ -80,8 +80,8 @@ export function apiRouter(deps: ApiRouteDeps): Router {
   });
 
   router.get("/api/state/elder", auth, async (_req, res) => {
-    const { photoKey, ...view } = elderProjection(await loadDoc(deps.repo, res), deps.now());
-    res.json({ ...view, photoUrl: photoKey ? signMediaUrl(photoKey, deps.secret, deps.now()) : undefined });
+    const { photoKey, stillUrl, ...view } = elderProjection(await loadDoc(deps.repo, res), deps.now());
+    res.json({ ...view, photoUrl: photoKey ? signMediaUrl(photoKey, deps.secret, deps.now()) : stillUrl });
   });
 
   router.get("/api/state/family", auth, async (_req, res) => {

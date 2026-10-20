@@ -52,7 +52,19 @@ export class ElevenLabs {
   }
 
   // A library voice must be added to the account before TTS can use it.
+  // The voices in this account (clones and added library voices; premade ones left out).
+  async accountVoices(): Promise<{ voiceId: string; name: string; category: string; createdAt: number; labels: Record<string, string> }[]> {
+    const res = await this.call("/v1/voices");
+    const body = (await res.json()) as { voices?: Record<string, unknown>[] };
+    return (body.voices ?? [])
+      .filter((v) => v.category !== "premade")
+      .map((v) => ({ voiceId: String(v.voice_id), name: String(v.name ?? ""), category: String(v.category ?? ""), createdAt: Number(v.created_at_unix ?? 0), labels: (v.labels ?? {}) as Record<string, string> }));
+  }
+
+  // Each added voice takes one of the plan's few slots (10 on Starter), so a voice already in the
+  // account is reused instead of added again.
   async addLibraryVoice(publicOwnerId: string, voiceId: string, newName: string): Promise<string> {
+    if ((await this.accountVoices()).some((v) => v.voiceId === voiceId)) return voiceId;
     const res = await this.call(`/v1/voices/add/${encodeURIComponent(publicOwnerId)}/${encodeURIComponent(voiceId)}`, {
       method: "POST",
       headers: { "content-type": "application/json" },
@@ -72,6 +84,16 @@ export class ElevenLabs {
     const res = await this.call("/v1/voices/add", { method: "POST", body: form }, 60000);
     const body = (await res.json()) as { voice_id?: string; requires_verification?: boolean };
     return { voiceId: String(body.voice_id), requiresVerification: Boolean(body.requires_verification) };
+  }
+
+  // Make room before a new demo clone: delete the oldest demo clones so at most `keep` remain.
+  // Only clones labelled demo=yes are touched; the owner's own clone is never deleted here.
+  // A household whose clone is recycled falls back to the default voice.
+  async recycleDemoClones(keep: number): Promise<string[]> {
+    const clones = (await this.accountVoices()).filter((v) => v.category === "cloned" && v.labels.demo === "yes").sort((a, b) => a.createdAt - b.createdAt);
+    const drop = clones.slice(0, Math.max(0, clones.length - keep));
+    for (const v of drop) await this.deleteVoice(v.voiceId).catch(() => undefined);
+    return drop.map((v) => v.voiceId);
   }
 
   async deleteVoice(voiceId: string) {

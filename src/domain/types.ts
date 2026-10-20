@@ -69,6 +69,7 @@ export type AvatarChoice = {
   provider: "anam";
   avatarId: string;
   photoKey?: string; // our copy of the photo, shown while the tablet is asleep
+  stillUrl?: string; // a stock avatar's still (the "Start demo" preset), served with the web app
   consent: ConsentRecord;
 };
 

@@ -218,13 +218,22 @@ label.check input { width: 22px; height: 22px; margin-top: 2px; flex: none; }
 /* setup wizard */
 .wizard { max-width: 720px; margin: 0 auto; width: 100%; }
 .wizard fieldset { gap: 12px; }
+.choices { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; margin: 8px 0; }
+.choice { display: flex; flex-direction: column; gap: 8px; align-items: flex-start; text-align: left; padding: 14px; border: 2px solid var(--line); border-radius: var(--radius); background: var(--surface); color: var(--ink); font: inherit; cursor: pointer; }
+.choice:hover:not(:disabled), .choice:focus-visible { border-color: var(--brand); }
+.choice:disabled { opacity: 0.6; cursor: progress; }
+.choice img { width: 100%; aspect-ratio: 3 / 2; object-fit: cover; border-radius: 10px; }
+.choice__icon { display: grid; place-items: center; width: 100%; aspect-ratio: 3 / 2; border-radius: 10px; background: var(--surface-2); color: var(--brand); font-size: 3rem; }
+.choice strong { font-size: 1.2rem; }
+.choice span:last-child { color: var(--muted); }
 .pron { display: flex; gap: 8px; flex-wrap: wrap; }
 .chip.is-on { background: var(--brand); color: var(--brand-ink); border-color: var(--brand); }
 label select { padding: 10px 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface); font: inherit; color: inherit; }
 
 /* photo-real avatar */
 .photoav { position: relative; width: min(100%, 420px); aspect-ratio: 1; border-radius: var(--radius); overflow: hidden; background: #000; }
-.photoav video { width: 100%; height: 100%; object-fit: cover; display: block; }
+.photoav video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; opacity: 0; transition: opacity 0.25s; }
+.photoav video.is-on { opacity: 1; }
 .photoav__wait { position: absolute; inset: auto 0 44% 0; text-align: center; color: #fff; font-weight: 600; }
 
 /* face and voice */

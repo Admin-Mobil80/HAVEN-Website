@@ -24,7 +24,7 @@ export type LikenessDeps = {
   pollyPcm?: (text: string) => Promise<Buffer>;
   media?: { put(key: string, data: Buffer, contentType: string): Promise<void> };
   householdLimit?: HouseholdLimiter;
-  limits?: { ttsCharsPerDay?: number; clonesPerDay?: number; avatarsPerDay?: number; avatarSessionsPerDay?: number };
+  limits?: { ttsCharsPerDay?: number; clonesPerDay?: number; avatarsPerDay?: number; avatarSessionsPerDay?: number; demoClonesKept?: number };
 };
 
 const AUDIO = /^audio\/(webm|ogg|mp4|mpeg|aac|x-m4a|wav|x-wav)(;.*)?$/;
@@ -35,7 +35,7 @@ export function likenessRouter(deps: LikenessDeps): Router {
   const auth = requireHousehold(deps.secret);
   const write = householdWriteLimit(deps.householdLimit);
   const hh = (res: Response) => res.locals.householdId as string;
-  const limits = { ttsCharsPerDay: 20000, clonesPerDay: 15, avatarsPerDay: 15, avatarSessionsPerDay: 60, ...deps.limits };
+  const limits = { ttsCharsPerDay: 20000, clonesPerDay: 15, avatarsPerDay: 15, avatarSessionsPerDay: 300, demoClonesKept: 5, ...deps.limits };
   const fail = (res: Response, err: unknown) => {
     if (err instanceof ElevenError || err instanceof AnamError) {
       console.warn(JSON.stringify({ msg: "likeness_provider_error", provider: err.name, status: err.status, error: err.message.slice(0, 200) }));
@@ -99,7 +99,8 @@ export function likenessRouter(deps: LikenessDeps): Router {
     if (!doc) return void res.status(404).json({ error: "household_not_found" });
     const p = people(doc);
     try {
-      const out = await eleven.cloneVoice(`Haven ${p.user} ${doc.id.slice(-6)}`, req.body, type, { use: "haven-companion" });
+      if (doc.demo) await eleven.recycleDemoClones(limits.demoClonesKept - 1).catch(() => undefined); // free a slot first
+      const out = await eleven.cloneVoice(`Haven ${p.user} ${doc.id.slice(-6)}`, req.body, type, { use: "haven-companion", demo: doc.demo ? "yes" : "no" });
       const old = doc.persona.voice?.source === "cloned" ? doc.persona.voice.voiceId : undefined;
       const at = deps.now().toISOString();
       await deps.repo.update(hh(res), (d) => void (d.persona.voice = { provider: "elevenlabs", voiceId: out.voiceId, name: `${p.user}'s voice (AI)`, source: "cloned", consent: { by: d.persona.childMemberId, at } }));

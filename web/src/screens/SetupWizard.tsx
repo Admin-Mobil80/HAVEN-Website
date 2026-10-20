@@ -6,9 +6,49 @@ import { forms, type Pronouns } from "../lib/names";
 const USER_RELATIONS = ["son", "daughter", "grandson", "granddaughter", "nephew", "niece", "friend", "neighbour", "other"];
 const ELDER_RELATIONS = ["mother", "father", "grandmother", "grandfather", "aunt", "uncle", "friend", "neighbour", "other"];
 
-// First thing every demo shows: who you are and who Haven is for. Nothing is pre-filled with
-// invented people; the companion is built from these answers.
-export function SetupWizard({ onDone }: { onDone: () => void }) {
+// First thing every demo shows: a ready-made demo (fictional family, stock face and voice) or
+// your own (your names, then your photo and voice).
+export function SetupWizard({ onDone }: { onDone: (how: "demo" | "own") => void }) {
+  const [own, setOwn] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState("");
+  const startDemo = async () => {
+    setBusy(true);
+    setErr("");
+    try {
+      await api("/api/setup/demo", { body: {} });
+      emit("refresh");
+      onDone("demo");
+    } catch (e) {
+      setErr(`Couldn't start the demo: ${(e as Error).message}`);
+      setBusy(false);
+    }
+  };
+  if (own) return <OwnSetup onDone={() => onDone("own")} onBack={() => setOwn(false)} />;
+  return (
+    <section className="panel wizard" aria-label="Start Haven">
+      <header className="panel__head">
+        <h2>Welcome to Haven</h2>
+      </header>
+      <p>Haven keeps someone you love company when you can't be there, and tells you each evening what to talk about when you call. It speaks as a clearly labelled AI version of you.</p>
+      <div className="choices">
+        <button className="choice" onClick={startDemo} disabled={busy}>
+          <img src="/demo/digital-arjun.webp" alt="" />
+          <strong>{busy ? "Starting…" : "Start demo"}</strong>
+          <span>Meet Digital Arjun, keeping his mother Kamala ("Amma") company in Chennai. A fictional family with a stock AI face and voice. Ready in one click.</span>
+        </button>
+        <button className="choice" onClick={() => setOwn(true)} disabled={busy}>
+          <span className="choice__icon" aria-hidden>＋</span>
+          <strong>Create your own</strong>
+          <span>Enter your name and who Haven is for, then add your own photo and voice. About two minutes.</span>
+        </button>
+      </div>
+      {err && <p className="error">{err}</p>}
+    </section>
+  );
+}
+
+function OwnSetup({ onDone, onBack }: { onDone: () => void; onBack: () => void }) {
   const [f, setF] = useState({
     userName: "",
     userRelation: "son",
@@ -67,10 +107,9 @@ export function SetupWizard({ onDone }: { onDone: () => void }) {
   return (
     <form className="panel wizard" onSubmit={submit} aria-label="Set up Haven">
       <header className="panel__head">
-        <h2>Set up Haven</h2>
+        <h2>Create your own</h2>
         <span className="muted">takes a minute</span>
       </header>
-      <p>Haven keeps someone you love company when you can't be there, and tells you each evening what to talk about when you call. It speaks as a clearly labelled AI version of you.</p>
 
       <fieldset>
         <legend>You</legend>
@@ -101,7 +140,8 @@ export function SetupWizard({ onDone }: { onDone: () => void }) {
 
       {err && <p className="error">{err}</p>}
       <button className="btn btn--primary btn--huge" disabled={busy}>{busy ? "Setting up…" : `Create Digital ${f.userName.trim() || "me"}`}</button>
-      <p className="muted">You can add your photo and voice next, and change anything later in Setup.</p>
+      <p className="muted">Next you can add your photo and voice. You can change anything later in Setup.</p>
+      <button type="button" className="btn btn--ghost" onClick={onBack}>← Back</button>
     </form>
   );
 }

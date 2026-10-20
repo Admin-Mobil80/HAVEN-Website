@@ -18,10 +18,11 @@ async function app() {
     addLibraryVoice: async () => (calls.push("add"), "acct-lib1"),
     cloneVoice: async () => (calls.push("clone"), { voiceId: "clone1", requiresVerification: false }),
     deleteVoice: async () => void calls.push("delete"),
+    recycleDemoClones: async () => (calls.push("recycle"), []),
     pcm: async () => (calls.push("pcm"), Buffer.alloc(3200)),
   } as unknown as ElevenLabs;
   const anam = { createAvatar: async () => (calls.push("avatar"), "av1"), sessionToken: async () => "tok123" } as unknown as Anam;
-  const h = await startApp({ repo, likeness: { eleven: async () => eleven, anam: async () => anam, pollyPcm: async () => Buffer.alloc(1600) } });
+  const h = await startApp({ repo, likeness: { eleven: async () => eleven, anam: async () => anam, pollyPcm: async () => Buffer.alloc(1600), limits: { avatarSessionsPerDay: 5 } } });
   const auth = { authorization: `Bearer ${signToken("demo-lk", SECRET)}` };
   return { h, repo, calls, auth };
 }
@@ -45,6 +46,7 @@ test("voices: list, pick a library voice, clone own voice only with consent", as
     assert.ok(v.consent, "consent recorded");
     assert.match(v.name, /Fazil's voice \(AI\)/);
     assert.ok(calls.includes("clone"));
+    assert.ok(calls.indexOf("recycle") < calls.indexOf("clone"), "a demo household frees a voice slot before cloning");
   } finally {
     await h.close();
   }
@@ -61,7 +63,7 @@ test("photo avatar: needs consent, then the tablet can get a session token", asy
     assert.equal((await h.request("GET", "/api/state/elder", { headers: auth })).json().photoAvatar, true);
     assert.equal((await h.request("POST", "/api/avatar/session", { headers: auth })).json().sessionToken, "tok123");
     // Sessions are billed per minute: a daily cap per household stops a runaway reconnect.
-    for (let i = 0; i < 59; i++) await h.request("POST", "/api/avatar/session", { headers: auth });
+    for (let i = 0; i < 4; i++) await h.request("POST", "/api/avatar/session", { headers: auth });
     const over = await h.request("POST", "/api/avatar/session", { headers: auth });
     assert.equal(over.status, 429);
     assert.equal(over.json().error, "daily_avatar_session_limit");
@@ -88,4 +90,48 @@ test("/api/tts returns PCM in the chosen voice, Polly otherwise, with a daily ca
 test("character timings become mouth shapes", () => {
   const m = charsToMouths(["H", "e", "l", "l", "o", " ", "m", "a"], [0, 60, 120, 180, 240, 300, 360, 420]);
   assert.deepEqual(m.map((x) => x.mouth), ["rest", "narrow", "open", "narrow", "round", "rest", "closed", "open", "rest"]);
+});
+
+test("Start demo: a fictional household with a stock face and voice, and its still on the tablet", async () => {
+  const { h, repo, auth } = await app();
+  try {
+    const view = (await h.request("POST", "/api/setup/demo", { headers: auth })).json();
+    assert.equal(view.user.name, "Arjun");
+    assert.equal(view.elder.calledBy, "Amma");
+    const doc = (await repo.get("demo-lk"))!;
+    assert.equal(doc.persona.voice?.source, "library");
+    assert.ok(doc.persona.avatar?.avatarId && !doc.persona.avatar.photoKey);
+    const elder = (await h.request("GET", "/api/state/elder", { headers: auth })).json();
+    assert.equal(elder.photoAvatar, true);
+    assert.equal(elder.photoUrl, "/demo/digital-arjun.webp");
+  } finally {
+    await h.close();
+  }
+});
+
+test("ElevenLabs: library voices are reused, and only old demo clones are recycled", async () => {
+  const deleted: string[] = [];
+  const added: string[] = [];
+  const voices = [
+    { voice_id: "own", category: "cloned", created_at_unix: 1, labels: {} },
+    { voice_id: "d1", category: "cloned", created_at_unix: 2, labels: { demo: "yes" } },
+    { voice_id: "d2", category: "cloned", created_at_unix: 3, labels: { demo: "yes" } },
+    { voice_id: "d3", category: "cloned", created_at_unix: 4, labels: { demo: "yes" } },
+    { voice_id: "lib1", category: "professional", created_at_unix: 5, labels: {} },
+    { voice_id: "rachel", category: "premade", created_at_unix: 0, labels: {} },
+  ];
+  const f = (async (url: string, init?: RequestInit) => {
+    const u = String(url);
+    if (init?.method === "DELETE") return deleted.push(u.split("/").pop()!), new Response("{}");
+    if (u.includes("/v1/voices/add/")) return added.push(u), new Response(JSON.stringify({ voice_id: "lib2" }));
+    return new Response(JSON.stringify({ voices }));
+  }) as typeof fetch;
+  const { ElevenLabs } = await import("../src/voice/eleven.js");
+  const e = new ElevenLabs("k", f);
+  assert.equal(await e.addLibraryVoice("o", "lib1", "x"), "lib1");
+  assert.equal(added.length, 0, "already in the account: not added again");
+  assert.equal(await e.addLibraryVoice("o", "lib2", "x"), "lib2");
+  assert.equal(added.length, 1);
+  assert.deepEqual(await e.recycleDemoClones(1), ["d1", "d2"]);
+  assert.deepEqual(deleted, ["d1", "d2"], "the owner's own clone is never touched");
 });

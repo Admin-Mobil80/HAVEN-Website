@@ -1,13 +1,13 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Avatar, type AvatarState, type Mouth } from "../components/Avatar";
 import { api, poll } from "../lib/api";
-import { playBase64, playSrc, speakBrowser, unlockAudio } from "../lib/audio";
+import { playBase64, playSrc, playTts, speakBrowser, unlockAudio } from "../lib/audio";
 import { emit, log, on } from "../lib/bus";
 import { callTool } from "../lib/mcp";
 import { canListen, listen, type Listening } from "../lib/speech";
 import type { ElderState, PlayedMessage, TurnResponse } from "../lib/types";
 import { forms, useNames } from "../lib/names";
-import { isLive, speakPhoto, startPhotoAvatar, stopPhotoAvatar } from "../lib/anam";
+import { cuePhoto, isLive, speakPhoto, startPhotoAvatar, stopPhotoAvatar } from "../lib/anam";
 
 // Stable function identity that always calls the latest closure.
 function useCallbackRef<A extends unknown[], R>(fn: (...a: A) => R) {
@@ -34,11 +34,12 @@ export function Tablet({ chips: chipsProp, compact }: { chips?: string[]; compac
   const [callEnded, setCallEnded] = useState<string>();
   // The photo-real face: "off" (illustrated avatar), "connecting", "live", or "failed" (fallback).
   const [photo, setPhoto] = useState<"off" | "connecting" | "live" | "failed">("off");
+  const [videoOn, setVideoOn] = useState(false); // the live face shows only while it is speaking
   const photoRef = useRef(photo);
   photoRef.current = photo;
-  const lastActive = useRef(Date.now());
   const busy = useRef(false);
   const openRef = useRef(false);
+  const listening = useRef<Listening | null>(null);
 
   const elderRef = useRef<ElderState | undefined>(undefined);
   const refresh = useCallback(async () => {
@@ -55,20 +56,93 @@ export function Tablet({ chips: chipsProp, compact }: { chips?: string[]; compac
     return () => off();
   }, [refresh]);
 
-  const speak = useCallback(async (r: Pick<TurnResponse, "text" | "audio" | "visemes">) => {
+  // The photo-real face is billed per minute, so it is only connected around a reply: it starts
+  // connecting when a turn begins (while they speak and Haven thinks), shows while it talks, and
+  // closes a few seconds later. In between, the tablet shows the still photo.
+  const wantPhoto = () => Boolean(elderRef.current?.photoAvatar) && photoRef.current !== "failed";
+  const connecting = useRef<Promise<boolean> | null>(null);
+  const closeTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const warmPhoto = useCallback((): Promise<boolean> => {
+    clearTimeout(closeTimer.current);
+    if (!wantPhoto()) return Promise.resolve(false);
+    if (isLive()) return Promise.resolve(true);
+    if (connecting.current) return connecting.current;
+    setPhoto("connecting");
+    const t0 = performance.now();
+    connecting.current = startPhotoAvatar("haven-video", () => (setPhoto("off"), setVideoOn(false)))
+      .then(() => {
+        setPhoto("live");
+        log({ source: "tablet", dir: "•", title: `photo avatar connected in ${Math.round(performance.now() - t0)} ms` });
+        return true;
+      })
+      .catch((e) => {
+        console.warn("photo avatar unavailable, using the illustrated one", e);
+        setPhoto("failed");
+        return false;
+      })
+      .finally(() => (connecting.current = null));
+    return connecting.current;
+  }, []);
+  const releasePhoto = useCallback(() => {
+    clearTimeout(closeTimer.current);
+    closeTimer.current = setTimeout(() => {
+      if (busy.current || listening.current || !isLive()) return;
+      stopPhotoAvatar();
+      setPhoto("off");
+      setVideoOn(false);
+    }, 4000);
+  }, []);
+  useEffect(() => {
+    const hidden = () => document.visibilityState === "hidden" && isLive() && (stopPhotoAvatar(), setPhoto("off"), setVideoOn(false));
+    document.addEventListener("visibilitychange", hidden);
+    return () => {
+      document.removeEventListener("visibilitychange", hidden);
+      clearTimeout(closeTimer.current);
+      stopPhotoAvatar();
+    };
+  }, []);
+
+  const flapWhile = async (play: () => Promise<void>) => {
+    const flap = setInterval(() => setMouth((m) => (m === "open" ? "narrow" : "open")), 140);
+    try {
+      await play();
+    } finally {
+      clearInterval(flap);
+    }
+  };
+
+  const speak = useCallback(async (r: Pick<TurnResponse, "text" | "audio" | "visemes" | "mode">) => {
     if (!r.text) return;
     setCaption(r.text);
-    setState("speaking");
-    if (isLive() && !r.audio) {
-      try {
-        await speakPhoto(r.text);
-        setState("idle");
-        return;
-      } catch (e) {
-        console.warn("photo avatar speech failed, falling back", e);
-        setPhoto("failed");
+    if (!r.audio && wantPhoto()) {
+      const ok = await warmPhoto();
+      setState("speaking");
+      if (ok) {
+        try {
+          cuePhoto(r.mode === "safety" ? "concerned" : r.mode === "greeting" || r.mode === "goodbye" ? "happy" : "warm");
+          setVideoOn(true);
+          await speakPhoto(r.text);
+          setVideoOn(false);
+          setState("idle");
+          releasePhoto();
+          return;
+        } catch (e) {
+          console.warn("photo avatar speech failed, falling back", e);
+          setVideoOn(false);
+          setPhoto("failed");
+        }
       }
+      // No live face: the same voice through the speaker, with the illustrated avatar.
+      try {
+        await flapWhile(() => playTts(r.text));
+      } catch {
+        await speakBrowser(r.text);
+      }
+      setMouth("rest");
+      setState("idle");
+      return;
     }
+    setState("speaking");
     if (r.audio) {
       const timeline = r.visemes;
       let i = 0;
@@ -98,14 +172,14 @@ export function Tablet({ chips: chipsProp, compact }: { chips?: string[]; compac
   );
   const runTurn = useCallbackRef(async (body: Record<string, unknown>) => {
     busy.current = true;
-    lastActive.current = Date.now();
-    if (photoRef.current === "off") await startPhoto(); // reconnect after an idle close (no-op without a photo avatar)
+    const photoReply = wantPhoto();
+    if (photoReply) void warmPhoto(); // connect while Haven thinks
     {
       setError("");
       setState("thinking");
       try {
-        // With the photo avatar live, the avatar speaks (via /api/tts), so skip server audio.
-        const r = await api<TurnResponse>("/api/turn", { body: { ...body, speech: isLive() ? "none" : "server" } });
+        // With the photo avatar, the avatar speaks (via /api/tts), so skip server audio.
+        const r = await api<TurnResponse>("/api/turn", { body: { ...body, speech: photoReply ? "none" : "server" } });
         for (const t of r.mcpTrace) log({ source: t.client === "rule" ? "rule" : "agent", dir: "•", title: t.summary, isError: t.isError });
         if (r.mode === "safety") log({ source: "rule", dir: "•", title: "safety rule fired: incident opened, family alerted (no LLM)" });
         setConfirm(r.awaitingConfirmation);
@@ -137,41 +211,9 @@ export function Tablet({ chips: chipsProp, compact }: { chips?: string[]; compac
     [turn],
   );
 
-  const startPhoto = useCallback(async () => {
-    if (!elderRef.current?.photoAvatar || isLive()) return;
-    setPhoto("connecting");
-    await new Promise((r) => requestAnimationFrame(() => r(undefined))); // let the <video> mount
-    try {
-      await startPhotoAvatar("haven-video", () => setPhoto("off"));
-      setPhoto("live");
-    } catch (e) {
-      console.warn("photo avatar unavailable, using the illustrated one", e);
-      setPhoto("failed");
-    }
-  }, []);
-
-  // The photo avatar is billed per minute: close it after 5 quiet minutes, when the tab is
-  // hidden, and on leaving the screen. The next turn reconnects it.
-  useEffect(() => {
-    const park = () => {
-      if (!isLive()) return;
-      stopPhotoAvatar();
-      setPhoto("off");
-      log({ source: "tablet", dir: "•", title: "photo avatar closed to save minutes" });
-    };
-    const idle = setInterval(() => !busy.current && Date.now() - lastActive.current > 5 * 60_000 && park(), 30_000);
-    const hidden = () => document.visibilityState === "hidden" && park();
-    document.addEventListener("visibilitychange", hidden);
-    return () => {
-      clearInterval(idle);
-      document.removeEventListener("visibilitychange", hidden);
-      stopPhotoAvatar();
-    };
-  }, []);
-
   const start = useCallback(async () => {
     unlockAudio();
-    await startPhoto();
+    if (photoRef.current === "failed") setPhoto("off"); // a new conversation tries the live face again
     if (openRef.current) return;
     openRef.current = true;
     setOpen(true);
@@ -188,7 +230,6 @@ export function Tablet({ chips: chipsProp, compact }: { chips?: string[]; compac
   }, [say]);
 
   // Tap once to speak; tap again ("Done") to finish early. Otherwise it finishes after a pause.
-  const listening = useRef<Listening | null>(null);
   const talk = async () => {
     unlockAudio();
     if (!canListen) return;
@@ -196,6 +237,7 @@ export function Tablet({ chips: chipsProp, compact }: { chips?: string[]; compac
     setState("listening");
     setHeard("");
     setError("");
+    void warmPhoto(); // the live face connects while they talk
     try {
       listening.current = listen({ lang: elderRef.current?.elder.language === "hi-IN" ? "hi-IN" : "en-IN", onInterim: setHeard });
       const text = await listening.current.done;
@@ -253,15 +295,10 @@ export function Tablet({ chips: chipsProp, compact }: { chips?: string[]; compac
             <button className="btn" onClick={() => setCallEnded(calling.at)}>Call ended</button>
           </div>
         ) : (
-          photo === "connecting" || photo === "live" ? (
+          elder?.photoAvatar && photo !== "failed" ? (
             <div className={`photoav${relay ? " avatar--dim" : ""}`}>
-              <video id="haven-video" autoPlay playsInline />
-              {photo === "connecting" && <p className="photoav__wait">Connecting to {n.companion}…</p>}
-              <div className="avatar__badge" aria-label="This is an AI">{badge}</div>
-            </div>
-          ) : elder?.photoUrl && photo === "off" && !open ? (
-            <div className="photoav">
-              <img src={elder.photoUrl} alt={`${n.companion}, asleep`} />
+              {elder.photoUrl && <img src={elder.photoUrl} alt={`${n.companion}${open ? "" : ", asleep"}`} />}
+              <video id="haven-video" className={videoOn ? "is-on" : ""} autoPlay playsInline />
               <div className="avatar__badge" aria-label="This is an AI">{badge}</div>
             </div>
           ) : (

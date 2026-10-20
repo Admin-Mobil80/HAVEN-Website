@@ -1,4 +1,4 @@
-import { AnamEvent, createClient, type AnamClient } from "@anam-ai/js-sdk";
+import { AnamEvent, createClient, type AnamClient, type DirectorNoteCueTag } from "@anam-ai/js-sdk";
 import { api, getToken } from "./api";
 import { log } from "./bus";
 
@@ -56,6 +56,15 @@ export async function speakPhoto(text: string): Promise<void> {
   stream.endSequence();
   const seconds = pcm.length / 32000;
   await new Promise((r) => setTimeout(r, seconds * 1000 + 900));
+}
+
+// A mood for the next reply ("warm", "happy", "concerned"...), on top of the session's warm style.
+export function cuePhoto(tag: DirectorNoteCueTag) {
+  try {
+    client?.sendDirectorNoteCue(tag);
+  } catch {
+    /* older avatar model: cues are optional */
+  }
 }
 
 export function interruptPhoto() {
