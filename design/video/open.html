@@ -5,10 +5,17 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Haven · Open</title>
 <!--
-  Source for the statistic: WHO news release, 30 June 2025,
-  "Social connection linked to improved health and reduced risk of early death"
-  https://www.who.int/news/item/30-06-2025-social-connection-linked-to-improved-heath-and-reduced-risk-of-early-death
-  WHO's wording: "1 in 6 people worldwide is affected by loneliness" (WHO Commission on Social Connection report).
+  The problem in numbers: three cards, about 20 s. Every figure is quoted from its source.
+
+  Card 1 and card 2: CDC, "Health Effects of Social Isolation and Loneliness" (updated 15 May 2024)
+    https://www.cdc.gov/social-connectedness/risk-factors/index.html
+    "About 1 in 3 adults in the U.S. report feeling lonely."
+    "Social isolation and loneliness can increase a person's risk for: Heart disease and stroke ...
+     Depression and anxiety ... Dementia ..."
+
+  Card 3: Pew Research Center, "Americans' Use of Mobile Devices in 2026" (fact sheet, 19 Oct 2026)
+    https://www.pewresearch.org/internet/fact-sheet/mobile/
+    79% of U.S. adults 65 and older own a smartphone (survey Jan 30 to Jun 18, 2026), so about 1 in 5 do not.
 -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -21,37 +28,40 @@
     transform: translate(-50%, -50%) scale(var(--s, 1)); background: var(--bg);
     font-family: "Plus Jakarta Sans", system-ui, sans-serif; color: var(--ink);
   }
-  .lines { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 28px; }
-  .line { font-size: 76px; font-weight: 600; letter-spacing: -0.02em; line-height: 1.15; opacity: 0; }
-  .stat { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 40px; }
-  .big { font-size: 104px; font-weight: 700; letter-spacing: -0.03em; opacity: 0; text-align: center; line-height: 1.12; }
+  .card { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 44px; padding: 0 180px; text-align: center; }
+  .big { font-size: 96px; font-weight: 700; letter-spacing: -0.03em; line-height: 1.14; opacity: 0; }
   .big b { color: var(--brand); font-weight: 800; }
-  .src { font-size: 30px; font-weight: 500; color: var(--muted); opacity: 0; }
+  .mid { font-size: 76px; font-weight: 600; letter-spacing: -0.02em; line-height: 1.18; opacity: 0; }
+  .src { font-size: 28px; font-weight: 500; color: var(--muted); opacity: 0; }
 
   @keyframes in { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
   @keyframes out { from { opacity: 1; } to { opacity: 0; } }
   @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
 
-  /* Timeline (s): lines at 0.4 / 1.7 / 3.0 / 4.5, all out at 7.2, statistic 8.0, source 9.0, hold to 12. */
-  .play .l1 { animation: in .8s ease-out .4s both, out .7s ease-in 7.2s forwards; }
-  .play .l2 { animation: in .8s ease-out 1.7s both, out .7s ease-in 7.2s forwards; }
-  .play .l3 { animation: in .8s ease-out 3.0s both, out .7s ease-in 7.2s forwards; }
-  .play .l4 { animation: in .8s ease-out 4.5s both, out .7s ease-in 7.2s forwards; }
-  .play .big { animation: in 1s ease-out 8.0s both; }
-  .play .src { animation: fade .8s ease-out 9.0s both; }
+  /* Timeline (s): card 1 0.3 to 6.6, card 2 7.0 to 13.4, card 3 13.8 (second line at 16.6), hold to 20. */
+  .play .c1 .big { animation: in .9s ease-out .3s both, out .5s ease-in 6.3s forwards; }
+  .play .c1 .src { animation: fade .7s ease-out 1.2s both, out .5s ease-in 6.3s forwards; }
+  .play .c2 .big { animation: in .9s ease-out 7.0s both, out .5s ease-in 12.9s forwards; }
+  .play .c2 .src { animation: fade .7s ease-out 7.9s both, out .5s ease-in 12.9s forwards; }
+  .play .c3 .big { animation: in .9s ease-out 13.8s both; }
+  .play .c3 .mid { animation: in .9s ease-out 16.6s both; }
+  .play .c3 .src { animation: fade .7s ease-out 14.7s both; }
 </style>
 </head>
 <body>
 <div id="stage">
-  <div class="lines">
-    <div class="line l1">Your mom.</div>
-    <div class="line l2">Your grandad.</div>
-    <div class="line l3">The friend who moved away.</div>
-    <div class="line l4">The neighbour who taught you to ride a bike.</div>
+  <div class="card c1">
+    <div class="big">About <b>1 in 3</b> adults in the U.S.<br>report feeling lonely.</div>
+    <div class="src">CDC, Health Effects of Social Isolation and Loneliness, 2024</div>
   </div>
-  <div class="stat">
-    <div class="big"><b>1 in 6</b> people worldwide<br>are affected by loneliness.</div>
-    <div class="src">World Health Organization, 2025</div>
+  <div class="card c2">
+    <div class="big">Loneliness can raise the risk of<br><b>dementia, depression,<br>stroke and heart disease.</b></div>
+    <div class="src">CDC, Health Effects of Social Isolation and Loneliness, 2024</div>
+  </div>
+  <div class="card c3">
+    <div class="big">About <b>1 in 5</b> Americans over 65<br>don't own a smartphone.</div>
+    <div class="mid">And their children can't be there every day.</div>
+    <div class="src">Pew Research Center, Americans' Use of Mobile Devices, 2026</div>
   </div>
 </div>
 <script>

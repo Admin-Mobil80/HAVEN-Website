@@ -105,3 +105,25 @@ WHO news release, 30 June 2025: "1 in 6 people worldwide is affected by loneline
 https://www.who.int/news/item/30-06-2025-social-connection-linked-to-improved-heath-and-reduced-risk-of-early-death
 
 The card uses WHO's wording ("are affected by loneliness") rather than "are lonely", so the on-screen line matches the cited source.
+
+## Mary's voice (cue board)
+
+Mary is fictional, and her lines are a synthetic voice: the ElevenLabs library voice **"Carol – Relatable, Real, Likeable Grandma"**, an older American woman, generated with `eleven_multilingual_v2` at a slightly slow pace. The video says so on screen (beat 4).
+
+| Clip | Line | Beat |
+|---|---|---|
+| `mary/1-memory.mp3` | "I met my old friend at the market today. We used to sing together." | 6 |
+| `mary/2-are-you-real.mp3` | "Are you real?" | 6 |
+| `mary/3-come-home.mp3` | "Will you come home next month?" | 6 |
+| `mary/4a-tell-daniel.mp3` | "Tell Daniel the roses are blooming." | 8 |
+| `mary/4b-yes-send.mp3` | "Yes, send it." (play after "Shall I send this…?") | 8 |
+| `mary/5-dizzy.mp3` | "Help… I feel dizzy." | 9 |
+
+**How to use it:**
+
+1. Serve the folder with `python3 -m http.server 8765 --directory design/video`.
+2. Open `http://<laptop-ip>:8765/mary.html` on a phone (same Wi-Fi), or `localhost:8765/mary.html` on a second computer.
+3. Hold the speaker about 30 cm from the laptop mic. Use a quiet room, with Do Not Disturb on.
+4. Press each line when the tablet shows **Listening…**. The button turns green while it plays.
+
+**If it mishears a line:** press it again, or type the same words into the tablet's **Or type here…** box. As a last resort, use the matching walkthrough button.

@@ -76,6 +76,15 @@ const DEFAULT_BRAIN_CAP = 300;
 const ASKS_TO_SEND = (child: string) =>
   new RegExp(String.raw`\b(tell|let|ask|message|inform|send)\b.{0,40}\b(${child}|her|him|them|my (daughter|son|grandson|granddaughter|child)|beti|beta)\b|\b(${child}|beti|beta)\s+(ko|se)\b.{0,40}\b(bolo|bol do|batao|bata do|kaho|keh do)\b`, "i");
 const ASKS_FOR_CALL = /\b(call me|ring me|phone me|give me a call|mujhe (call|phone) kar)/i;
+
+// Her own words after "tell Daniel (that) …", used when she clearly asked to pass something on but
+// the model proposed nothing to send. Nothing goes out without her yes either way.
+function ownWords(text: string, child: string): string | undefined {
+  const m = new RegExp(String.raw`\b(?:tell|let|message|inform|send)\b\s+(?:${child}|him|her|them|my (?:daughter|son|grandson|granddaughter|child))\b(?:\s+know)?[\s,:]*(?:that\s+)?(.+)$`, "i").exec(text.trim());
+  const rest = m?.[1]?.trim().replace(/[.!?\s]+$/, "");
+  if (!rest || rest.length < 3) return undefined;
+  return (rest.charAt(0).toUpperCase() + rest.slice(1)).slice(0, 200);
+}
 const SOUNDS_PRIVATE = /\b(don'?t|do not|never)\s+(tell|mention|say|share)\b|\b(mat|na) (batana|bataana|batao|bolna|kehna)\b/i;
 
 const CONCERN_TO_WELLBEING: Record<Concern, { mood: (typeof MOODS)[number]; sleep?: "poor"; appetite?: "poor" }> = {
@@ -276,12 +285,15 @@ async function textTurn(hh: string, raw: string, deps: TurnDeps, mcp: LocalMcp, 
   }
   let pendingReply: Routed["pendingReply"] = clearPending;
   let awaiting: Routed["awaiting"];
-  if (brain.send_to_priya && ASKS_TO_SEND(child).test(text)) {
+  const asked = ASKS_TO_SEND(child).test(text);
+  // Never build a message from her words when she said not to tell ("don't tell Daniel, but …").
+  const toSend = asked ? brain.send_to_priya ?? (SOUNDS_PRIVATE.test(text) ? undefined : ownWords(text, child)) : undefined;
+  if (toSend) {
     const kind = ASKS_FOR_CALL.test(text) ? "call_request" : "reply";
-    const r = await mcp.call("agent", "record_reply", { message: brain.send_to_priya, kind });
+    const r = await mcp.call("agent", "record_reply", { message: toSend, kind });
     if (r.ok && r.data.status === "needs_confirmation") {
-      pendingReply = { confirmationId: String(r.data.confirmation_id), message: brain.send_to_priya, kind };
-      awaiting = { to: String(r.data.to ?? child), message: brain.send_to_priya };
+      pendingReply = { confirmationId: String(r.data.confirmation_id), message: toSend, kind };
+      awaiting = { to: String(r.data.to ?? child), message: toSend };
       // Ask instead of announcing: nothing is sent until she says yes.
       say = typeof r.data.say === "string" ? r.data.say : `Shall I send that to ${child}?`;
     }

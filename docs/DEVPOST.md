@@ -16,7 +16,8 @@ Loneliness is a public-health problem, not a niche one:
 
 - The **WHO Commission on Social Connection** reports that **1 in 6 people worldwide** is affected by loneliness, and links it to **more than 871,000 deaths a year** ([WHO, 30 June 2025](https://www.who.int/news/item/30-06-2025-social-connection-linked-to-improved-heath-and-reduced-risk-of-early-death)).
 - The **US Surgeon General's 2023 advisory**, *Our Epidemic of Loneliness and Isolation*, found that about **half of US adults** reported measurable loneliness. It linked poor social connection to a **29% higher risk of heart disease, a 32% higher risk of stroke, and a 50% higher risk of dementia in older adults** ([HHS, May 2023](https://www.hhs.gov/sites/default/files/surgeon-general-social-connection-advisory.pdf)).
-- The **CDC** reports that about **1 in 3 US adults** feel lonely, and that **older adults are more at risk of social isolation** ([CDC](https://www.cdc.gov/social-connectedness/risk-factors/index.html)).
+- The **CDC** reports that about **1 in 3 US adults** feel lonely, and that social isolation and loneliness can raise the risk of **heart disease and stroke, depression and anxiety, and dementia** ([CDC, May 2024](https://www.cdc.gov/social-connectedness/risk-factors/index.html)).
+- **Pew Research** finds that **about 1 in 5 Americans over 65 don't own a smartphone** (79% do), so an app-only answer misses many of them; voice doesn't ([Pew, Oct 2026](https://www.pewresearch.org/internet/fact-sheet/mobile/)).
 
 AI companions are an obvious answer, and a worrying one. A companion that is always available and always agreeable can quietly replace the people it should lead back to, especially for an older parent whose children live far away.
 

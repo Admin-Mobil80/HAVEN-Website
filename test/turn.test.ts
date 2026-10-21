@@ -109,6 +109,19 @@ test("sending to Priya needs her spoken yes: preview first, then send", async ()
   assert.equal(d.session?.pendingReply, undefined, "preview cleared");
 });
 
+test("if the model proposes nothing, her own words after 'tell …' are offered for sending", async () => {
+  const s = await setup({ say: "That's wonderful, Amma!" });
+  const ask = await say(s, "Tell Priya the roses are blooming.");
+  assert.match(ask.text, /^Shall I send this to Priya/);
+  assert.equal(ask.awaitingConfirmation?.message, "The roses are blooming");
+  assert.equal((await doc(s)).outbox.length, 0, "nothing sent before yes");
+  const yes = await say(s, "Yes, send it.");
+  assert.equal(yes.mode, "consent");
+  assert.match((await doc(s)).outbox[0].body, /roses are blooming/);
+  const quiet = await say(s, "Don't tell Priya, but I skipped my walk");
+  assert.equal(quiet.awaitingConfirmation, undefined, "a private remark is never offered for sending");
+});
+
 test("a decline after the preview sends nothing", async () => {
   const s = await setup({ say: "Okay.", send_to_priya: "I miss you" });
   await say(s, "Tell Priya I miss her");
