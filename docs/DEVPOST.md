@@ -24,7 +24,7 @@ We wanted the opposite: a companion whose job is to make itself less necessary, 
 
 ## What it does
 
-A family member, here Daniel in the demo, sets Haven up for his mother Margaret in Seattle. She talks to **Digital Daniel**, a clearly labelled AI version of her son with a live face and voice. It remembers what she shares, plays messages the real Daniel leaves, and keeps her company. It never pretends to be him.
+A family member, here Daniel in the demo, sets Haven up for his mother Mary in Seattle. She talks to **Digital Daniel**, a clearly labelled AI version of her son with a live face and voice. It remembers what she shares, plays messages the real Daniel leaves, and keeps her company. It never pretends to be him.
 
 - **Daniel's evening update.** Each evening Daniel gets a short summary with a voice note: how Mom's day went, the stories she told and the questions only he can answer. It ends with ideas for tonight's call. Real households get it on WhatsApp; the demo mirrors it on a phone panel.
 - **Questions go to the real person.** If Mom asks "Will you come home next month?", Digital Daniel doesn't make promises. It says that one is for the real Daniel and passes it to him.

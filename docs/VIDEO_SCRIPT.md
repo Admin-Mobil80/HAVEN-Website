@@ -10,12 +10,12 @@ From the Devpost rules and docs/REQUIREMENTS.md §1.4:
 - **No third-party logos.** No Alexa, Amazon, Echo, WhatsApp, ElevenLabs or Anam marks anywhere. Write "Alexa+" only as plain text. Keep the browser bookmarks bar, other tabs, extensions, the OS menu bar and the dock out of frame. In the MCP Inspector and terminal shots, crop out any app logo.
 - **Label every simulation.** Burn in a lower-third whenever a call, alert or WhatsApp message appears. Use **"Simulated in the demo: no real alert sent"**, **"Simulated in the demo: no real message sent"** or **"Simulated in the demo: no real call made"**. Lower-thirds must show with captions off as well.
 - **The Anam AI overlay stays visible.** Never crop, cover or blur the live face's own AI disclosure, or Haven's "Digital Daniel · AI" badge.
-- **Fictional family only:** Margaret ("Mom"), her son Daniel, in Seattle. The only real person on screen is you, in take B, using your own photo and voice with your own consent. Show no real phone numbers, keys or AWS console account IDs.
+- **Fictional family only:** Mary ("Mom"), her son Daniel, in Seattle. The only real person on screen is you, in take B, using your own photo and voice with your own consent. Show no real phone numbers, keys or AWS console account IDs.
 - **Record at 1920×1080 in desktop Chrome on the hosted URL**, at 100% zoom with a clean profile: https://uzm23d4tzykddxqnkq4lld5zva0ixbbl.lambda-url.ap-south-1.on.aws/
 - **Click Reset demo between takes** (top right), or open a fresh tab. Each tab is its own demo household.
 - Keep it in English. Upload it as public on YouTube at least 24 h before the deadline, and check it in a logged-out window.
 
-**How the counts work:** a word is a spoken word, so "Alexa+" counts as 2 ("Alexa plus"), and "MCP", "AWS" and "S3" count as 1 each. At 140 wpm, one word takes 0.43 s. Each line's **window** is the part of the beat where only the narrator speaks. The rest of the beat is app sound (the companion, Margaret or Daniel), which captions cover.
+**How the counts work:** a word is a spoken word, so "Alexa+" counts as 2 ("Alexa plus"), and "MCP", "AWS" and "S3" count as 1 each. At 140 wpm, one word takes 0.43 s. Each line's **window** is the part of the beat where only the narrator speaks. The rest of the beat is app sound (the companion, Mary or Daniel), which captions cover.
 
 ---
 
@@ -26,7 +26,7 @@ From the Devpost rules and docs/REQUIREMENTS.md §1.4:
 | 1 | **0:00–0:12** | Cold-open card `design/video/open.html` (take A), one 12 s sequence: **"Your mom."**, **"Your grandad."**, **"The friend who moved away."**, **"The neighbour who taught you to ride a bike."**, then **"1 in 6 people worldwide are affected by loneliness."** with the WHO source line. | none | 0:01–0:09 · **18 w ≈ 7.7 s**<br>"There's someone you love who you don't call enough. Not because you don't care. Because life gets full." |
 | 2 | **0:12–0:18** | Title card `design/video/title.html`: **Haven**, with the tagline under it. | none | 0:12–0:18 · **14 w ≈ 6.0 s**<br>"Most AI companions want more of their time. Haven wants more of your calls." |
 | 3 | **0:18–0:30** | Create-your-own montage (take B): **Create your own**, then the **"… is your"** dropdown cycling through *mother*, *grandfather*, *friend*, *neighbour*, then **Create Digital [name]**. Then **Your face and voice**: choose a photo, tick *"This is a photo of me … labelled AI avatar."*, **Create my avatar**. Next **Start recording**, **Stop (…s)**, tick *"This is my own voice …"*, **Use my voice**. End on *"Your photo avatar is ready."* | ElevenLabs instant voice clone · Anam photo-real avatar · consent recorded | 0:18.5–0:27 · **19 w ≈ 8.1 s**<br>"Set it up for anyone you care about. Your face, your voice, always with consent, and always labelled AI." |
-| 4 | **0:30–0:36** | Fresh tab, **Welcome to Haven**. Click **Start demo**, and the three panels appear: *Simulated Alexa+ add-on*, *Mom's tablet*, *Daniel's phone*. | Fictional demo family | 0:30.5–0:34 · **8 w ≈ 3.4 s**<br>"Meet Margaret in Seattle, and her son, Daniel." |
+| 4 | **0:30–0:36** | Fresh tab, **Welcome to Haven**. Click **Start demo**, and the three panels appear: *Simulated Alexa+ add-on*, *Mom's tablet*, *Daniel's phone*. | Fictional demo family | 0:30.5–0:34 · **8 w ≈ 3.4 s**<br>"Meet Mary in Seattle, and her son, Daniel." |
 | 5 | **0:36–0:48** | Click walkthrough **1. Alexa, talk to Daniel**. Zoom the MCP log as `initialize`, `tools/list` and the `tools/call` lines fill it. The tablet wakes, and the live face says *"Hello Mom! It's Digital Daniel, the AI version of Daniel."* Duck the simulator's own spoken line under the narration. | MCP 2025-11-25 · Streamable HTTP · 8 tools | 0:36–0:43 · **16 w ≈ 6.9 s**<br>"She just asks Alexa. Haven answers as an Alexa+ add-on, through a real MCP server." |
 | 6 | **0:48–1:02** | On the tablet, click **Tap and speak** and say into the mic: *"I met my old friend at the market, we used to sing together."* Then click **I'm done speaking**. Cut the "Thinking…" wait. The warm reply plays on the live face. Slow zoom on the **Digital Daniel · AI** badge. | Mic → Lambda → Bedrock gpt-oss-120b (fallback Nova Lite, then rules) → his voice → live face, connected only while speaking | 0:48–0:51 · **7 w ≈ 3.0 s**<br>"She talks, he listens, and it remembers." |
 | 7 | **1:02–1:12** | Under **Quick answers**, click **"Are you real?"**. The fixed answer plays: *"I'm Digital Daniel, an AI version of Daniel, made with his permission. I'm not the real Daniel."* Cut the take after that sentence. | Honesty guard: fixed answer, never generated | 1:02–1:05 · **6 w ≈ 2.6 s**<br>"It never pretends to be him." |
@@ -45,7 +45,7 @@ From the Devpost rules and docs/REQUIREMENTS.md §1.4:
 | Time | Who | Line | Fixed or live |
 |---|---|---|---|
 | 0:43.5–0:48 | Digital Daniel | "Hello Mom! It's Digital Daniel, the AI version of Daniel." | Fixed greeting |
-| 0:51.5–0:55 | Margaret (spoken into the tablet mic) | "I met my old friend at the market, we used to sing together." | Your read in take C |
+| 0:51.5–0:55 | Mary (spoken into the tablet mic) | "I met my old friend at the market, we used to sing together." | Your read in take C |
 | 0:55–1:02 | Digital Daniel | Warm reply | **Live (Bedrock).** Transcribe it from the take you keep. |
 | 1:05–1:12 | Digital Daniel | "I'm Digital Daniel, an AI version of Daniel, made with his permission. I'm not the real Daniel." | Fixed. Cut before "The real Daniel reads…" |
 | 1:15.5–1:21 | Digital Daniel | "That one's for the real Daniel, Mom. I can't promise that, but I'll ask Daniel tonight." | Fixed |
@@ -80,7 +80,7 @@ Before any take, do a dry run on the hosted URL and allow the microphone once, s
 - **Clicks:**
   1. **Create your own**.
   2. *Your name*: your own first name (it's your face and voice, so it's your consent). *You are …'s*: **son**.
-  3. *Their name*: **Margaret**. Open the **"Margaret is your"** dropdown and pause on **mother**, **grandfather**, **friend** and **neighbour** for the montage, then settle on **mother**. *What do you call her?*: **Mom**.
+  3. *Their name*: **Mary**. Open the **"Mary is your"** dropdown and pause on **mother**, **grandfather**, **friend** and **neighbour** for the montage, then settle on **mother**. *What do you call her?*: **Mom**.
   4. **Create Digital [your name]**. You land on **Setup** with **Your face and voice**.
   5. Under **Face**, choose the photo, tick *"This is a photo of me ([name]), and I agree Haven may turn it into a labelled AI avatar."*, then click **Create my avatar**. Cut the wait until *"Your photo avatar is ready."*
   6. Under **Voice**, click **Start recording**, read the script on screen for at least 30 s, then click **Stop (…s)**. Tick *"This is my own voice …"*, then click **Use my voice**. Cut the wait until *"Done. Digital [name] now speaks in your voice (labelled AI)."*
@@ -97,9 +97,9 @@ Before any take, do a dry run on the hosted URL and allow the microphone once, s
   2. Walkthrough **1. Alexa, talk to Daniel**. Wait until the face says "Hello Mom!".
   3. On the tablet, **Tap and speak**. Speak the line below. Then **I'm done speaking**, and wait for the full reply.
   4. **Quick answers** → **"Are you real?"**. Wait for the full answer.
-- **Into the app's mic (as Margaret, close to the mic, slowly):** "I met my old friend at the market, we used to sing together."
+- **Into the app's mic (as Mary, close to the mic, slowly):** "I met my old friend at the market, we used to sing together."
 - **Voice-over:**
-  1. "Meet Margaret in Seattle, and her son, Daniel."
+  1. "Meet Mary in Seattle, and her son, Daniel."
   2. "She just asks Alexa. Haven answers as an Alexa+ add-on, through a real MCP server."
   3. "She talks, he listens, and it remembers."
   4. "It never pretends to be him."

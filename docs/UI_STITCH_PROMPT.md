@@ -43,7 +43,7 @@ Design a web app called **Haven**, built for the Amazon Alexa+ hackathon.
 - a pronoun picker (she/her, he/him, they/them chips);
 - a collapsible log row.
 
-**Demo data to use:** son Daniel; his mother Margaret, whom he calls "Mom"; Seattle. She loves her rose garden, big band music, baking for the grandkids and old Hollywood movies.
+**Demo data to use:** son Daniel; his mother Mary, whom he calls "Mom"; Seattle. She loves her rose garden, big band music, baking for the grandkids and old Hollywood movies.
 
 ---
 
@@ -57,7 +57,7 @@ Design a web app called **Haven**, built for the Amazon Alexa+ hackathon.
 **Centre:**
 - Card titled "Welcome to Haven", with one short paragraph about what Haven does.
 - Two large side-by-side choice cards:
-  - **"Start demo":** a landscape photo of a friendly man in his 30s (Digital Daniel) and the text "Meet Digital Daniel, keeping his mother Margaret company in Seattle. A fictional family with a stock AI face and voice. Ready in one click."
+  - **"Start demo":** a landscape photo of a friendly man in his 30s (Digital Daniel) and the text "Meet Digital Daniel, keeping his mother Mary company in Seattle. A fictional family with a stock AI face and voice. Ready in one click."
   - **"Create your own":** a big "+" illustration and the text "Enter your name and who Haven is for, then add your own photo and voice. About two minutes."
 - Hover and focus states on both cards.
 

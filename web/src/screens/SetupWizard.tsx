@@ -44,7 +44,7 @@ export function SetupWizard({ onDone }: { onDone: (how: "demo" | "own") => void 
           </div>
           <p className="kicker">Ready-made demo</p>
           <h3>Start demo</h3>
-          <p>Meet Digital Daniel, keeping his mother Margaret company in Seattle. A fictional family with a stock AI face and voice. Ready in one click.</p>
+          <p>Meet Digital Daniel, keeping his mother Mary company in Seattle. A fictional family with a stock AI face and voice. Ready in one click.</p>
           <button className="btn btn--primary" onClick={startDemo} disabled={busy}>
             {busy ? "Starting…" : "Start demo"}
             <Icon name="arrow_forward" />

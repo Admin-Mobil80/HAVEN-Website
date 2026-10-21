@@ -32,7 +32,7 @@ and always labelled AI.
 
 8
 00:00:30,500 --> 00:00:34,200
-Meet Margaret in Seattle,
+Meet Mary in Seattle,
 and her son, Daniel.
 
 9
@@ -60,7 +60,7 @@ and it remembers.
 
 14
 00:00:51,500 --> 00:00:55,000
-[Margaret] I met my old friend
+[Mary] I met my old friend
 at the market, we used to sing together.
 
 15

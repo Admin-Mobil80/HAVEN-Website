@@ -16,7 +16,7 @@ Haven is an AI. It never claims to be a person, never gives medical advice, and 
 
 Use desktop Chrome or Edge with sound on. Each browser tab gets its own private demo household, so judges never see each other's data.
 
-1. Open the link and click **Start demo**. This creates a fictional family: Daniel (the son) and his mother Margaret ("Mom") in Seattle. The face is a stock Anam avatar and the voice a premade ElevenLabs voice, so no real person's likeness is used.
+1. Open the link and click **Start demo**. This creates a fictional family: Daniel (the son) and his mother Mary ("Mom") in Seattle. The face is a stock Anam avatar and the voice a premade ElevenLabs voice, so no real person's likeness is used.
 2. The page shows three panels side by side:
    - the **Simulated Alexa+ add-on** with its live **MCP log**;
    - **Mom's tablet**, where she talks to Digital Daniel;

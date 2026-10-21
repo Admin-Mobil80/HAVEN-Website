@@ -8,7 +8,7 @@ export const DEMO_PRESET: SetupInput = {
   userName: "Daniel",
   userPronouns: "he",
   userRelation: "son",
-  elderName: "Margaret",
+  elderName: "Mary",
   relationToUser: "mother",
   calledBy: "Mom",
   elderPronouns: "she",
