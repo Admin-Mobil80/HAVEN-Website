@@ -5,13 +5,31 @@ import type { FamilyState } from "../lib/types";
 import { useNames } from "../lib/names";
 import { Icon } from "../components/Icon";
 
-// The family member's phone. What they need before they call, and one tap to act. In judge mode it also
-// mirrors what WhatsApp delivered, since judges cannot receive messages from the test number.
+type Digest = FamilyState["digests"][number];
+type Incident = FamilyState["incidents"][number];
+type Deferral = FamilyState["deferrals"][number];
+type Message = FamilyState["messages"][number];
+type Outbox = FamilyState["outbox"][number];
+
+// One chat line, in time order. Haven's messages come in on the left; the family member's own
+// replies go out on the right.
+type Item =
+  | { at: string; type: "digest"; digest: Digest }
+  | { at: string; type: "alert"; incident: Incident }
+  | { at: string; type: "question"; deferral: Deferral }
+  | { at: string; type: "text"; body: string; kind: string }
+  | { at: string; type: "mine"; message: Message };
+
+const time = (iso: string) => new Date(iso).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" }).toLowerCase();
+
+// The family member's side of Haven, styled as the chat it arrives in. Real families get these
+// messages on WhatsApp; in the demo household they are simulated and shown here instead.
 export function Family({ framed }: { framed?: boolean }) {
   const [s, setS] = useState<FamilyState>();
   const [busy, setBusy] = useState("");
   const [note, setNote] = useState("");
   const n = useNames();
+  const end = useRef<HTMLDivElement>(null);
   const refresh = useCallback(async () => setS(await api<FamilyState>("/api/state/family")), []);
   useEffect(() => {
     const off = poll(refresh, 5000);
@@ -38,125 +56,197 @@ export function Family({ framed }: { framed?: boolean }) {
     }
   };
 
-  if (!s) return <section className={`panel family${framed ? " family--framed" : ""}`}><p className="muted">Loading…</p></section>;
-  const amma = s.elder.calledBy;
-  const incident = [...s.incidents].reverse().find((i) => i.state === "open" || i.state === "acknowledged");
-  const digest = s.digests.at(-1);
-  const open = s.deferrals.filter((d) => d.status === "open");
+  const items = s ? timeline(s) : [];
+  const count = items.length;
+  useEffect(() => {
+    end.current?.scrollIntoView({ block: "end" });
+  }, [count, note]);
+
+  if (!s) return <section className={`wa${framed ? " wa--framed" : ""}`}><p className="muted" style={{ padding: 16 }}>Loading…</p></section>;
+  const mom = s.elder.calledBy;
+  const E = n.elderP;
   const stats = s.callStats;
-  const mirror = [...s.outbox].reverse().slice(0, 6);
+  const openQuestion = [...s.deferrals].reverse().find((d) => d.status === "open");
+  const callMom = () => act(`Call ${mom}`, () => api("/api/calls", { body: {} }), `Calling ${mom}… ${n.companion} steps aside.`);
+  const callTonight = () => act("I'll call tonight", () => api("/api/call-promise", { body: {} }), `Haven will tell ${mom} you'll call tonight.`);
 
   return (
-    <section className={`panel family${framed ? " family--framed" : ""}`} aria-label={`${n.user}'s phone`}>
-      <header className="panel__head">
-        <h2><Icon name="cottage" fill />Haven</h2>
-        <span className="pill pill--real">{n.user} · family</span>
-      </header>
-      <div className="family__body">
-        {incident && (
-          <div className={`card card--alert${incident.state === "acknowledged" ? " is-acked" : ""}`} role="alert">
-            <p className="card__kicker"><Icon name="shield_with_heart" fill />{incident.state === "acknowledged" ? "Alert · you're on it" : "Urgent · call now"}</p>
-            <p className="card__title">{amma} may need you right now ({incident.reason.replace(/_/g, " ")}).</p>
-            <p className="muted">Detected {new Date(incident.openedAt).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })} by Haven's safety rules. Haven is an AI and can be wrong.</p>
-            <div className="row row--wrap">
-              {incident.state === "open" && (
-                <button className="btn btn--yes" disabled={!!busy} onClick={() => act("Calling now", async () => { await api(`/api/incidents/${incident.id}/ack`, { body: {} }); await api("/api/calls", { body: {} }); }, `Marked as seen. Call ${amma} on +${s.elder.phone}.`)}>
-                  <Icon name="call" fill />Calling now
-                </button>
-              )}
-              <a className="btn" href={`tel:+${s.elder.phone}`}><Icon name="call" />Call {amma}</a>
-              <button className="btn btn--ghost" disabled={!!busy} onClick={() => act("Close alert", () => api(`/api/incidents/${incident.id}/close`, { body: {} }), `Closed. Haven tells ${amma} you've got it.`)}>
-                <Icon name="check" />{n.elderP.Subj === "They" ? "They're" : `${n.elderP.Subj}'s`} safe, close
-              </button>
-            </div>
-            <ol className="timeline">
-              {incident.timeline.slice(-5).map((e, i) => (
-                <li key={i}>
-                  <span>{e.at.slice(11, 19)}</span> {e.event.replace(/_/g, " ").replace(/:/g, " · ")}
-                </li>
-              ))}
-            </ol>
-          </div>
-        )}
-
-        <div className="metric" aria-label="Real calls this week">
-          <p className="kicker">Real calls this week</p>
-          <div className="metric__num">
-            {stats.realCallsThisWeek}
-            <span> / {stats.goal}</span>
-          </div>
-          <p className="metric__label">
-            real calls with {amma} this week
-            <span className="muted">
-              before Haven: {stats.baseline}/week · {stats.promptedByHaven} prompted by Haven{stats.demoSeeded ? ` · ${stats.demoSeeded} demo data` : ""}
-            </span>
-          </p>
+    <section className={`wa${framed ? " wa--framed" : ""}`} aria-label={`${n.user}'s WhatsApp`}>
+      <header className="wa__bar">
+        <Icon name="arrow_back" />
+        <span className="wa__avatar" aria-hidden><Icon name="cottage" fill /></span>
+        <div className="wa__who">
+          <strong>Haven</strong>
+          <span>{mom}'s companion · business account</span>
         </div>
+        <Icon name="more_vert" />
+      </header>
 
-        <div className="card">
-          <p className="card__kicker"><Icon name="wb_twilight" />Today's update{digest ? ` · ${new Date(digest.createdAt).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}` : ""}</p>
-          {digest ? (
-            <>
-              <p className="quote">{digest.summary}</p>
-              {digest.audioUrl && <audio className="player" controls preload="none" src={digest.audioUrl} />}
-              {digest.starters.length > 0 && (
-                <>
-                  <p className="kicker"><Icon name="lightbulb" />When you call, ask about</p>
-                  <ul className="starters">{digest.starters.map((x) => <li key={x}>{x}</li>)}</ul>
-                </>
-              )}
-            </>
-          ) : (
-            <p className="muted">Haven sends this update every evening at 9 pm.</p>
-          )}
-          <button className="btn btn--dashed btn--sm" disabled={!!busy} onClick={() => act("Send digest now", () => api("/api/digest/run", { body: {} }), "Today's update is ready.")}>
+      <div className="wa__chat" role="log" aria-live="polite">
+        <div className="wa__pinned">
+          <Icon name="push_pin" fill />
+          <div>
+            <strong>Real calls with {mom} this week: {stats.realCallsThisWeek} / {stats.goal}</strong>
+            <span>before Haven: {stats.baseline}/week · {stats.promptedByHaven} prompted by Haven{stats.demoSeeded ? ` · ${stats.demoSeeded} demo data` : ""}</span>
+          </div>
+        </div>
+        <p className="wa__system"><Icon name="lock" />Messages from Haven about {mom}. {s.demo ? "Simulated in this demo: nothing is sent to a real phone." : "Delivered on WhatsApp."}</p>
+        <p className="wa__day">Today</p>
+
+        <Bubble at={items[0]?.at}>
+          Hi {n.user} 👋 I'm Haven, keeping {mom} company. Every evening you'll get {E.poss} update here, with what to ask when you call. If {E.subj} ever needs you, I'll message you straight away.
+        </Bubble>
+
+        {items.map((it, i) => {
+          if (it.type === "digest") {
+            const d = it.digest;
+            return (
+              <Bubble key={i} at={it.at} buttons={[
+                { label: `Call ${mom}`, icon: "call", onClick: callMom },
+                { label: "I'll call tonight", onClick: callTonight },
+              ]} busy={!!busy}>
+                <p className="wa__title"><Icon name="wb_twilight" />Today's update · {mom}</p>
+                <p>{d.summary}</p>
+                {d.audioUrl && <audio className="wa__audio" controls preload="none" src={d.audioUrl} />}
+                {d.starters.length > 0 && (
+                  <>
+                    <p className="wa__title wa__title--ask"><Icon name="lightbulb" />When you call, ask about:</p>
+                    <ul className="wa__list">{d.starters.map((x) => <li key={x}>{x}</li>)}</ul>
+                  </>
+                )}
+              </Bubble>
+            );
+          }
+          if (it.type === "alert") {
+            const inc = it.incident;
+            const active = inc.state === "open" || inc.state === "acknowledged";
+            return (
+              <Bubble key={i} at={it.at} tone={active ? "alert" : undefined} busy={!!busy} buttons={active ? [
+                ...(inc.state === "open" ? [{ label: "Calling now", icon: "call" as const, onClick: () => act("Calling now", async () => { await api(`/api/incidents/${inc.id}/ack`, { body: {} }); await api("/api/calls", { body: {} }); }, `Marked as seen. Calling ${mom}.`) }] : []),
+                { label: `${E.Subj === "They" ? "They're" : `${E.Subj}'s`} safe, close`, icon: "check" as const, onClick: () => act("Close alert", () => api(`/api/incidents/${inc.id}/close`, { body: {} }), `Closed. Haven tells ${mom} you've got it.`) },
+              ] : undefined}>
+                <p className="wa__title wa__title--alert"><Icon name="shield_with_heart" fill />{inc.state === "acknowledged" ? "Alert · you're on it" : inc.state === "open" ? "Urgent · call now" : "Alert · closed"}</p>
+                <p><strong>{mom} may need you right now</strong> ({inc.reason.replace(/_/g, " ")}).</p>
+                <p className="wa__small">Detected by Haven's safety rules. Haven is an AI and can be wrong.</p>
+                {s.elder.phone && active && <a className="wa__link" href={`tel:+${s.elder.phone}`}>Call {mom} directly</a>}
+              </Bubble>
+            );
+          }
+          if (it.type === "question") {
+            const d = it.deferral;
+            return (
+              <Bubble key={i} at={it.at}>
+                <p className="wa__title"><Icon name="mark_chat_unread" />{mom} asked you</p>
+                <p className="wa__quote">"{d.question}"</p>
+                <p className="wa__small">{d.status === "open" ? `${n.companion} didn't answer for you. Reply below, in your own voice if you can: ${mom} will hear the real you.` : "✓ You answered."}</p>
+              </Bubble>
+            );
+          }
+          if (it.type === "text") return <Bubble key={i} at={it.at}>{it.body}</Bubble>;
+          const m = it.message;
+          return (
+            <Bubble key={i} at={it.at} mine read={Boolean(m.playedAt)}>
+              {m.audioUrl ? <audio className="wa__audio" controls preload="none" src={m.audioUrl} /> : <p>{m.kind === "call_promise" ? `I'll call you tonight, ${mom} 📞` : m.text}</p>}
+            </Bubble>
+          );
+        })}
+
+        {note && <p className="wa__system" role="status">{note}</p>}
+        <div className="wa__actions">
+          <button className="wa__chip" disabled={!!busy} onClick={() => act("Send digest now", () => api("/api/digest/run", { body: {} }), "Today's update is ready.")}>
             {busy === "Send digest now" ? "Writing…" : "Send today's update now"}
           </button>
         </div>
-
-        {open.length > 0 && (
-          <div className="card card--asked">
-            <p className="card__kicker"><Icon name="mark_chat_unread" />{amma} asked you</p>
-            {open.map((d) => (
-              <Question key={d.id} id={d.id} question={d.question} onDone={() => act("Reply sent", async () => undefined, `Haven will play your reply to ${amma} in your own voice.`)} />
-            ))}
-          </div>
-        )}
-
-        <div className="family__ctas">
-          <button className="btn" disabled={!!busy} onClick={() => act("I'll call tonight", () => api("/api/call-promise", { body: {} }), `Haven will tell ${amma} you'll call tonight.`)}>
-            I'll call tonight
-          </button>
-          <button className="btn btn--yes" disabled={!!busy} onClick={() => act(`Call ${amma}`, () => api("/api/calls", { body: {} }), `Calling ${amma}… ${n.companion} steps aside.`)}>
-            <Icon name="call" fill />Call {amma}
-          </button>
-        </div>
-        {note && <p className="note" role="status">{note}</p>}
-
-        <details className="mirror">
-          <summary><Icon name="chat" fill />WhatsApp messages ({s.outbox.length})<Icon name="expand_more" /></summary>
-          <p className="muted">What Haven sent to the family. In the demo household these are simulated.</p>
-          <ul>
-            {mirror.map((o) => (
-              <li key={o.id}>
-                <span className={`tag tag--${o.status}`}>{o.channel === "whatsapp" ? o.status : "simulated"}</span> <strong>{o.kind.replace(/_/g, " ")}</strong>: {o.body}
-              </li>
-            ))}
-          </ul>
-        </details>
+        <div ref={end} />
       </div>
+
+      <Composer mom={mom} openQuestion={openQuestion} onSent={(what) => act(what, async () => undefined, what === "Voice note sent" ? `${mom} will hear your voice note on the tablet.` : `${mom} will see your message on the tablet.`)} />
     </section>
   );
 }
 
-// Answer one of their questions with a voice note (MediaRecorder) or text.
-function Question({ id, question, onDone }: { id: string; question: string; onDone: () => void }) {
-  const [rec, setRec] = useState<MediaRecorder | null>(null);
+// Haven's messages and the family member's replies, oldest first.
+function timeline(s: FamilyState): Item[] {
+  const items: Item[] = [];
+  const shownDigests = new Set<string>();
+  const shownIncidents = new Set<string>();
+  for (const o of s.outbox as Outbox[]) {
+    if (o.kind === "digest") {
+      const d = s.digests.find((x) => x.id === o.refId) ?? s.digests.find((x) => Math.abs(Date.parse(x.createdAt) - Date.parse(o.at)) < 120_000);
+      if (d && !shownDigests.has(d.id)) {
+        shownDigests.add(d.id);
+        items.push({ at: o.at, type: "digest", digest: d });
+      }
+    } else if (o.kind === "urgent_alert" || o.kind === "important_alert") {
+      const inc = s.incidents.find((x) => x.id === o.refId);
+      if (inc && !shownIncidents.has(inc.id)) {
+        shownIncidents.add(inc.id);
+        items.push({ at: o.at, type: "alert", incident: inc });
+      }
+    } else if (o.kind === "elder_reply") {
+      items.push({ at: o.at, type: "text", body: o.body, kind: o.kind });
+    }
+  }
+  // Anything that never went out (no recipient yet, or a failed send) still shows in the chat.
+  for (const d of s.digests) if (!shownDigests.has(d.id)) items.push({ at: d.createdAt, type: "digest", digest: d });
+  for (const inc of s.incidents) if (!shownIncidents.has(inc.id)) items.push({ at: inc.openedAt, type: "alert", incident: inc });
+  for (const d of s.deferrals) items.push({ at: d.createdAt, type: "question", deferral: d });
+  for (const m of s.messages) items.push({ at: m.createdAt, type: "mine", message: m });
+  return items.sort((a, b) => a.at.localeCompare(b.at));
+}
+
+type Button = { label: string; icon?: "call" | "check"; onClick: () => void };
+
+function Bubble({ at, mine, read, tone, buttons, busy, children }: { at?: string; mine?: boolean; read?: boolean; tone?: "alert"; buttons?: Button[]; busy?: boolean; children: React.ReactNode }) {
+  return (
+    <div className={`wa__row${mine ? " wa__row--mine" : ""}`}>
+      <div className="wa__bubblewrap">
+        <div className={`wa__bubble${mine ? " wa__bubble--mine" : ""}${tone === "alert" ? " wa__bubble--alert" : ""}`}>
+          <div className="wa__body">{children}</div>
+          <span className="wa__meta">
+            {at ? time(at) : ""}
+            {mine && <Icon name="done_all" className={read ? "wa__read" : ""} />}
+          </span>
+        </div>
+        {buttons && buttons.length > 0 && (
+          <div className="wa__buttons">
+            {buttons.map((b) => (
+              <button key={b.label} disabled={busy} onClick={b.onClick}>
+                {b.icon && <Icon name={b.icon} />}
+                {b.label}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// The message bar: type, or hold a voice note. When the person asked a question, the reply answers it.
+function Composer({ mom, openQuestion, onSent }: { mom: string; openQuestion?: Deferral; onSent: (what: string) => void }) {
   const [text, setText] = useState("");
+  const [rec, setRec] = useState<MediaRecorder | null>(null);
+  const [secs, setSecs] = useState(0);
   const [err, setErr] = useState("");
   const chunks = useRef<Blob[]>([]);
+  const timer = useRef<ReturnType<typeof setInterval>>(undefined);
 
-  const start = async () => {
+  const sendText = async () => {
+    const t = text.trim();
+    if (!t) return;
+    setErr("");
+    try {
+      if (openQuestion) await api(`/api/deferrals/${encodeURIComponent(openQuestion.id)}/answer`, { body: { text: t } });
+      else await api("/api/messages", { body: { text: t } });
+      setText("");
+      onSent("Message sent");
+    } catch (e) {
+      setErr(`Couldn't send: ${(e as Error).message}`);
+    }
+  };
+
+  const record = async () => {
     setErr("");
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -166,45 +256,54 @@ function Question({ id, question, onDone }: { id: string; question: string; onDo
       r.ondataavailable = (e) => e.data.size && chunks.current.push(e.data);
       r.onstop = async () => {
         stream.getTracks().forEach((t) => t.stop());
+        clearInterval(timer.current);
         const blob = new Blob(chunks.current, { type: r.mimeType || "audio/webm" });
         try {
-          await api(`/api/recordings?deferral=${encodeURIComponent(id)}`, { raw: blob, contentType: blob.type.split(";")[0] });
-          onDone();
+          const q = openQuestion ? `?deferral=${encodeURIComponent(openQuestion.id)}` : "";
+          await api(`/api/recordings${q}`, { raw: blob, contentType: blob.type.split(";")[0] });
+          onSent("Voice note sent");
         } catch (e) {
           setErr(`Upload failed: ${(e as Error).message}`);
         }
       };
       r.start();
+      setSecs(0);
+      timer.current = setInterval(() => setSecs((x) => x + 1), 1000);
       setRec(r);
     } catch {
-      setErr("Microphone not available. You can type a reply instead.");
+      setErr("Microphone not available. You can type instead.");
     }
   };
 
   return (
-    <div className="question">
-      <p className="question__q">"{question}"</p>
-      <div className="row row--wrap">
+    <div className="wa__compose">
+      {err && <p className="wa__err">{err}</p>}
+      {openQuestion && !rec && <p className="wa__replying">Replying to: "{openQuestion.question}"</p>}
+      <form
+        className="wa__inputrow"
+        onSubmit={(e) => {
+          e.preventDefault();
+          void sendText();
+        }}
+      >
         {rec ? (
-          <button className="btn btn--rec is-on btn--block" onClick={() => (rec.stop(), setRec(null))}><Icon name="stop_circle" fill />Stop and send</button>
+          <div className="wa__recording" role="status">
+            <span className="wa__dot" aria-hidden />Recording {Math.floor(secs / 60)}:{String(secs % 60).padStart(2, "0")}
+            <button type="button" className="wa__cancel" onClick={() => ((rec.onstop = null), rec.stop(), rec.stream.getTracks().forEach((t) => t.stop()), clearInterval(timer.current), setRec(null))} aria-label="Cancel voice note">
+              <Icon name="cancel" />
+            </button>
+          </div>
         ) : (
-          <button className="btn btn--real btn--block" onClick={start}><Icon name="mic" fill />Reply in your own voice</button>
+          <input value={text} onChange={(e) => setText(e.target.value)} placeholder={openQuestion ? `Reply to ${mom}…` : `Message ${mom}…`} aria-label={`Message ${mom}`} maxLength={500} />
         )}
-        <form
-          className="typebox"
-          onSubmit={async (e) => {
-            e.preventDefault();
-            if (!text.trim()) return;
-            await api(`/api/deferrals/${encodeURIComponent(id)}/answer`, { body: { text } });
-            setText("");
-            onDone();
-          }}
-        >
-          <input value={text} onChange={(e) => setText(e.target.value)} placeholder="or type a reply" aria-label="Type a reply" maxLength={500} />
-          <button className="btn" type="submit" disabled={!text.trim()} aria-label="Send reply"><Icon name="send" /></button>
-        </form>
-      </div>
-      {err && <p className="error">{err}</p>}
+        {text.trim() && !rec ? (
+          <button className="wa__send" type="submit" aria-label="Send"><Icon name="send" fill /></button>
+        ) : rec ? (
+          <button className="wa__send" type="button" onClick={() => (rec.stop(), setRec(null))} aria-label="Send voice note"><Icon name="send" fill /></button>
+        ) : (
+          <button className="wa__send" type="button" onClick={() => void record()} aria-label={openQuestion ? "Reply in your own voice" : "Record a voice note"}><Icon name="mic" fill /></button>
+        )}
+      </form>
     </div>
   );
 }

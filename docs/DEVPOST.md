@@ -30,7 +30,7 @@ A family member, here Daniel in the demo, sets Haven up for his mother Mary in S
 - **Questions go to the real person.** If Mom asks "Will you come home next month?", Digital Daniel doesn't make promises. It says that one is for the real Daniel and passes it to him.
 - **Messages only with her yes.** "Tell Daniel the roses have bloomed" becomes "Shall I send this?", and nothing leaves until she says yes.
 - **Urgent alerts.** "Help, I feel dizzy" triggers deterministic safety rules, with no AI in the loop. Daniel gets an urgent **Call now** alert, and Mom's tablet tells her to call 911 if she is in danger. One tap on **Calling now** acknowledges the alert, logs the call, and the tablet shows Mom that the real Daniel is calling.
-- **The metric that matters.** Daniel's phone shows **real calls this week** against a goal, and how many of them Haven prompted.
+- **The metric that matters.** Daniel's WhatsApp chat pins **real calls this week** against a goal, and how many of them Haven prompted.
 - **Honest by design.** An always-on "Digital Daniel · AI" badge. Ask "Are you real?" and you get a fixed answer: an AI version of Daniel, made with his permission, not the real Daniel.
 - **Alexa+ fit.** "Alexa, talk to Daniel" opens Haven through a **simulated Alexa+ add-on**. This is our own browser code, labelled as such, and it acts as a real MCP client: you watch `initialize`, `tools/list` and `tools/call` happen live against Haven's MCP server.
 - **Create your own.** Families can use their own names and, with consent, their own photo and voice.

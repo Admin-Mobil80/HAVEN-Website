@@ -6,7 +6,7 @@ export type IconName =
   | "mark_chat_unread" | "mic" | "person" | "photo_camera" | "play_arrow" | "play_circle" | "psychology"
   | "record_voice_over" | "restart_alt" | "route" | "schedule" | "send" | "shield_with_heart" | "smart_toy"
   | "smartphone" | "stop_circle" | "tablet_mac" | "terminal" | "tune" | "verified" | "verified_user"
-  | "volume_up" | "waving_hand" | "wb_twilight";
+  | "volume_up" | "waving_hand" | "wb_twilight" | "done_all" | "push_pin" | "more_vert" | "attach_file" | "lock" | "cancel";
 
 export function Icon({ name, fill, className }: { name: IconName; fill?: boolean; className?: string }) {
   return (

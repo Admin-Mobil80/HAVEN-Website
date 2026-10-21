@@ -33,6 +33,8 @@ export function Tablet({ chips: chipsProp, compact }: { chips?: string[]; compac
   const [relay, setRelay] = useState<PlayedMessage | null>(null);
   const [error, setError] = useState("");
   const [callEnded, setCallEnded] = useState<string>();
+  const callEndedRef = useRef<string | undefined>(undefined);
+  callEndedRef.current = callEnded;
   // The photo-real face: "off" (illustrated avatar), "connecting", "live", or "failed" (fallback).
   const [photo, setPhoto] = useState<"off" | "connecting" | "live" | "failed">("off");
   const [videoOn, setVideoOn] = useState(false); // the live face shows only while it is speaking
@@ -41,6 +43,12 @@ export function Tablet({ chips: chipsProp, compact }: { chips?: string[]; compac
   const busy = useRef(false);
   const openRef = useRef(false);
   const listening = useRef<Listening | null>(null);
+  // Hands-free: once they start talking (Talk to …, Tap and speak, or "Alexa, talk to …"), the tablet
+  // listens again by itself after every reply, and stops when they go quiet. Typing, a quick answer
+  // or "Bye for now" hands control back to the buttons.
+  const handsFree = useRef(false);
+  const dropHeard = useRef(false); // a listen we cut short ourselves: throw its words away
+  const [hint, setHint] = useState("");
 
   const elderRef = useRef<ElderState | undefined>(undefined);
   const refresh = useCallback(async () => {
@@ -188,6 +196,7 @@ export function Tablet({ chips: chipsProp, compact }: { chips?: string[]; compac
         emit("refresh");
         await speak(r);
         void refresh();
+        if (handsFree.current && body.event !== "session_end") setTimeout(() => keepListening(), 350);
       } catch (e) {
         setError("Sorry, I couldn't hear that properly. Please try again.");
         setState("idle");
@@ -199,9 +208,16 @@ export function Tablet({ chips: chipsProp, compact }: { chips?: string[]; compac
   });
 
   const say = useCallback(
-    async (text: string) => {
+    async (text: string, spoken = false) => {
       const t = text.trim();
       if (!t) return;
+      if (!spoken) {
+        handsFree.current = false;
+        if (listening.current) {
+          dropHeard.current = true;
+          listening.current.stop();
+        }
+      }
       if (!openRef.current) {
         openRef.current = true;
         setOpen(true);
@@ -215,6 +231,7 @@ export function Tablet({ chips: chipsProp, compact }: { chips?: string[]; compac
 
   const start = useCallback(async () => {
     unlockAudio();
+    handsFree.current = canListen;
     if (photoRef.current === "failed") setPhoto("off"); // a new conversation tries the live face again
     if (openRef.current) return;
     openRef.current = true;
@@ -232,32 +249,54 @@ export function Tablet({ chips: chipsProp, compact }: { chips?: string[]; compac
   }, [say]);
 
   // Tap once to speak; tap again ("Done") to finish early. Otherwise it finishes after a pause.
-  const talk = async () => {
-    unlockAudio();
+  const talk = async (auto = false) => {
+    if (!auto) unlockAudio();
     if (!canListen) return;
     if (listening.current) return listening.current.stop();
+    if (!auto) handsFree.current = true;
     setState("listening");
     setHeard("");
     setError("");
+    setHint("");
     void warmPhoto(); // the live face connects while they talk
     try {
       listening.current = listen({ lang: speechLang(elderRef.current?.elder.language), onInterim: setHeard });
       const text = await listening.current.done;
       listening.current = null;
+      if (dropHeard.current) {
+        dropHeard.current = false;
+        return;
+      }
       setState("idle");
-      if (text) await say(text);
-      else setError("I didn't catch that. Tap and try again, a little closer to the microphone.");
+      if (text) await say(text, true);
+      else if (auto) {
+        handsFree.current = false; // they went quiet: stop listening until they want to talk again
+        setHint("I'm here whenever you want to talk. Just tap the button.");
+      } else setError("I didn't catch that. Tap and try again, a little closer to the microphone.");
     } catch (e) {
       listening.current = null;
+      handsFree.current = false;
       setState("idle");
       const denied = /not-allowed|service-not-allowed/.test((e as Error).message);
       setError(denied ? "The microphone is blocked. Allow it in the browser's address bar, or type below." : "The microphone isn't available. You can type or tap a suggestion below.");
     }
   };
 
+  // Listen again after a reply, unless something else is going on.
+  const keepListening = useCallbackRef(() => {
+    const calling = elderRef.current?.familyCalling;
+    if (!handsFree.current || !openRef.current || listening.current || busy.current || document.visibilityState !== "visible") return;
+    if (calling && calling.at !== callEndedRef.current) return void (handsFree.current = false); // the real person is on the phone
+    void talk(true);
+  });
+
   // A real recording or note from the family member: played as them, with the avatar stepped back.
   const playFamily = async () => {
     unlockAudio();
+    if (listening.current) {
+      dropHeard.current = true;
+      listening.current.stop();
+    }
     const r = await callTool<{ message: PlayedMessage | null }>("play_family_message", {});
     const m = r.data.message;
     if (!m) return void refresh();
@@ -354,6 +393,8 @@ export function Tablet({ chips: chipsProp, compact }: { chips?: string[]; compac
               )}
             </div>
             {error && <p className="error">{error}</p>}
+            {hint && !error && <p className="muted" style={{ textAlign: "center" }}>{hint}</p>}
+            {state === "listening" && handsFree.current && <p className="muted" style={{ textAlign: "center" }}>Just talk. I'll answer, then listen again. I stop when you go quiet.</p>}
 
             <div className="tablet__controls">
               {elder && elder.pendingFamilyMessages > 0 && !relay && (
@@ -378,11 +419,11 @@ export function Tablet({ chips: chipsProp, compact }: { chips?: string[]; compac
               )}
               {canListen &&
                 (state === "listening" ? (
-                  <button className="btn btn--huge btn--soft" onClick={talk} aria-label="I'm done speaking" style={{ color: "var(--ink)" }}>
+                  <button className="btn btn--huge btn--soft" onClick={() => void talk()} aria-label="I'm done speaking" style={{ color: "var(--ink)" }}>
                     <Icon name="check_circle" fill />I'm done speaking
                   </button>
                 ) : (
-                  <button className="btn btn--huge" onClick={talk} disabled={state === "thinking" || state === "speaking"} aria-label="Tap and speak">
+                  <button className="btn btn--huge" onClick={() => void talk()} disabled={state === "thinking" || state === "speaking"} aria-label="Tap and speak">
                     <Icon name="mic" fill />Tap and speak
                   </button>
                 ))}
@@ -405,7 +446,16 @@ export function Tablet({ chips: chipsProp, compact }: { chips?: string[]; compac
                   </button>
                 ))}
               </div>
-              <button className="btn btn--ghost tablet__end" onClick={() => ((openRef.current = false), setOpen(false), void turn({ event: "session_end" }))} disabled={state !== "idle"}>
+              <button className="btn btn--ghost tablet__end" onClick={() => {
+                  handsFree.current = false;
+                  if (listening.current) {
+                    dropHeard.current = true;
+                    listening.current.stop();
+                  }
+                  openRef.current = false;
+                  setOpen(false);
+                  void turn({ event: "session_end" });
+                }} disabled={state !== "idle" && state !== "listening"}>
                 <Icon name="waving_hand" />Bye for now
               </button>
             </div>

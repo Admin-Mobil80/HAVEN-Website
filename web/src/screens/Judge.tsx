@@ -120,7 +120,7 @@ export function Judge() {
               <div className="col">
                 <div>
                   <div className="device__label device__label--phone">
-                    <span className="kicker"><Icon name="smartphone" />{names.user}'s phone</span>
+                    <span className="kicker"><Icon name="chat" />{names.user}'s WhatsApp</span>
                     <span className="pill pill--real">Haven for family</span>
                   </div>
                   <div className="bezel bezel--phone">

@@ -39,7 +39,7 @@ export type FamilyState = {
   digests: { id: string; date: string; createdAt: string; summary: string; mood?: string; topics: string[]; starters: string[]; tier: string; audioUrl?: string }[];
   deferrals: { id: string; topic: string; question: string; status: "open" | "answered" | "relayed"; createdAt: string }[];
   messages: { id: string; from: string; kind: string; text?: string; audioUrl?: string; inReplyTo?: string; createdAt: string; playedAt?: string }[];
-  outbox: { id: string; at: string; to: string; kind: string; body: string; channel: string; status: string }[];
+  outbox: { id: string; at: string; to: string; kind: string; body: string; channel: string; status: string; refId?: string }[];
   incidents: { id: string; tier: string; emergency: boolean; reason: string; state: string; openedAt: string; ackBy?: string; timeline: { at: string; event: string }[] }[];
   avatarLines: { at: string; text: string }[];
   callStats: { realCallsThisWeek: number; promptedByHaven: number; demoSeeded: number; goal: number; baseline: number };

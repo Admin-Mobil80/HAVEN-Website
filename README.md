@@ -20,7 +20,7 @@ Use desktop Chrome or Edge with sound on. Each browser tab gets its own private 
 2. The page shows three panels side by side:
    - the **Simulated Alexa+ add-on** with its live **MCP log**;
    - **Mom's tablet**, where she talks to Digital Daniel;
-   - **Daniel's phone**, the family view.
+   - **Daniel's WhatsApp**, the family view, styled as his chat with Haven (simulated in the demo).
 3. Click the walkthrough buttons in order:
 
 | Step | What you'll see |
@@ -29,9 +29,9 @@ Use desktop Chrome or Edge with sound on. Each browser tab gets its own private 
 | **2. A memory** | Mom mentions an old friend from the market. Digital Daniel replies, and the brain stores the memory with the `remember` tool. |
 | **3. Will you come home?** | Only the real Daniel can make that promise, so Digital Daniel doesn't. A deterministic detector files the question for Daniel with `create_deferral`, and it appears on his phone. |
 | **4. Tell Daniel…** | Mom asks for a message to be passed on. Haven asks "Shall I send this?" and nothing is sent yet (`record_reply`, step one). |
-| **5. Yes, send it** | Mom's spoken yes completes the send (`record_reply`, step two). The message appears on Daniel's phone. |
-| **6. Evening update** | Runs the evening digest now: a Bedrock-written summary, a voice note and ideas for the next call. In the demo, WhatsApp delivery is simulated and mirrored on Daniel's phone. |
-| **7. Help, I feel dizzy** | Deterministic safety rules open an incident with no LLM involved. The tablet shows 911 and Daniel's phone shows an urgent **Call now** card. Tap **Calling now** to acknowledge it and log a real call. |
+| **5. Yes, send it** | Mom's spoken yes completes the send (`record_reply`, step two). The message appears in Daniel's WhatsApp chat. |
+| **6. Evening update** | Runs the evening digest now: a Bedrock-written summary, a voice note and ideas for the next call. In the demo, WhatsApp delivery is simulated and shown in Daniel's WhatsApp chat. |
+| **7. Help, I feel dizzy** | Deterministic safety rules open an incident with no LLM involved. The tablet shows 911 and Daniel's WhatsApp gets an urgent **Call now** message. Tap **Calling now** to acknowledge it and log a real call. |
 
 You can also ask the tablet **"Are you real?"**. The answer is fixed text, never improvised by a model: *"I'm Digital Daniel, an AI version of Daniel, made with his permission. I'm not the real Daniel…"*
 
