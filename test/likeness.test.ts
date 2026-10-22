@@ -138,3 +138,30 @@ test("ElevenLabs: library voices are reused, and only old demo clones are recycl
   assert.deepEqual(await e.recycleDemoClones(1), ["d1", "d2"]);
   assert.deepEqual(deleted, ["d1", "d2"], "the owner's own clone is never touched");
 });
+
+test("Voice ID: the person's voice note is stored only with consent, shown in Setup, and removable", async () => {
+  const repo = new MemoryRepo();
+  await repo.create(newHousehold("demo-vid", new Date(), setup, { demo: true }));
+  const stored = new Map<string, string>();
+  const h = await startApp({ repo, digest: { media: { put: async (k: string, _d: Buffer, t: string) => void stored.set(k, t) } } as never });
+  const auth = { authorization: `Bearer ${signToken("demo-vid", SECRET)}` };
+  try {
+    const audio = Buffer.alloc(20_000, 1).toString("latin1");
+    const noConsent = await h.request("POST", "/api/elder-voice", { headers: { ...auth, "content-type": "audio/wav" }, body: audio });
+    assert.equal(noConsent.status, 400);
+    assert.equal((await h.request("POST", "/api/elder-voice?consent=yes", { headers: { ...auth, "content-type": "audio/wav" }, body: "short" })).status, 400);
+    const ok = await h.request("POST", "/api/elder-voice?consent=yes", { headers: { ...auth, "content-type": "audio/wav" }, body: audio });
+    assert.equal(ok.status, 201);
+    assert.ok([...stored.keys()].some((k) => k.includes("voice-id/sample.wav")));
+    const doc = (await repo.get("demo-vid"))!;
+    assert.equal(doc.elder.voiceSample?.consent.by, "elder");
+    const view = (await h.request("GET", "/api/setup", { headers: auth })).json();
+    assert.ok(view.elderVoice?.at && view.elderVoice.url, "Setup shows it and can play it back");
+    const tablet = (await h.request("GET", "/api/state/elder", { headers: auth })).json();
+    assert.equal(JSON.stringify(tablet).includes("voice-id"), false, "never sent to the tablet");
+    await h.request("POST", "/api/elder-voice/remove", { headers: auth, body: {} });
+    assert.equal((await repo.get("demo-vid"))!.elder.voiceSample, undefined);
+  } finally {
+    await h.close();
+  }
+});

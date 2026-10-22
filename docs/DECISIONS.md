@@ -119,6 +119,13 @@ The Polly check and the bake-off are rerun after the user gets the Haven develop
 - **The live face only while speaking.** The tablet starts the Anam session when a turn begins, so it connects while the person talks and Haven thinks. The video shows only while the reply plays, and the session closes 4 s later. In between, the tablet shows the still photo. If the live face fails, the same voice plays through the speaker with the illustrated avatar.
 - **Limits.** Anam sessions are capped at 300 per household per day and 15 minutes each. ElevenLabs Starter has 10 voice slots, so library voices already in the account are reused rather than added again. Before a new demo clone, the oldest demo clones are deleted so that at most 5 remain. The owner's own clone is never deleted this way.
 
+## Voice ID enrolment (22 Oct)
+Setup collects a consented voice note of the person Haven is for. It is stored at `voice-id/sample.*` in the media store, and only Setup can play it back; the tablet and the family view never receive it. It is enrolment only for now. Speaker verification and a "soft gate" come after the hackathon:
+- safety always runs;
+- anything personal or any send is shared only with the recognised voice.
+
+Alexa+ add-ons don't receive the recognised speaker (friction log #17), so Alexa's own Voice ID can't be used yet.
+
 ## Pending: AWS account checks
 - Classic account or "new sign-up" (new sign-up blocks Global inference profiles and Transcribe): _tbd_
 - Lambda ConcurrentExecutions quota in ap-south-1: _tbd_

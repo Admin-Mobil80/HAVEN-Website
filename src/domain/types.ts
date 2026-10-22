@@ -19,6 +19,9 @@ export type Elder = {
   city: string;
   phone: string; // shown in urgent alerts so family can tap to call
   language: "en-US" | "en-IN" | "hi-IN";
+  // A voice note of this person, kept for Voice ID: recognising them, and not strangers, before
+  // Haven shares anything. Stored now, not yet used to gate replies (see docs/DECISIONS.md).
+  voiceSample?: { key: string; contentType: string; at: ISODate; consent: ConsentRecord };
 };
 
 export type Member = {

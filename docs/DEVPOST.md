@@ -90,6 +90,10 @@ All of these are written up in our friction log.
 ## What's next for Haven
 
 - Register the MCP server as a real **Alexa+ add-on** as soon as access opens.
+- **Voice ID: answer only the person it's for.**
+  - Setup already collects a consented voice note of that person.
+  - Next, Haven will check each speaker against it before sharing anything personal. Alexa's own speaker recognition comes first, if Alexa+ starts passing it to add-ons (friction log #17); an on-device check is the fallback.
+  - Safety never depends on it: "help" from anyone still reaches the family.
 - A consented pilot with real families, measuring change in calls per week.
 - More languages for the elder (the app already supports Indian English and Hindi in "Create your own").
 - Photo sharing from family into the conversation.

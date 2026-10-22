@@ -26,6 +26,7 @@ export type FamilyRouteDeps = {
 };
 
 const AUDIO_TYPES = /^audio\/(webm|ogg|mp4|mpeg|aac|x-m4a)(;.*)?$/;
+const VOICE_SAMPLE_TYPES = /^audio\/(webm|ogg|mp4|mpeg|aac|x-m4a|m4a|wav|x-wav|wave)(;.*)?$/;
 
 const text = (max: number) => z.string().trim().min(1).max(max);
 const SetupBody = z.object({
@@ -53,6 +54,7 @@ export function setupView(doc: Household) {
     voice: doc.persona.voice ? { name: doc.persona.voice.name, source: doc.persona.voice.source } : null,
     photoAvatar: Boolean(doc.persona.avatar),
     elder: { name: doc.elder.name, calledBy: doc.elder.calledBy, city: doc.elder.city, relationToUser: doc.elder.relationToUser, pronouns: doc.elder.pronouns, language: doc.elder.language },
+    elderVoice: doc.elder.voiceSample ? { at: doc.elder.voiceSample.at } : null,
     user: { name: child?.name ?? "", relation: child?.relation ?? "", pronouns: child?.pronouns ?? "they" },
     childName: child?.name ?? "",
     displayName: doc.persona.displayName,
@@ -95,6 +97,31 @@ export function familyRouter(deps: FamilyRouteDeps): Router {
       return { messageId: message.id, answered: deferral?.id };
     });
     res.status(201).json({ ok: true, ...out });
+  });
+
+  // Voice ID enrolment: a voice note of the person Haven is for, recorded in the browser or
+  // uploaded, with the main user's confirmation that the person agreed. Kept private in the media
+  // store; replacing it overwrites the old one. Not yet used to decide who Haven answers.
+  router.post("/api/elder-voice", auth, write, express.raw({ type: (r) => VOICE_SAMPLE_TYPES.test(String(r.headers["content-type"] ?? "")), limit: "8mb" }), async (req, res) => {
+    if (req.query.consent !== "yes") return void res.status(400).json({ error: "consent_required" });
+    const type = String(req.header("content-type") ?? "");
+    if (!VOICE_SAMPLE_TYPES.test(type) || !Buffer.isBuffer(req.body)) return void res.status(400).json({ error: "invalid_audio" });
+    if (req.body.length < 16_000) return void res.status(400).json({ error: "recording_too_short" });
+    if (!deps.media) return void res.status(503).json({ error: "media_store_not_configured" });
+    const doc = await deps.repo.get(hh(res));
+    if (!doc) return void res.status(404).json({ error: "household_not_found" });
+    const contentType = type.split(";")[0];
+    const ext = /wav/.test(contentType) ? "wav" : /mp4|m4a|aac/.test(contentType) ? "m4a" : /mpeg/.test(contentType) ? "mp3" : /ogg/.test(contentType) ? "ogg" : "webm";
+    const key = mediaKey(doc.id, doc.demo, `voice-id/sample.${ext}`);
+    await deps.media.put(key, req.body, contentType);
+    const at = deps.now().toISOString();
+    await deps.repo.update(hh(res), (d) => void (d.elder.voiceSample = { key, contentType, at, consent: { by: "elder", at, witnessedBy: primaryId(d) } }));
+    res.status(201).json({ ok: true, at });
+  });
+
+  router.post("/api/elder-voice/remove", auth, write, async (_req, res) => {
+    await deps.repo.update(hh(res), (d) => void delete d.elder.voiceSample);
+    res.json({ ok: true });
   });
 
   // Same as the WhatsApp "I will call tonight" button, for the dashboard and judge mode.
@@ -140,7 +167,9 @@ export function familyRouter(deps: FamilyRouteDeps): Router {
   router.get("/api/setup", auth, async (_req, res) => {
     const doc = await deps.repo.get(hh(res));
     if (!doc) return void res.status(404).json({ error: "household_not_found" });
-    res.set("Cache-Control", "no-store").json(setupView(doc));
+    const view = setupView(doc);
+    const sample = doc.elder.voiceSample;
+    res.set("Cache-Control", "no-store").json(sample ? { ...view, elderVoice: { at: sample.at, url: signMediaUrl(sample.key, deps.secret, deps.now()) } } : view);
   });
 
   router.post("/api/setup", auth, write, express.json({ limit: "32kb" }), async (req, res) => {

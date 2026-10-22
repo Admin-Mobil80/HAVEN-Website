@@ -206,6 +206,14 @@ All demo people are fictional.
 - [docs/DECISIONS.md](docs/DECISIONS.md): the decisions log
 - [docs/DEPLOY.md](docs/DEPLOY.md): deploying the stack
 
+
+## Voice ID (in progress)
+
+Setup collects a consented voice note of the person Haven is for. It can be recorded in the browser or uploaded (for example a WhatsApp voice note), and is stored privately (`POST /api/elder-voice?consent=yes`). It is not yet used to gate replies. The planned design:
+- Recognise the speaker, preferring Alexa's own speaker recognition if Alexa+ exposes it to add-ons (see FRICTION_LOG.md #17), otherwise an on-device check.
+- Answer only that person with anything personal.
+- Always run the safety rules for anyone.
+
 ## Licence
 
 [MIT](LICENSE). Third-party services (AWS, Anam, ElevenLabs, Meta WhatsApp) are used under their own terms. Alexa, Amazon, Echo and WhatsApp are trademarks of their owners; Haven is not affiliated with or endorsed by them.

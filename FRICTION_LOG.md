@@ -145,3 +145,18 @@ Each entry has the six fields the hackathon asks for: task, steps, expected vs a
 - **Severity:** major.
 - **Workaround:** Subscribed the app to the WABA through the API, and switched to a permanent system-user token stored in SSM.
 - **Suggestion:** Show the WABA subscription status on the webhook settings page, and warn when a user token is stored for server use.
+
+## 17. Alexa+ add-ons can't tell who is speaking (Voice ID)
+- **Task:** Make Haven answer only the person it was set up for (Mom), not visitors, children or strangers. That's a security need: the companion knows family messages, reminders and private memories.
+- **Steps:**
+  - Read the Alexa+ add-on policy and functional requirements, and the MCP toolkit's overview, client lifecycle and authentication pages.
+  - Compared them with the classic custom-skill personalisation docs.
+- **Expected vs actual:**
+  - **Expected:** Classic Alexa skills receive the recognised speaker as `context.System.person.personId` when that person has a Voice ID profile with "Personalize skills" turned on. We expected Alexa+ add-ons to get the same.
+  - **Actual:** In the Alexa+ MCP client lifecycle, a tool call carries only `name` and `arguments`. Identity arrives only as an account-linked OAuth user token: it says which household is linked, not who is talking.
+  - **Not covered:** We didn't read the Alexa+ account-linking and supported-capabilities pages.
+- **Severity:** major. Without it, every add-on that holds personal data must build its own speaker verification, which means storing voiceprints.
+- **Workaround:**
+  - **What Setup does now:** it collects a consented voice note of the person Haven is for (record it, or upload one, for example from WhatsApp) and stores it privately, ready for speaker verification. It is **not yet used** to decide who Haven answers.
+  - **Planned:** an on-device check with an open speaker-embedding model, and a soft gate. Safety rules always run, and "help" from anyone still alerts the family. An unrecognised voice gets a polite reply, but no family messages, reminders or memories, and no sends.
+- **Suggestion:** Pass Alexa's existing speaker recognition to add-ons as an opaque per-household person id, with a confidence level, behind the same customer opt-in as classic skills. Then add-ons never need to handle voiceprints at all.

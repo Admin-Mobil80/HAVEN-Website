@@ -12,6 +12,7 @@ export type SetupView = {
   voice: { name: string; source: string } | null;
   photoAvatar: boolean;
   elder: { name: string; calledBy: string; city: string; relationToUser: string; pronouns: Pronouns; language?: string };
+  elderVoice?: { at: string; url?: string } | null; // Voice ID sample of the person Haven is for
   user: { name: string; relation: string; pronouns: Pronouns };
   childName: string;
   displayName: string;

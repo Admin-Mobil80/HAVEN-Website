@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { api } from "../lib/api";
 import { emit } from "../lib/bus";
 import { forms, type Pronouns, type SetupView } from "../lib/names";
@@ -104,10 +104,119 @@ export function Setup() {
           </label>
         </fieldset>
       </div>
+      <VoiceId
+        them={them}
+        E={E}
+        sample={v.elderVoice ?? null}
+        onChange={async () => {
+          const fresh = await api<SetupView>("/api/setup");
+          setV({ ...v, elderVoice: fresh.elderVoice });
+        }}
+      />
       <div className="row">
         <button className="btn btn--primary" onClick={save}><Icon name="check" />Save</button>
         {saved && <span className="note" role="status">{saved}</span>}
       </div>
     </section>
+  );
+}
+
+// Voice ID: a voice note of the person Haven is for, so it can learn to answer only them, not
+// visitors or children. Recorded here or uploaded, with their agreement. Safety never depends on
+// it: anyone saying "help" still reaches the family.
+function VoiceId({ them, E, sample, onChange }: { them: string; E: ReturnType<typeof forms>; sample: { at: string; url?: string } | null; onChange: () => Promise<void> }) {
+  const [blob, setBlob] = useState<Blob>();
+  const [rec, setRec] = useState<MediaRecorder | null>(null);
+  const [secs, setSecs] = useState(0);
+  const [consent, setConsent] = useState(false);
+  const [msg, setMsg] = useState("");
+  const [busy, setBusy] = useState(false);
+  const chunks = useRef<Blob[]>([]);
+  const timer = useRef<ReturnType<typeof setInterval>>(undefined);
+  const preview = blob ? URL.createObjectURL(blob) : undefined;
+
+  const record = async () => {
+    setMsg("");
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } });
+      const type = ["audio/webm;codecs=opus", "audio/mp4", "audio/webm"].find((t) => MediaRecorder.isTypeSupported(t)) ?? "";
+      const r = new MediaRecorder(stream, type ? { mimeType: type } : undefined);
+      chunks.current = [];
+      r.ondataavailable = (e) => e.data.size && chunks.current.push(e.data);
+      r.onstop = () => {
+        stream.getTracks().forEach((t) => t.stop());
+        clearInterval(timer.current);
+        setBlob(new Blob(chunks.current, { type: r.mimeType || "audio/webm" }));
+      };
+      r.start(1000);
+      setSecs(0);
+      setBlob(undefined);
+      timer.current = setInterval(() => setSecs((x) => x + 1), 1000);
+      setRec(r);
+    } catch {
+      setMsg("Microphone not available. You can upload a voice note instead.");
+    }
+  };
+
+  const save = async () => {
+    if (!blob) return;
+    setBusy(true);
+    setMsg("");
+    try {
+      await api("/api/elder-voice?consent=yes", { raw: blob, contentType: blob.type.split(";")[0] || "audio/webm" });
+      setBlob(undefined);
+      setConsent(false);
+      await onChange();
+      setMsg(`Saved. Haven keeps ${them}'s voice note for Voice ID.`);
+    } catch (e) {
+      setMsg(`Couldn't save: ${(e as Error).message}`);
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <fieldset className="voiceid">
+      <legend><Icon name="record_voice_over" />{them}'s voice · Voice ID</legend>
+      <p className="helper">
+        <Icon name="verified_user" />
+        So Haven can learn to answer only {them}, not visitors, children or strangers. Safety never depends on it: anyone who says "help" still reaches you.
+      </p>
+      <p className="now">
+        Now:{" "}
+        <span className={`pill ${sample ? "pill--good" : "pill--brand"}`}>
+          {sample ? `voice note saved ${new Date(sample.at).toLocaleDateString()}` : "no voice note yet"}
+        </span>
+        {sample?.url && <audio controls preload="none" src={sample.url} style={{ height: 36 }} />}
+      </p>
+      <p className="muted">Record {them} reading a few sentences, about 20 to 60 seconds in a quiet room, or upload a voice note you already have (for example from WhatsApp).</p>
+      <div className="row row--wrap">
+        {rec ? (
+          <button className="btn btn--rec is-on" onClick={() => (rec.stop(), setRec(null))}><Icon name="stop_circle" fill />Stop ({secs}s)</button>
+        ) : (
+          <button className="btn btn--rec" disabled={busy} onClick={() => void record()}><Icon name="mic" fill />Record {E.obj} now</button>
+        )}
+        <label className="btn" style={{ cursor: "pointer" }}>
+          <Icon name="attach_file" />Upload a voice note
+          <input type="file" accept="audio/*,.m4a,.opus,.ogg,.wav,.mp3" style={{ display: "none" }} onChange={(e) => e.target.files?.[0] && setBlob(e.target.files[0])} />
+        </label>
+        {preview && <audio controls src={preview} style={{ height: 36 }} />}
+      </div>
+      <label className="check">
+        <input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} />
+        This is {them}'s own voice, and {E.subj} agreed that Haven may keep it to recognise {E.obj}.
+      </label>
+      <div className="row row--wrap">
+        <button className="btn btn--primary" disabled={!blob || !consent || busy} onClick={() => void save()}>
+          <Icon name="check" />{busy ? "Saving…" : sample ? "Replace voice note" : "Save voice note"}
+        </button>
+        {sample && (
+          <button className="btn btn--ghost" disabled={busy} onClick={async () => (await api("/api/elder-voice/remove", { body: {} }), await onChange(), setMsg("Removed."))}>
+            Remove
+          </button>
+        )}
+      </div>
+      {msg && <p className="note" role="status">{msg}</p>}
+    </fieldset>
   );
 }
