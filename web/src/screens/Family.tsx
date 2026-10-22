@@ -29,7 +29,7 @@ export function Family({ framed }: { framed?: boolean }) {
   const [busy, setBusy] = useState("");
   const [note, setNote] = useState("");
   const n = useNames();
-  const end = useRef<HTMLDivElement>(null);
+  const chat = useRef<HTMLDivElement>(null);
   const refresh = useCallback(async () => setS(await api<FamilyState>("/api/state/family")), []);
   useEffect(() => {
     const off = poll(refresh, 5000);
@@ -58,8 +58,10 @@ export function Family({ framed }: { framed?: boolean }) {
 
   const items = s ? timeline(s) : [];
   const count = items.length;
+  // Scroll the chat itself, never the page.
   useEffect(() => {
-    end.current?.scrollIntoView({ block: "end" });
+    const el = chat.current;
+    if (el) el.scrollTop = el.scrollHeight;
   }, [count, note]);
 
   if (!s) return <section className={`wa${framed ? " wa--framed" : ""}`}><p className="muted" style={{ padding: 16 }}>Loading…</p></section>;
@@ -72,17 +74,23 @@ export function Family({ framed }: { framed?: boolean }) {
 
   return (
     <section className={`wa${framed ? " wa--framed" : ""}`} aria-label={`${n.user}'s WhatsApp`}>
+      {framed && (
+        <div className="wa__status" aria-hidden>
+          <span>{new Date().toLocaleTimeString([], { hour: "numeric", minute: "2-digit" }).replace(/\s?[AP]M$/i, "")}</span>
+          <span className="wa__statusicons"><Icon name="signal_cellular_alt" /><Icon name="wifi" /><Icon name="battery_full" /></span>
+        </div>
+      )}
       <header className="wa__bar">
         <Icon name="arrow_back" />
         <span className="wa__avatar" aria-hidden><Icon name="cottage" fill /></span>
         <div className="wa__who">
           <strong>Haven</strong>
-          <span>{mom}'s companion · business account</span>
+          <span>{mom}'s companion · Business account</span>
         </div>
-        <Icon name="more_vert" />
+        <span className="wa__baricons" aria-hidden><Icon name="videocam" /><Icon name="call" /><Icon name="more_vert" /></span>
       </header>
 
-      <div className="wa__chat" role="log" aria-live="polite">
+      <div className="wa__chat" role="log" aria-live="polite" ref={chat}>
         <div className="wa__pinned">
           <Icon name="push_pin" fill />
           <div>
@@ -157,7 +165,6 @@ export function Family({ framed }: { framed?: boolean }) {
             {busy === "Send digest now" ? "Writing…" : "Send today's update now"}
           </button>
         </div>
-        <div ref={end} />
       </div>
 
       <Composer mom={mom} openQuestion={openQuestion} onSent={(what) => act(what, async () => undefined, what === "Voice note sent" ? `${mom} will hear your voice note on the tablet.` : `${mom} will see your message on the tablet.`)} />
@@ -294,7 +301,12 @@ function Composer({ mom, openQuestion, onSent }: { mom: string; openQuestion?: D
             </button>
           </div>
         ) : (
-          <input value={text} onChange={(e) => setText(e.target.value)} placeholder={openQuestion ? `Reply to ${mom}…` : `Message ${mom}…`} aria-label={`Message ${mom}`} maxLength={500} />
+          <div className="wa__field">
+            <Icon name="mood" />
+            <input value={text} onChange={(e) => setText(e.target.value)} placeholder={openQuestion ? `Reply to ${mom}` : "Message"} aria-label={`Message ${mom}`} maxLength={500} />
+            <Icon name="attach_file" />
+            {!text.trim() && <Icon name="photo_camera" />}
+          </div>
         )}
         {text.trim() && !rec ? (
           <button className="wa__send" type="submit" aria-label="Send"><Icon name="send" fill /></button>

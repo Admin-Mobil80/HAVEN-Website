@@ -17,13 +17,15 @@ const LABEL: Record<LogItem["source"], string> = {
 export function McpLog() {
   const [items, setItems] = useState<LogItem[]>([]);
   const [open, setOpen] = useState<number | null>(null);
-  const end = useRef<HTMLDivElement>(null);
+  const body = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const off = on("log", (item) => setItems((xs) => [...xs.slice(-199), item]));
     return () => off();
   }, []);
+  // Scroll the log box itself, never the page (scrollIntoView would drag the whole page down).
   useEffect(() => {
-    end.current?.scrollIntoView({ block: "nearest" });
+    const el = body.current;
+    if (el) el.scrollTop = el.scrollHeight;
   }, [items.length]);
 
   return (
@@ -34,7 +36,7 @@ export function McpLog() {
           <span className="muted">spec 2025-11-25 · Streamable HTTP</span>
         </div>
       </header>
-      <div className="log__body" role="log" aria-live="polite">
+      <div className="log__body" role="log" aria-live="polite" ref={body}>
         {items.length === 0 && <p className="muted">Start with "Alexa, talk to …" to see the MCP calls.</p>}
         {items.map((it, i) => (
           <div key={i} className={`log__row log__row--${it.source}${it.isError ? " log__row--error" : ""}`}>
@@ -47,7 +49,6 @@ export function McpLog() {
             {open === i && it.detail && <pre className="log__detail">{it.detail}</pre>}
           </div>
         ))}
-        <div ref={end} />
       </div>
     </section>
   );
