@@ -59,6 +59,18 @@ Safety alerts never depend on Bedrock: deterministic rules open the incident, an
 
 ---
 
+## MCP Inspector (v2.12.0, web UI and CLI)
+
+| Question | Answer |
+|---|---|
+| **Used for** | Checking the live `/mcp` during development (the CLI's `tools/list`), and showing the real server in the demo video: the web UI connects, lists the 8 tools and calls `recall_memory`. |
+| **Worked well** | v2 started pre-pointed at our server with `--web --transport http --server-url …/mcp`, so connecting was one click. Structured output is shown next to the text result, and the message log with timings makes the JSON-RPC exchange easy to explain. |
+| **Needs work** | The v1 line (0.17.x) showed an empty tool list for our 2025-11-25 server, and its proxy crashed whenever a browser disconnected on Node 26 (friction log #18). In v2's "auto" protocol mode the `server/discover` probe shows as a red error against a legacy-era server, which looks like a fault in the server. |
+| **Onboarding** | One `npx` command for v2. With v1 we lost about an hour before switching. |
+| **Build again?** | **Yes**, v2. It is the quickest way to show that an MCP server is real. |
+
+---
+
 ## Alexa+ add-on docs and MCP toolkit (simulated path)
 
 | Question | Answer |
@@ -124,7 +136,7 @@ Safety alerts never depend on Bedrock: deterministic rules open the incident, an
 | Question | Answer |
 |---|---|
 | **Used for** | The development partner for the whole build: server, MCP tools, safety rules, tests, CDK, web app and documentation. |
-| **Worked well** | Working in small, tested steps with a written decisions log kept a solo ten-day build coherent. |
+| **Worked well** | Working in small, tested steps with a written decisions log kept a one-week build by a small team coherent. |
 | **Needs work** | Long sessions need explicit hand-over notes and a decisions log to stay consistent. |
 | **Onboarding** | Install, then start in the repo. |
 | **Build again?** | **Yes.** |

@@ -160,3 +160,16 @@ Each entry has the six fields the hackathon asks for: task, steps, expected vs a
   - **What Setup does now:** it collects a consented voice note of the person Haven is for (record it, or upload one, for example from WhatsApp) and stores it privately, ready for speaker verification. It is **not yet used** to decide who Haven answers.
   - **Planned:** an on-device check with an open speaker-embedding model, and a soft gate. Safety rules always run, and "help" from anyone still alerts the family. An unrecognised voice gets a polite reply, but no family messages, reminders or memories, and no sends.
 - **Suggestion:** Pass Alexa's existing speaker recognition to add-ons as an opaque per-household person id, with a confidence level, behind the same customer opt-in as classic skills. Then add-ons never need to handle voiceprints at all.
+
+## 18. MCP Inspector v1 couldn't show our 2025-11-25 server's tools
+- **Task:** Record MCP Inspector's web UI connected to the live `/mcp`, listing the 8 tools and calling one, for the demo video.
+- **Steps:**
+  - Ran `npx @modelcontextprotocol/inspector@0.17.2` (the v1 line) on Node 26, opened the UI with `transport=streamable-http&serverUrl=…/mcp`, connected, then clicked **List Tools**.
+  - Switched to the current v2 (`npx @modelcontextprotocol/inspector@latest --web --transport http --server-url …/mcp`).
+- **Expected vs actual:**
+  - **Expected:** v1 lists the 8 tools, as our `curl` `tools/list` and the Inspector CLI do.
+  - **Actual (v1):** `tools/list` showed in the history, but the tool list stayed empty. Our tools carry 2025-11-25 fields (`title`, `annotations`, `outputSchema`, `execution`); we didn't confirm which one v1 rejects. The v1 proxy also crashed with `ERR_INVALID_STATE: Controller is already closed` whenever a browser disconnected, so it had to be restarted for every session.
+  - **Actual (v2):** connected, listed all 8 tools and ran `recall_memory` with structured output. In "auto" protocol mode it first sends `server/discover`, which our 2025-11-25 server answers with an error that shows red in the message log; the default (legacy) mode doesn't send it.
+- **Severity:** minor (v2 works).
+- **Workaround:** Used Inspector v2 started with `--transport http --server-url`, in the default protocol mode.
+- **Suggestion:** Show a clear message when v1 can't parse a server's tools instead of an empty list, point v1 users to v2 for 2025-11-25 servers, and label the `server/discover` probe as expected for legacy-era servers rather than as an error.
