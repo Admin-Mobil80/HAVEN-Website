@@ -14,7 +14,7 @@ Paste each section into the matching field of the Devpost form. Items marked **T
 
 **Mini challenge:** AWS Builder. The "which AWS services and how" answer is the first section of [PRODUCT_FEEDBACK.md](../PRODUCT_FEEDBACK.md).
 
-**Video:** **TODO** the public YouTube link to the final cut (2:39.5).
+**Video:** **TODO** the public YouTube link to the final cut (2:43).
 
 **Try it:** https://uzm23d4tzykddxqnkq4lld5zva0ixbbl.lambda-url.ap-south-1.on.aws/
 
@@ -56,6 +56,8 @@ No sign-up, no keys. Use desktop Chrome or Edge with sound on.
 ---
 
 ## Story (the "About the project" field, Markdown)
+
+**Haven is an Alexa+ add-on built as a self-hosted MCP server (spec 2025-11-25, Streamable HTTP, 8 tools) on AWS Lambda.** An older parent says "Alexa, talk to Arjun", and Alexa+ reaches Haven's MCP tools: a clearly labelled AI version of their child keeps them company, while the real family gets what to ask when they call. Our simulated Alexa+ client is a real MCP client: it sends `initialize`, `tools/list` and `tools/call` over Streamable HTTP, and you can watch every message live in the demo.
 
 ### Inspiration
 
