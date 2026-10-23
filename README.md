@@ -49,6 +49,11 @@ The real Alexa+ add-on toolkit is open only to selected partners, and hackathon 
 
 ## The MCP server
 
+- **Where the code is:**
+  - [src/mcp/server.ts](src/mcp/server.ts): `createMcpServer`, which registers the 8 tools ([src/mcp/tools/](src/mcp/tools/)) and the prompt.
+  - [src/http/mcpRoute.ts](src/http/mcpRoute.ts): the Streamable HTTP endpoint (`POST /mcp`, `/mcp/h/<token>`).
+  - [web/src/lib/mcp.ts](web/src/lib/mcp.ts): the browser MCP client behind the simulated Alexa+ add-on ([web/src/screens/AlexaSim.tsx](web/src/screens/AlexaSim.tsx)). It sends `initialize`, `tools/list` and `tools/call`.
+  - [src/agent/mcpLocal.ts](src/agent/mcpLocal.ts): the conversation engine's in-process MCP client (SDK `Client` over `InMemoryTransport`).
 - **Endpoint:** `POST https://uzm23d4tzykddxqnkq4lld5zva0ixbbl.lambda-url.ap-south-1.on.aws/mcp`
 - **Protocol:** MCP **2025-11-25** over Streamable HTTP. It is stateless and answers in JSON (no SSE stream). GET returns 405, and a browser `Origin` not on the allowlist gets 403. Built with `@modelcontextprotocol/sdk` 1.32.1 (pinned).
 - **Household scope:** with no token, `/mcp` serves a shared public demo household. The web app uses `/mcp/h/<token>`, which is scoped to that tab's own demo household. Tools never take a household or person id, so a client cannot reach another household.
